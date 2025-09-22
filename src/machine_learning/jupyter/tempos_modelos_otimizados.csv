@@ -1,0 +1,20 @@
+Modelo,Tempo Treinamento (s)
+ExtraTrees 150 (Otimizado),15.482
+QDA (Otimizado),0.027
+KNN 5 (Otimizado),0.076
+LogReg 14 (Otimizado),0.122
+"MLP (100,) (Otimizado)",108.471
+GradBoost 200 (Otimizado),34.636
+Bagging DT d10 (Otimizado),27.221
+RandForest 200 (Otimizado),12.133
+KNN 7 (Otimizado),0.088
+GradBoost 150 (Otimizado),37.603
+SVM sigmoid (Otimizado),0.348
+DecTree dNone (Otimizado),0.18
+RandForest 50 (Otimizado),12.997
+RandForest 100 (Otimizado),12.095
+Naive Bayes 34 (Otimizado),0.013
+ExtraTrees 50 (Otimizado),11.511
+DecTree d3 (Otimizado),0.136
+AdaBoost 200 (Otimizado),1.656
+LogReg 86 (Otimizado),0.112

@@ -1,0 +1,7 @@
+id,tipo_sensor_id,nome,cod_serial,descricao,data_instalacao,latitude,longitude
+1,1,Sensor Lux,,Criado automaticamente pelo sistema,,,
+2,2,Sensor Temperatura (°C),,Criado automaticamente pelo sistema,,,
+3,3,Sensor Vibração,,Criado automaticamente pelo sistema,,,
+4,1,Sensor L - 0000100100C40A24,0000100100C40A24,Sensor cadastrado via API,,,
+5,2,Sensor T - 0000100100C40A24,0000100100C40A24,Sensor cadastrado via API,,,
+6,3,Sensor V - 0000100100C40A24,0000100100C40A24,Sensor cadastrado via API,,,

@@ -1,0 +1,20 @@
+Modelo,Tempo Treinamento (s)
+ExtraTrees 100,0.313
+LogReg 47,0.005
+QDA,0.001
+Naive Bayes 84,0.001
+LogReg 46,0.005
+RandForest 50,0.131
+DecTree dNone,0.004
+LDA,0.001
+LogReg 36,0.005
+LogReg 25,0.005
+LogReg 8,0.005
+GradBoost 50,0.919
+SVM sigmoid,1.963
+DecTree d5,0.005
+"MLP (50, 50)",0.089
+AdaBoost 50,0.25
+"MLP (50,)",1.264
+KNN 7,0.003
+LogReg 40,0.004

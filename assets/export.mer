@@ -1,0 +1,54 @@
+
+Modelo de Entidade-Relacionamento:
+
+Tabela: EQUIPAMENTO
+  - id (INTEGER NOT NULL) [PK]
+  - nome (VARCHAR(255) NOT NULL)
+  - modelo (VARCHAR(255))
+  - localizacao (VARCHAR(255))
+  - descricao (TEXT(2000))
+  - observacoes (TEXT(2000))
+  - data_instalacao (DATETIME)
+
+Tabela: TIPO_SENSOR
+  - id (INTEGER NOT NULL) [PK]
+  - nome (VARCHAR(255) NOT NULL)
+  - tipo (VARCHAR(15) NOT NULL)
+
+Tabela: SENSOR
+  - id (INTEGER NOT NULL) [PK]
+  - tipo_sensor_id (INTEGER NOT NULL) [FK -> TIPO_SENSOR]
+  - nome (VARCHAR(255))
+  - cod_serial (VARCHAR(255))
+  - descricao (VARCHAR(255))
+  - data_instalacao (DATETIME)
+  - equipamento_id (INTEGER) [FK -> EQUIPAMENTO]
+
+Tabela: LEITURA_SENSOR
+  - id (INTEGER NOT NULL) [PK]
+  - sensor_id (INTEGER NOT NULL) [FK -> SENSOR]
+  - data_leitura (DATETIME NOT NULL)
+  - valor (FLOAT NOT NULL)
+
+Tabela: EMPRESA
+  - id (INTEGER NOT NULL) [PK]
+  - nome (VARCHAR(255) NOT NULL)
+  - cnpj (VARCHAR(14))
+  - logradouro (VARCHAR(255))
+  - numero (VARCHAR(255))
+  - bairro (VARCHAR(255))
+  - cidade (VARCHAR(255))
+  - estado (VARCHAR(2))
+  - cep (VARCHAR(8))
+
+Tabela: MANUTENCAO_EQUIPAMENTO
+  - id (INTEGER NOT NULL) [PK]
+  - equipamento_id (INTEGER NOT NULL) [FK -> EQUIPAMENTO]
+  - data_previsao_manutencao (DATETIME)
+  - motivo (TEXT(2000))
+  - data_inicio_manutencao (DATETIME)
+  - data_fim_manutencao (DATETIME)
+  - descricao (TEXT(2000))
+  - observacoes (TEXT(2000))
+  - custo (FLOAT)
+
