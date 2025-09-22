@@ -6,6 +6,7 @@ from src.dashboard.global_messages import get_global_messages
 from src.dashboard.manual import previsao_manual_page
 from src.dashboard.principal import get_principal_page
 from src.dashboard.generic.table_view import TableView
+from src.dashboard.train.train_model_view import train_model_page
 from src.database.dynamic_import import import_models
 from src.dashboard.menu import menu
 from src.dashboard.manual import previsao_manual_page
@@ -41,7 +42,8 @@ def navigation():
         *get_generic_pages(),
         exportar_db_page,
         importar_db_page,
-        previsao_manual_page
+        previsao_manual_page,
+        train_model_page
     ])
 
     menu()
