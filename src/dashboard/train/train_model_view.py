@@ -1,19 +1,9 @@
 import streamlit as st
-
 from pycaret.classification import *
-
 from src.machine_learning.dateset_manipulation import get_dataframe_leituras_sensores
-
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-@st.cache_resource
-def treinar_e_comparar_modelos(s, metrica, turbo):
-    best_models = s.compare_models(n_select=5, sort=metrica, fold=5, turbo=turbo)
-    compare_df = pull()
-    st.write("Resumo da comparação dos modelos:")
-    st.dataframe(compare_df)
-    return best_models
 
 def train_model_view():
     st.title('Treinando a IA com Pycaret')
@@ -28,11 +18,11 @@ def train_model_view():
 
     target_column = 'Manutencao'
 
-    df[target_column] = df[target_column].astype(bool)
-    st.write(df.head())
-    st.write(df.dtypes)
-
     train_dataset = df.drop(columns=['data_leitura'])
+    train_dataset[target_column] = train_dataset[target_column].apply(lambda x: bool(x))
+    st.write(train_dataset.head())
+    st.write(train_dataset.dtypes)
+
 
     pairplot_fig = sns.pairplot(
         train_dataset.drop(columns=[target_column]),
@@ -68,41 +58,33 @@ def train_model_view():
 
     turbo = st.checkbox("Modo turbo (mais rápido, menos preciso)", value=True)
 
-    best_models = None
+    _best_models = None
 
     if st.button('Treinar e comparar modelos'):
+
         with st.spinner("Treinando modelos (este processo pode demorar um pouco)..."):
-            best_models = s.compare_models(n_select=5, sort=metrica, fold=5, turbo=turbo)
+            _best_models = s.compare_models(n_select=1, sort=metrica, fold=5, turbo=turbo)
             compare_df = pull()
             st.write("Resumo da comparação dos modelos:")
             st.dataframe(compare_df)
 
-    if best_models:
-        st.write("Top 5 modelos:")
+    if _best_models:
 
-        modelo_selected = st.selectbox(
-            'Selecione o modelo para visualizar as métricas',
-            best_models,
-            format_func=lambda model: model.__str__(),
-        )
+        best_model = finalize_model(_best_models)
+        st.success(f"✅ Melhor modelo selecionado:\n\n**{_best_models.__str__()}**")
 
-        # s.evaluate_model(modelo_selected)
+        model_results = predict_model(best_model)
+        st.write("Resultados do modelo no conjunto de dados de teste:")
+        st.dataframe(model_results)
 
-        if modelo_selected:
+        fig = plt.figure()
+        s.plot_model(best_model, plot='threshold', display_format='streamlit')
 
-            col1, col2, col3 = st.columns(3)
+        fig = plt.figure()
+        s.plot_model(best_model, plot='confusion_matrix', display_format='streamlit')
 
-            with col1:
-                fig = plt.figure()
-                s.plot_model(modelo_selected, plot='auc', display_format='streamlit')
-                # st.pyplot(fig)
-
-            with col2:
-                fig = plt.figure()
-                s.plot_model(modelo_selected, plot='confusion_matrix', display_format='streamlit')
-            with col3:
-                fig = plt.figure()
-                s.plot_model(modelo_selected, plot = 'feature', display_format='streamlit')
+        save_model(best_model, 'best_classification_model')
+        st.success("Modelo salvo como 'best_classification_model.pkl'")
 
 
 train_model_page = st.Page(
