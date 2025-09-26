@@ -19,7 +19,17 @@ REM PQ fazer isso? A imagem do docker buildada tem 1.6GB por conta do pycaret. E
 scp -i %KEY_FILE% -o StrictHostKeyChecking=no Dockerfile ubuntu@%EC2_IP%:~/app/Dockerfile
 
 REM 4. Conectar via SSH e instalar Docker, buildar e rodar app
-ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo apt-get update && sudo apt-get install -y docker.io && sudo usermod -aG docker ubuntu && cd ~/app && sudo docker build -t streamlit-app . && sudo docker run -d -p 8501:8501 streamlit-app streamlit run main_dash.py --server.address=0.0.0.0 --server.port=8501"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% ^
+  "sudo apt-get update && \
+   sudo apt-get install -y docker.io && \
+   sudo usermod -aG docker ubuntu && \
+   cd ~/app && \
+   sudo docker build -t streamlit-app . && \
+   sudo docker run -d -p 8501:8501 streamlit-app streamlit run main_dash.py --server.address=0.0.0.0 --server.port=8501"
+
+REM 5. Remover arquivos temporários se existirem
+if exist instance_public_ip.txt del instance_public_ip.txt
+if exist app_server_key.pem del app_server_key.pem
 
 echo Deploy finalizado. Acesse: http://%EC2_IP%:8501
 pause
