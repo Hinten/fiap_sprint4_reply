@@ -3,14 +3,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y git
-
-RUN git clone https://github.com/Hinten/fiap_sprint4_reply.git /app/repo
-
-WORKDIR /app/repo
+#faz isso primeiro para aproveitar o cache do docker, senão demora muito o build toda vez
+COPY requirements.txt /app/requirements.txt
 
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
+
+COPY src/ /app/src/
+COPY .env /app/.env
+
 
 EXPOSE 8180
 

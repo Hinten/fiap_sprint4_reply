@@ -3,7 +3,6 @@ from typing import List
 from sqlalchemy import Sequence, String, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.database.tipos_base.model import Model
-from src.database.models.sensor import Sensor
 from src.database.models.manutencao_equipamento import ManutencaoEquipamento
 
 class Equipamento(Model):
@@ -41,7 +40,7 @@ class Equipamento(Model):
         comment="Data de instalação do equipamento"
     )
 
-    sensores: Mapped[List[Sensor]] = relationship(
+    sensores: Mapped[List["Sensor"]] = relationship(
         back_populates='equipamento',
         cascade='all, delete-orphan',
         info={'label': 'Sensores'}

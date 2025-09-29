@@ -38,6 +38,5 @@ services:
       - "POSTGRE_DB=${POSTGRE_DB}"
       - "POSTGRE_HOST=${POSTGRE_HOST}"
       - "POSTGRE_PORT=${POSTGRE_PORT}"
-
     ports:
       - "${API_PORT}:8180"
