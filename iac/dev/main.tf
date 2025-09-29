@@ -120,6 +120,11 @@ resource "aws_instance" "app_server" {
   vpc_security_group_ids = [aws_security_group.app_server_sg.id]
   subnet_id              = aws_subnet.app_server_subnet.id
 
+  root_block_device {
+    volume_size = 30 # Altere para o tamanho desejado em GB
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = var.instance_name
   }

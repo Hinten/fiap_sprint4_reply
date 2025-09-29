@@ -1,8 +1,10 @@
 from typing import List
 
-from sqlalchemy import Sequence, String, ForeignKey, Float, DateTime, Enum, Text
+from sqlalchemy import Sequence, String, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.database.tipos_base.model import Model
+from src.database.models.sensor import Sensor
+from src.database.models.manutencao_equipamento import ManutencaoEquipamento
 
 class Equipamento(Model):
     __tablename__ = 'EQUIPAMENTO'
@@ -27,11 +29,11 @@ class Equipamento(Model):
     )
 
     descricao: Mapped[str] = mapped_column(
-        Text(2000), nullable=True, info={'label': 'Descrição'},
+        Text, nullable=True, info={'label': 'Descrição'},
     )
 
     observacoes: Mapped[str] = mapped_column(
-        Text(2000), nullable=True, info={'label': 'Observações'},
+        Text, nullable=True, info={'label': 'Observações'},
     )
 
     data_instalacao: Mapped[DateTime] = mapped_column(
@@ -39,13 +41,13 @@ class Equipamento(Model):
         comment="Data de instalação do equipamento"
     )
 
-    sensores: Mapped[List['Sensor']] = relationship(
+    sensores: Mapped[List[Sensor]] = relationship(
         back_populates='equipamento',
         cascade='all, delete-orphan',
         info={'label': 'Sensores'}
     )
 
-    manutencoes: Mapped[List['ManutencaoEquipamento']] = relationship(
+    manutencoes: Mapped[List[ManutencaoEquipamento]] = relationship(
         back_populates='equipamento',
         cascade='all, delete-orphan',
         info={'label': 'Manutenções'}
