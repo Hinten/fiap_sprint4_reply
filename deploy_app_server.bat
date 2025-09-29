@@ -46,6 +46,7 @@ REM 5. Remover arquivos temporários se existirem
 if exist instance_public_ip.txt del instance_public_ip.txt
 if exist app_server_key.pem del app_server_key.pem
 
-echo Deploy finalizado. Acesse dashboard: http://%dashboard_url%
-echo Deploy finalizado. Acesse api: http://%api_url%
+echo Deploy finalizado.
+echo Acesse dashboard: http://%dashboard_url%
+echo Acesse api: http://%api_url%
 pause
