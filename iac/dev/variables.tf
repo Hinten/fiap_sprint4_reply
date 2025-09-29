@@ -25,13 +25,12 @@ variable "api_port" {
 variable "rds_db_name" {
   description = "Nome do banco Oracle RDS"
   type        = string
-  default = "fiap_reply_db"
+  default     = "fiap_reply_db"
 }
 
 variable "rds_username" {
   description = "Usuário master do Oracle RDS"
   type        = string
-  default = "RONALDO"
 }
 
 variable "rds_password" {
@@ -50,10 +49,4 @@ variable "rds_allocated_storage" {
   description = "Armazenamento (GB) do Oracle RDS"
   type        = number
   default     = 20
-}
-
-variable "oracle_rds_dsn" {
-  description = "DSN para conexão Oracle RDS"
-  type        = string
-  default     = "localhost:1521/ORCLPDB1"
 }

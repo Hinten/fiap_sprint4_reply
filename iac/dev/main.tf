@@ -151,10 +151,10 @@ resource "aws_security_group" "oracle_rds_sg" {
   vpc_id      = aws_vpc.app_server_vpc.id
 
   ingress {
-    description = "Permite acesso Oracle do EC2"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Permite acesso Oracle do EC2"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.app_server_sg.id]
   }
 
@@ -167,18 +167,18 @@ resource "aws_security_group" "oracle_rds_sg" {
 }
 
 resource "aws_db_instance" "oracle_rds" {
-  identifier              = "oracle-rds-instance"
-  engine                  = "oracle-se2"
-  engine_version          = "19.0.0.0.ru-2024-04.rur-2024-04.r1"
-  instance_class          = var.rds_instance_class
-  allocated_storage       = var.rds_allocated_storage
-  db_name                 = var.rds_db_name
-  username                = var.rds_username
-  password                = var.rds_password
-  db_subnet_group_name    = aws_db_subnet_group.oracle_rds_subnet_group.name
-  vpc_security_group_ids  = [aws_security_group.oracle_rds_sg.id]
-  skip_final_snapshot     = true
-  publicly_accessible     = false
+  identifier             = "oracle-rds-instance"
+  engine                 = "oracle-se2"
+  engine_version         = "19.0.0.0.ru-2024-04.rur-2024-04.r1"
+  instance_class         = var.rds_instance_class
+  allocated_storage      = var.rds_allocated_storage
+  db_name                = var.rds_db_name
+  username               = var.rds_username
+  password               = var.rds_password
+  db_subnet_group_name   = aws_db_subnet_group.oracle_rds_subnet_group.name
+  vpc_security_group_ids = [aws_security_group.oracle_rds_sg.id]
+  skip_final_snapshot    = true
+  publicly_accessible    = false
   tags = {
     Name = "oracle-rds-instance"
   }
