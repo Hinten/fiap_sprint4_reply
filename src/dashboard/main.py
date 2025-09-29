@@ -2,7 +2,7 @@ import logging
 import os
 
 from src.dashboard.api_sensor import iniciar_api_sensor
-from src.dashboard.login import login_view, login_sqlite, login_oracle_from_env
+from src.dashboard.login import login_view, login_sqlite, login_oracle_from_env, logint_postgres_from_env
 import streamlit as st
 from src.dashboard.navigator import navigation
 from src.dashboard.setup import setup
