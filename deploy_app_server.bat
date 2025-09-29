@@ -16,16 +16,23 @@ set KEY_FILE=app_server_key.pem
 REM 3. Copiar o dockerfile e o app para o servidor
 REM PQ fazer isso? A imagem do docker buildada tem 1.6GB por conta do pycaret. Esta forma não é a mais correta, porém é muito rápido, bom para testar
 
-scp -i %KEY_FILE% -o StrictHostKeyChecking=no Dockerfile ubuntu@%EC2_IP%:~/app/Dockerfile
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "mkdir -p ~/app/src/dashboard"
+scp -i %KEY_FILE% -o StrictHostKeyChecking=no src/dashboard/Dockerfile ubuntu@%EC2_IP%:~/app/src/dashboard/Dockerfile
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "mkdir -p ~/app/src/api"
+scp -i %KEY_FILE% -o StrictHostKeyChecking=no src/api/Dockerfile ubuntu@%EC2_IP%:~/app/src/api/Dockerfile
+scp -i %KEY_FILE% -o StrictHostKeyChecking=no docker-compose.yaml ubuntu@%EC2_IP%:~/app/docker-compose.yaml
 
 REM 4. Conectar via SSH e instalar Docker, buildar e rodar app
-ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% ^
-  "sudo apt-get update && \
-   sudo apt-get install -y docker.io && \
-   sudo usermod -aG docker ubuntu && \
-   cd ~/app && \
-   sudo docker build -t streamlit-app . && \
-   sudo docker run -d -p 8501:8501 streamlit-app streamlit run main_dash.py --server.address=0.0.0.0 --server.port=8501"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo apt-get update"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo apt-get install -y docker.io"
+REM tive que adicionar as 2 linhas abaixo pq o docker-compose não estava no package manager do ubuntu da máquina
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo curl -L \"https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo chmod +x /usr/local/bin/docker-compose"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo usermod -aG docker ubuntu"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "mkdir -p ~/app"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "cd ~/app"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo docker-compose version"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo docker-compose -f ~/app/docker-compose.yaml up -d"
 
 REM 5. Remover arquivos temporários se existirem
 if exist instance_public_ip.txt del instance_public_ip.txt

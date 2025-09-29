@@ -1,7 +1,7 @@
 import logging
 import os
 import streamlit as st
-from src.wokwi_api.api_basica import inciar_api_thread_paralelo
+from src.api.api_basica import inciar_api_thread_paralelo
 
 def iniciar_api_sensor():
 

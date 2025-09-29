@@ -57,3 +57,14 @@ def init_sensor(request:InitSensorRequest):
     }
 
 
+@init_router.get('/test')
+def init_sensor(request:InitSensorRequest):
+    """
+    Rota de teste para verificar se a API está funcionando
+    """
+    return {
+        "status": "success",
+        "message": "Api funcionando"
+    }
+
+

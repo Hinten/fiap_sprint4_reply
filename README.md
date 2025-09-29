@@ -161,7 +161,7 @@ Neste projeto, foi implementada uma API básica utilizando o FastAPI para recebe
 
 Para facilitar os testes, a API está configurada para rodar localmente na porta 8180 e será iniciada automaticamente junto ao dashboard ao executar o comando `streamlit run main_dash.py` quando a variável de ambiente `ENABLE_API` for setada como `true`.
 
-No entanto, caso queira, a API pode ser executada separadamente executando o arquivo [api_basica.py](src/wokwi_api/api_basica.py).
+No entanto, caso queira, a API pode ser executada separadamente executando o arquivo [api_basica.py](src/api/api_basica.py).
 
 Explicações mais detalhadas sobre como iniciar o dashboard e variáveis de ambiente serão apresentadas na seção "Instalando e Executando o Projeto", a seguir neste mesmo README.md.
 

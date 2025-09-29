@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
 from src.settings import DEBUG
-from src.wokwi_api.init_sensor import init_router
-from src.wokwi_api.receber_leitura import receber_router
+from src.api.init_sensor import init_router
+from src.api.receber_leitura import receber_router
 import uvicorn
 import threading
 
