@@ -1,6 +1,7 @@
 import logging
 from src.database.tipos_base.database import Database, DEFAULT_DSN
 import streamlit as st
+import os
 
 
 def cached_login(username, password, dsn):
@@ -60,3 +61,13 @@ def login_sqlite():
         st.session_state.engine = Database.engine
         st.session_state.session = Database.session
         st.rerun()
+
+def login_oracle_from_env():
+    user = os.environ.get('ORACLE_USER')
+    senha = os.environ.get('ORACLE_PASSWORD')
+    dsn = os.environ.get('ORACLE_DSN')
+
+    if user is None or senha is None or dsn is None:
+        raise ValueError("As variáveis de ambiente ORACLE_USER, ORACLE_PASSWORD e ORACLE_DSN devem estar definidas.")
+
+    cached_login(user, senha, dsn)

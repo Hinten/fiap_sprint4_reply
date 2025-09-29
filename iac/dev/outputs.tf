@@ -23,3 +23,19 @@ output "api_url" {
   description = "URL to access the FastAPI service"
   value       = "${aws_instance.app_server.public_ip}:${var.api_port}"
 }
+
+output "oracle_rds_username" {
+  description = "Usuário master do Oracle RDS"
+  value       = var.rds_username
+}
+
+output "oracle_rds_password" {
+  description = "Senha master do Oracle RDS"
+  value       = var.rds_password
+  sensitive   = true
+}
+
+output "oracle_rds_dsn" {
+  description = "DSN para conexão Oracle RDS"
+  value       = "${aws_db_instance.oracle_rds.endpoint}:1521/${var.rds_db_name}"
+}

@@ -6,6 +6,10 @@ services:
       context: ./
       dockerfile: src/dashboard/Dockerfile
     restart: always
+    environment:
+      - "ORACLE_DSN=${ORACLE_DSN}"
+      - "ORACLE_USER=${ORACLE_USER}"
+      - "ORACLE_PASSWORD=${ORACLE_PASSWORD}"
     ports:
       - "${DASHBOARD_PORT}:8501"
 
@@ -14,7 +18,11 @@ services:
       context: ./
       dockerfile: src/api/Dockerfile
     restart: always
-#    environment:
-#      - DATABASE_URL=postgresql://postgres:password@db:5432/mydatabase
+
+    environment:
+      - "ORACLE_DSN=${ORACLE_DSN}"
+      - "ORACLE_USER=${ORACLE_USER}"
+      - "ORACLE_PASSWORD=${ORACLE_PASSWORD}"
+
     ports:
       - "${API_PORT}:8180"
