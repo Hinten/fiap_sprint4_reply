@@ -38,7 +38,7 @@ class ManutencaoEquipamento(Model):
     )
 
     motivo: Mapped[str] = mapped_column(
-        Text(2000), nullable=True, info={'label': 'Motivo da Manutenção'},
+        Text, nullable=True, info={'label': 'Motivo da Manutenção'},
         comment="Motivo pelo qual a manutenção será realizada no equipamento"
     )
 
@@ -53,12 +53,12 @@ class ManutencaoEquipamento(Model):
     )
 
     descricao: Mapped[str] = mapped_column(
-        Text(2000), nullable=True, info={'label': 'Descrição'},
+        Text, nullable=True, info={'label': 'Descrição'},
         comment="Descrição detalhada da manutenção realizada"
     )
 
     observacoes: Mapped[str] = mapped_column(
-        Text(2000), nullable=True, info={'label': 'Observações'},
+        Text, nullable=True, info={'label': 'Observações'},
         comment="Observações adicionais sobre a manutenção"
     )
 
