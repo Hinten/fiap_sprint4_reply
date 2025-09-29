@@ -11,8 +11,7 @@ for /f "delims=" %%i in ('terraform output -raw dashboard_url') do set dashboard
 for /f "delims=" %%i in ('terraform output -raw api_url') do set api_url=%%i
 popd
 
-REM 2. Ler IP e definir arquivo de chave
-set /p EC2_IP=<instance_public_ip.txt
+REM 2. Definir arquivo de chave
 set KEY_FILE=app_server_key.pem
 
 REM 3. Copiar o dockerfile e o app para o servidor
@@ -29,7 +28,8 @@ REM 4. Conectar via SSH e instalar Docker, buildar e rodar app
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo apt-get update"
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo apt-get install -y docker.io"
 REM tive que adicionar as 2 linhas abaixo pq o docker-compose não estava no package manager do ubuntu da máquina
-ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "if ! command -v docker-compose >/dev/null 2>&1; then sudo curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose; sudo chmod +x /usr/local/bin/docker-compose; fi"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo curl -L \"https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo chmod +x /usr/local/bin/docker-compose"
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo usermod -aG docker ubuntu"
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "mkdir -p ~/app"
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "cd ~/app"
