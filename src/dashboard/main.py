@@ -20,15 +20,18 @@ def main():
     st.set_page_config(layout="wide") # deixa a página mais larga
 
     sql_lite:bool = str(os.environ.get("SQL_LITE", 'false')).lower() == "true"
-    oracle_from_env = str(os.environ.get("ORACLE_DB_FROM_ENV", 'false')).lower() == "true"
+    oracle = str(os.environ.get("ORACLE_DB_FROM_ENV", 'false')).lower() == "true"
+    postgres:bool = str(os.environ.get("POSTGRE_DB_FROM_ENV", 'false')).lower() == "true"
 
     if not st.session_state.get('logged_in', False):
         logging.debug('acessando login')
 
         if sql_lite:
             login_sqlite()
-        elif oracle_from_env:
+        elif oracle:
             login_oracle_from_env()
+        elif postgres:
+            logint_postgres_from_env()
         else:
             login_view()
     else:

@@ -12,15 +12,23 @@ from src.database.tipos_base.database import Database
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     sql_lite: bool = str(os.environ.get("SQL_LITE", 'false')).lower() == "true"
-    oracle_from_env = str(os.environ.get("ORACLE_DB_FROM_ENV", 'false')).lower() == "true"
+    oracle = str(os.environ.get("ORACLE_DB_FROM_ENV", 'false')).lower() == "true"
+    postgre = str(os.environ.get("POSTGRE_DB_FROM_ENV", 'false')).lower() == "true"
 
     if sql_lite:
         Database.init_sqlite()
-    elif oracle_from_env:
+    elif oracle:
         user = os.environ.get('ORACLE_USER')
         senha = os.environ.get('ORACLE_PASSWORD')
         dsn = os.environ.get('ORACLE_DSN')
         Database.init_oracledb(user, senha, dsn)
+    elif postgre:
+        user = os.environ.get('POSTGRE_USER')
+        senha = os.environ.get('POSTGRE_PASSWORD')
+        database = os.environ.get('POSTGRE_DB')
+        host = os.environ.get('POSTGRE_HOST')
+        port = os.environ.get('POSTGRE_PORT')
+        Database.init_postgresdb(user, senha, host, int(port), database)
     yield
 
 app = FastAPI(lifespan=lifespan)

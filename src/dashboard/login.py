@@ -71,3 +71,20 @@ def login_oracle_from_env():
         raise ValueError("As variáveis de ambiente ORACLE_USER, ORACLE_PASSWORD e ORACLE_DSN devem estar definidas.")
 
     cached_login(user, senha, dsn)
+
+def logint_postgres_from_env():
+    user = os.environ.get('POSTGRE_USER')
+    senha = os.environ.get('POSTGRE_PASSWORD')
+    database = os.environ.get('POSTGRE_DB')
+    host = os.environ.get('POSTGRE_HOST')
+    port = os.environ.get('POSTGRE_PORT')
+
+    if user is None or senha is None or database is None or host is None or port is None:
+        raise ValueError("As variáveis de ambiente POSTGRE_USER, POSTGRE_PASSWORD, POSTGRE_DB, POSTGRE_HOST e POSTGRE_PORT devem estar definidas.")
+
+    if not st.session_state.get('logged_in', False):
+        Database.init_postgresdb(user, senha, host, int(port), database)
+        st.session_state.logged_in = True
+        st.session_state.engine = Database.engine
+        st.session_state.session = Database.session
+        st.rerun()

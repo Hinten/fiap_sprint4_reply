@@ -23,30 +23,30 @@ variable "api_port" {
 }
 
 variable "rds_db_name" {
-  description = "Nome do banco Oracle RDS"
+  description = "Nome do banco RDS"
   type        = string
   default     = "fiap_reply_db"
 }
 
 variable "rds_username" {
-  description = "Usuário master do Oracle RDS"
+  description = "Usuário master da database RDS"
   type        = string
 }
 
 variable "rds_password" {
-  description = "Senha master do Oracle RDS"
+  description = "Senha master da database RDS"
   type        = string
   sensitive   = true
 }
 
 variable "rds_instance_class" {
-  description = "Classe da instância Oracle RDS"
+  description = "Classe da instância RDS"
   type        = string
   default     = "db.t3.micro"
 }
 
 variable "rds_allocated_storage" {
-  description = "Armazenamento (GB) do Oracle RDS"
+  description = "Armazenamento (GB) do RDS"
   type        = number
   default     = 20
 }

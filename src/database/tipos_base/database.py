@@ -58,6 +58,24 @@ class Database:
         Database.session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
     @staticmethod
+    def init_postgresdb(user: str, password: str, host: str = "localhost", port: int = 5432, dbname: str = "postgres"):
+        """
+        Inicializa a conexão com o banco de dados PostgreSQL.
+        :param user: Nome do usuário do banco de dados.
+        :param password: Senha do usuário do banco de dados.
+        :param host: Host do banco de dados.
+        :param port: Porta do banco de dados.
+        :param dbname: Nome do banco de dados.
+        :return:
+        """
+        engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}", echo=SQL_ALCHEMY_DEBUG)
+        with engine.connect() as _:
+            print(f"Conexão bem-sucedida ao banco de dados PostgreSQL! Host: {host}, DB: {dbname}")
+        Database.engine = engine
+        Database.session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+    @staticmethod
     def init_from_session(engine:Engine, session:sessionmaker):
         """
         Inicializa a conexão com o banco de dados a partir de um engine e sessionLocal já existentes.

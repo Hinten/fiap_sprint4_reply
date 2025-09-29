@@ -7,9 +7,17 @@ services:
       dockerfile: src/dashboard/Dockerfile
     restart: always
     environment:
-      - "ORACLE_DSN=${ORACLE_DSN}"
-      - "ORACLE_USER=${ORACLE_USER}"
-      - "ORACLE_PASSWORD=${ORACLE_PASSWORD}"
+      - "LOGGING_ENABLED=false"
+      - "ENABLE_API=false"
+      - "ORACLE_DB_FROM_ENV=false"
+      - "SQL_LITE=false"
+      - "POSTGRE_DB_FROM_ENV=true"
+      - "POSTGRE_USER=${POSTGRE_USER}"
+      - "POSTGRE_PASSWORD=${POSTGRE_PASSWORD}"
+      - "POSTGRE_DB=${POSTGRE_DB}"
+      - "POSTGRE_HOST=${POSTGRE_HOST}"
+      - "POSTGRE_PORT=${POSTGRE_PORT}"
+
     ports:
       - "${DASHBOARD_PORT}:8501"
 
@@ -20,9 +28,16 @@ services:
     restart: always
 
     environment:
-      - "ORACLE_DSN=${ORACLE_DSN}"
-      - "ORACLE_USER=${ORACLE_USER}"
-      - "ORACLE_PASSWORD=${ORACLE_PASSWORD}"
+      - "LOGGING_ENABLED=false"
+      - "ENABLE_API=false"
+      - "ORACLE_DB_FROM_ENV=false"
+      - "SQL_LITE=false"
+      - "POSTGRE_DB_FROM_ENV=true"
+      - "POSTGRE_USER=${POSTGRE_USER}"
+      - "POSTGRE_PASSWORD=${POSTGRE_PASSWORD}"
+      - "POSTGRE_DB=${POSTGRE_DB}"
+      - "POSTGRE_HOST=${POSTGRE_HOST}"
+      - "POSTGRE_PORT=${POSTGRE_PORT}"
 
     ports:
       - "${API_PORT}:8180"
