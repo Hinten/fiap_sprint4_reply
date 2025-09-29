@@ -81,16 +81,16 @@ resource "aws_security_group" "app_server_sg" {
 
   ingress {
     description = "HTTP para Streamlit"
-    from_port   = 8501
-    to_port     = 8501
+    from_port   = var.dashboard_port
+    to_port     = var.dashboard_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     description = "Porta api REST FastAPI"
-    from_port   = 8180
-    to_port     = 8180
+    from_port   = var.api_port
+    to_port     = var.api_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -114,4 +114,12 @@ resource "aws_instance" "app_server" {
     Name = var.instance_name
   }
 
+}
+
+resource "local_file" "env_file" {
+  filename = "${path.module}/../../.env-docker"
+  content  = <<EOF
+DASHBOARD_PORT=${var.dashboard_port}
+API_PORT=${var.api_port}
+EOF
 }

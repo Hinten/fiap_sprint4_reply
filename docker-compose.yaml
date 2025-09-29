@@ -6,11 +6,15 @@ services:
       context: ./
       dockerfile: src/dashboard/Dockerfile
     restart: always
+    ports:
+      - "${DASHBOARD_PORT}:8501"
 
-#  api:
-#    build:
-#      context: ./
-#      dockerfile: src/api/Dockerfile
-#    restart: always
+  api:
+    build:
+      context: ./
+      dockerfile: src/api/Dockerfile
+    restart: always
 #    environment:
 #      - DATABASE_URL=postgresql://postgres:password@db:5432/mydatabase
+    ports:
+      - "${API_PORT}:8180"
