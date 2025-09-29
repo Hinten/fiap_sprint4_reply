@@ -1,7 +1,5 @@
 from sqlalchemy import Sequence, ForeignKey, Float, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from src.database.models.equipamento import Equipamento
 from src.database.tipos_base.model import Model
 from src.database.tipos_base.model_mixins.display import SimpleTableFilter
 
@@ -32,7 +30,7 @@ class ManutencaoEquipamento(Model):
         ForeignKey('EQUIPAMENTO.id'), nullable=False, info={'label': 'Equipamento'},
     )
 
-    equipamento: Mapped[Equipamento] = relationship('Equipamento', back_populates='manutencoes')
+    equipamento: Mapped["Equipamento"] = relationship('Equipamento', back_populates='manutencoes')
 
     data_previsao_manutencao: Mapped[DateTime] = mapped_column(
         DateTime, nullable=True, info={'label': 'Data Prevista da Manutenção'},

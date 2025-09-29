@@ -9,8 +9,8 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-COPY src/ /app/src/
 COPY .env /app/.env
+COPY src/ /app/src/
 COPY main_dash.py /app/main_dash.py
 
 

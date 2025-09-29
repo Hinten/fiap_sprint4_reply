@@ -37,7 +37,7 @@ def main():
     else:
         logging.debug('acessando dashboard')
         setup()
-        iniciar_api_sensor()
+        # iniciar_api_sensor()
         navigation()
 
 if __name__ == "__main__":
