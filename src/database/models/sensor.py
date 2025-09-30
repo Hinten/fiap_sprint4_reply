@@ -117,6 +117,16 @@ class Sensor(Model):
         ForeignKey('TIPO_SENSOR.id'), nullable=False, info={'label': 'Tipo de Sensor'}
     )
 
+    limiar_manutencao_maior: Mapped[float] = mapped_column(
+        Float, nullable=True, info={'label': 'Limiar de Manutenção Maior'},
+        comment="Limiar de manutenção para o sensor, ativa notificações quando a leitura ultrapassa esse valor"
+    )
+
+    limiar_manutencao_menor: Mapped[float] = mapped_column(
+        Float, nullable=True, info={'label': 'Limiar de Manutenção Menor'},
+        comment="Limiar de manutenção para o sensor, ativa notificações quando a leitura fica abaixo desse valor"
+    )
+
     tipo_sensor: Mapped[TipoSensor] = relationship('TipoSensor', back_populates='sensors')
 
     nome: Mapped[str] = mapped_column(
@@ -214,13 +224,14 @@ class LeituraSensor(Model):
     )
 
     @classmethod
-    def get_leituras_for_sensor(cls, sensor_id: int, data_inicial: date, data_final: date) -> List['LeituraSensor']:
+    def get_leituras_for_sensor(cls, sensor_id: int, data_inicial: date=None, data_final: date=None) -> List['LeituraSensor']:
         with Database.get_session() as session:
-            return session.query(cls).filter(
-                cls.sensor_id == sensor_id,
-                cls.data_leitura >= datetime.combine(data_inicial, time.min),
-                cls.data_leitura <= datetime.combine(data_final, time.max)
-            ).order_by(cls.data_leitura).all()
+            query = session.query(cls).filter(cls.sensor_id == sensor_id)
+            if data_inicial is not None:
+                query = query.filter(cls.data_leitura >= datetime.combine(data_inicial, time.min))
+            if data_final is not None:
+                query = query.filter(cls.data_leitura <= datetime.combine(data_final, time.max))
+            return query.order_by(cls.data_leitura).all()
 
     @classmethod
     def random_range(cls, nullable: bool = True, quantity: int = 100, **kwargs) -> List[Self]:

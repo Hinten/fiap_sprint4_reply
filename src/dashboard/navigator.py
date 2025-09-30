@@ -1,15 +1,14 @@
 import streamlit as st
-
 from src.dashboard.database.exportar import exportar_db_page
 from src.dashboard.database.importar import importar_db_page
 from src.dashboard.global_messages import get_global_messages
-from src.dashboard.manual import previsao_manual_page
-from src.dashboard.principal import get_principal_page
+from src.dashboard.notificacoes.email import subscrever_email_page
+from src.dashboard.principal import principal_page
 from src.dashboard.generic.table_view import TableView
-from src.dashboard.train.train_model_view import train_model_page
+from src.dashboard.machine_learning.train_model_view import train_model_page
 from src.database.dynamic_import import import_models
 from src.dashboard.menu import menu
-from src.dashboard.manual import previsao_manual_page
+from src.dashboard.machine_learning.manual import previsao_manual_page
 
 
 def get_generic_pages() -> list:
@@ -38,12 +37,13 @@ def navigation():
     get_global_messages()
 
     current_page = st.navigation([
-        get_principal_page(),
+        principal_page,
         *get_generic_pages(),
         exportar_db_page,
         importar_db_page,
         previsao_manual_page,
-        train_model_page
+        train_model_page,
+        subscrever_email_page
     ])
 
     menu()

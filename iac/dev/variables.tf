@@ -64,11 +64,6 @@ variable "sns_topic_name" {
   default     = "email-notifications-topic"
 }
 
-variable "sns_email_endpoint" {
-  description = "Endereço de e-mail para receber notificações SNS"
-  type        = string
-}
-
 variable "aws_access_key_id" {
   description = "AWS Access Key ID - Necessário para enviar notificações SNS, utilize aws configure get aws_access_key_id"
   type        = string

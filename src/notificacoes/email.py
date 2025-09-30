@@ -4,13 +4,22 @@ import os
 SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN')
 SNS_REGION = os.environ.get('SNS_REGION')
 
-sns = boto3.client("sns",  region_name=SNS_REGION)
 
 def enviar_email(assunto, mensagem):
+    sns = boto3.client("sns", region_name=SNS_REGION)
     response = sns.publish(
         TopicArn=SNS_TOPIC_ARN,
         Subject=assunto,
         Message=mensagem
+    )
+    return response
+
+def subscribe_email(email):
+    sns = boto3.client("sns", region_name=SNS_REGION)
+    response = sns.subscribe(
+        TopicArn=SNS_TOPIC_ARN,
+        Protocol='email',
+        Endpoint=email
     )
     return response
 

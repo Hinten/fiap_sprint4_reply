@@ -3,11 +3,11 @@ import streamlit as st
 from src.dashboard.database.exportar import exportar_db_page
 from src.dashboard.database.importar import importar_db_page
 from src.dashboard.generic.table_view import TableView
-from src.dashboard.manual import previsao_manual_page
-from src.dashboard.principal import get_principal_page
-from src.dashboard.train.train_model_view import train_model_page
+from src.dashboard.notificacoes.email import subscrever_email_page
+from src.dashboard.principal import principal_page
+from src.dashboard.machine_learning.train_model_view import train_model_page
 from src.database.dynamic_import import import_models
-from src.dashboard.manual import previsao_manual_page
+from src.dashboard.machine_learning.manual import previsao_manual_page
 
 def crud_menu():
     """
@@ -53,9 +53,10 @@ def menu():
     """
 
     
-    st.sidebar.page_link(get_principal_page())
+    st.sidebar.page_link(principal_page)
     st.sidebar.page_link(previsao_manual_page)
     st.sidebar.page_link(train_model_page)
+    st.sidebar.page_link(subscrever_email_page)
     crud_menu()
     export_import_menu()
 

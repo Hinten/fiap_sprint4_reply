@@ -4,11 +4,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-def get_grafico_linha(leituras: list[LeituraSensor], title: str):
+def get_grafico_linha(
+        leituras: list[LeituraSensor],
+        title: str,
+        limiar_manutencao_maior: float = None,
+        limiar_manutencao_menor: float = None,
+        show_df: bool = True,
+):
     """
     Função para gerar um gráfico de linha com os dados do sensor.
     :param leituras: instâncias de LeituraSensor
     :param title: título do gráfico
+    :param limiar_manutencao_maior: valor do limiar superior (opcional)
+    :param limiar_manutencao_menor: valor do limiar inferior (opcional)
+    :param show_df: se True, exibe a tabela com os dados abaixo do gráfico
     :return:
     """
 
@@ -29,8 +38,21 @@ def get_grafico_linha(leituras: list[LeituraSensor], title: str):
     ax.xaxis.set_major_formatter(date_format)
     plt.xticks(rotation=45)
 
+    # Adiciona linha vermelha para o limiar superior, se definido
+    if limiar_manutencao_maior is not None:
+        ax.axhline(y=limiar_manutencao_maior, color='red', linestyle='--', label='Limiar Superior')
+
+    # Adiciona linha vermelha para o limiar inferior, se definido
+    if limiar_manutencao_menor is not None:
+        ax.axhline(y=limiar_manutencao_menor, color='yellow', linestyle='--', label='Limiar Inferior')
+
+    # Exibe a legenda se algum limiar foi adicionado
+    if limiar_manutencao_maior is not None or limiar_manutencao_menor is not None:
+        ax.legend()
+
     # Exibe o gráfico no Streamlit
     st.pyplot(fig)
 
     # Tabela com os dados
-    st.write(df)
+    if show_df:
+        st.write(df)
