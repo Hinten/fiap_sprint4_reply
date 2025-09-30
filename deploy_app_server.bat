@@ -32,6 +32,8 @@ ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo usermod -aG 
 REM Corrigir permissões para permitir scp
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo chown -R ubuntu:ubuntu ~/app"
 
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "mkdir -p ~/app/"
+scp -i %KEY_FILE% -o StrictHostKeyChecking=no Dockerfile ubuntu@%EC2_IP%:~/app/Dockerfile
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "mkdir -p ~/app/src/dashboard"
 scp -i %KEY_FILE% -o StrictHostKeyChecking=no src/dashboard/Dockerfile ubuntu@%EC2_IP%:~/app/src/dashboard/Dockerfile
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "mkdir -p ~/app/src/api"
@@ -44,13 +46,14 @@ REM 4. Buildar e rodar app
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "mkdir -p ~/app"
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "cd ~/app"
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo docker-compose version"
-ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "docker container prune -f"
-ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "docker image prune -a -f"
-ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "docker volume prune -f"
-ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "docker network prune -f"
-ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo docker-compose -f ~/app/docker-compose.yaml build --no-cache"
+REM caso seja necessário, descomentar as linhas abaixo para limpar imagens antigas para evitar problemas de espaço
+REM ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "docker container prune -f"
+REM ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "docker image prune -a -f"
+REM ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "docker volume prune -f"
+REM ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "docker network prune -f"
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "cd ~/app && docker build -t requirements-cache:latest ."
+ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo docker-compose -f ~/app/docker-compose.yaml build"
 ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "sudo docker-compose -f ~/app/docker-compose.yaml up -d --remove-orphans"
-ssh -i %KEY_FILE% -o StrictHostKeyChecking=no ubuntu@%EC2_IP% "docker image prune -a -f"
 
 REM 5. Remover arquivos temporários se existirem
 if exist instance_public_ip.txt del instance_public_ip.txt
