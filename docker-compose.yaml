@@ -17,7 +17,10 @@ services:
       - "POSTGRE_DB=${POSTGRE_DB}"
       - "POSTGRE_HOST=${POSTGRE_HOST}"
       - "POSTGRE_PORT=${POSTGRE_PORT}"
-
+      - "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}"
+      - "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"
+      - "SNS_TOPIC_ARN=${SNS_TOPIC_ARN}"
+      - "SNS_REGION=${SNS_REGION}"
     ports:
       - "${DASHBOARD_PORT}:8501"
 
@@ -26,7 +29,6 @@ services:
       context: ./
       dockerfile: src/api/Dockerfile
     restart: always
-
     environment:
       - "LOGGING_ENABLED=false"
       - "ENABLE_API=false"
@@ -38,5 +40,9 @@ services:
       - "POSTGRE_DB=${POSTGRE_DB}"
       - "POSTGRE_HOST=${POSTGRE_HOST}"
       - "POSTGRE_PORT=${POSTGRE_PORT}"
+      - "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}"
+      - "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"
+      - "SNS_TOPIC_ARN=${SNS_TOPIC_ARN}"
+      - "SNS_REGION=${SNS_REGION}"
     ports:
       - "${API_PORT}:8180"

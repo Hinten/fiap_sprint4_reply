@@ -1,10 +1,11 @@
 import streamlit as st
 from src.dashboard.machine import _machine_learning_results
+from src.dashboard.notificacoes.enviar import enviar_email_teste
 
 
 def _principal():
-
-    _machine_learning_results()
+    enviar_email_teste()
+    # _machine_learning_results()
     
 
 def get_principal_page() -> st.Page:
