@@ -3,10 +3,8 @@ import os
 
 SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN')
 SNS_REGION = os.environ.get('SNS_REGION')
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 
-sns = boto3.client("sns", region_name=SNS_REGION)
+sns = boto3.client("sns",  region_name=SNS_REGION)
 
 def enviar_email(assunto, mensagem):
     response = sns.publish(

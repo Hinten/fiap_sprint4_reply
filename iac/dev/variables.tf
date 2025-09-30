@@ -1,3 +1,9 @@
+variable "aws_region" {
+  description = "AWS region to deploy resources"
+  type        = string
+  default     = "us-east-1"
+}
+
 variable "instance_name" {
   description = "Value of the Name tag for the EC2 instance"
   type        = string
@@ -31,6 +37,7 @@ variable "rds_db_name" {
 variable "rds_username" {
   description = "Usuário master da database RDS"
   type        = string
+  default     = "FIAPREPLYUSER"
 }
 
 variable "rds_password" {
@@ -49,4 +56,33 @@ variable "rds_allocated_storage" {
   description = "Armazenamento (GB) do RDS"
   type        = number
   default     = 20
+}
+
+variable "sns_topic_name" {
+  description = "Nome do tópico SNS para notificações por e-mail"
+  type        = string
+  default     = "email-notifications-topic"
+}
+
+variable "sns_email_endpoint" {
+  description = "Endereço de e-mail para receber notificações SNS"
+  type        = string
+}
+
+variable "aws_access_key_id" {
+  description = "AWS Access Key ID - Necessário para enviar notificações SNS, utilize aws configure get aws_access_key_id"
+  type        = string
+  sensitive   = true
+}
+
+variable "aws_secret_access_key" {
+  description = "AWS Secret Access Key - Necessário para enviar notificações SNS, utilize aws configure get aws_secret_access_key"
+  type        = string
+  sensitive   = true
+}
+
+variable "aws_session_token" {
+  description = "AWS Session Token - Necessário para enviar notificações SNS, utilize aws configure get aws_session_token"
+  type        = string
+  sensitive   = true
 }

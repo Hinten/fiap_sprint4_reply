@@ -34,3 +34,8 @@ output "rds_password" {
   value       = var.rds_password
   sensitive   = true
 }
+
+output "sns_topic_arn" {
+  description = "ARN do tópico SNS para notificações por e-mail"
+  value       = aws_sns_topic.email_notifications.arn
+}

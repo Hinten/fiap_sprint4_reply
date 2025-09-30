@@ -1,6 +1,6 @@
 # Configure the AWS Provider
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
 }
 
 data "aws_ami" "ubuntu" {
@@ -188,5 +188,21 @@ POSTGRE_PASSWORD=${var.rds_password}
 POSTGRE_DB=${var.rds_db_name}
 POSTGRE_HOST=${aws_db_instance.postgres_rds.address}
 POSTGRE_PORT=${aws_db_instance.postgres_rds.port}
+SNS_TOPIC_ARN=${aws_sns_topic.email_notifications.arn}
+SNS_REGION=${var.aws_region}
+AWS_ACCESS_KEY_ID=${var.aws_access_key_id}
+AWS_SECRET_ACCESS_KEY=${var.aws_secret_access_key}
+AWS_SESSION_TOKEN=${var.aws_session_token}
 EOF
 }
+
+resource "aws_sns_topic" "email_notifications" {
+  name = var.sns_topic_name
+}
+
+resource "aws_sns_topic_subscription" "email_subscription" {
+  topic_arn = aws_sns_topic.email_notifications.arn
+  protocol  = "email"
+  endpoint  = var.sns_email_endpoint
+}
+
