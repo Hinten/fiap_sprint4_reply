@@ -15,13 +15,12 @@ async def lifespan(app: FastAPI):
     oracle = str(os.environ.get("ORACLE_DB_FROM_ENV", 'false')).lower() == "true"
     postgre = str(os.environ.get("POSTGRE_DB_FROM_ENV", 'false')).lower() == "true"
 
-    if sql_lite:
-        Database.init_sqlite()
-    elif oracle:
+    if oracle:
         user = os.environ.get('ORACLE_USER')
         senha = os.environ.get('ORACLE_PASSWORD')
         dsn = os.environ.get('ORACLE_DSN')
         Database.init_oracledb(user, senha, dsn)
+        Database.create_all_tables()
     elif postgre:
         user = os.environ.get('POSTGRE_USER')
         senha = os.environ.get('POSTGRE_PASSWORD')
@@ -29,6 +28,14 @@ async def lifespan(app: FastAPI):
         host = os.environ.get('POSTGRE_HOST')
         port = os.environ.get('POSTGRE_PORT')
         Database.init_postgresdb(user, senha, host, int(port), database)
+        Database.create_all_tables()
+    elif sql_lite:
+        Database.init_sqlite()
+        Database.create_all_tables()
+    else:
+        print("WARNING: Nenhum banco de dados configurado. Usando SQLite como padrão.")
+        Database.init_sqlite()
+        Database.create_all_tables()
     yield
 
 app = FastAPI(lifespan=lifespan)

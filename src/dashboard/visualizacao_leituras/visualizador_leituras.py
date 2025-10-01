@@ -4,9 +4,10 @@ from itertools import islice
 from src.dashboard.plots.generic.grafico_linha import get_grafico_linha
 from datetime import datetime, timedelta
 
+RELOAD_TIMER = 60  # segundos
 
 @st.fragment(
-    run_every=60
+    run_every=RELOAD_TIMER
 )
 def grafico_leituras_sensor(sensor_id: int, periodo: int | None = None):
 
@@ -40,8 +41,8 @@ def visualizador_leituras_page():
 
     st.title('Visualizador de Leituras de Sensors em Tempo Real')
     
-    st.write("""
-    📡 Esta página exibe gráficos de linha para as leituras de todos os sensores cadastrados no sistema. Os gráficos são atualizados automaticamente a cada 10 segundos, permitindo o monitoramento em tempo real dos dados coletados pelos sensores.
+    st.write(f"""
+    📡 Esta página exibe gráficos de linha para as leituras de todos os sensores cadastrados no sistema. Os gráficos são atualizados automaticamente a cada {RELOAD_TIMER} segundos, permitindo o monitoramento em tempo real dos dados coletados pelos sensores.
             
     📊 Exibição contínua das leituras dos sensores principais:
 
