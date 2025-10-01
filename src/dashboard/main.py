@@ -26,12 +26,12 @@ def main():
     if not st.session_state.get('logged_in', False):
         logging.debug('acessando login')
 
-        if sql_lite:
-            login_sqlite()
-        elif oracle:
+        if oracle:
             login_oracle_from_env()
         elif postgres:
             logint_postgres_from_env()
+        elif sql_lite:
+            login_sqlite()
         else:
             login_view()
     else:

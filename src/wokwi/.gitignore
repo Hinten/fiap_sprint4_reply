@@ -3,3 +3,17 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+*.pyc
+__pycache__/
+.idea
+.vscode
+*.log
+*.db
+.venv
+venv
+.terraform
+*.pem
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+.env-docker

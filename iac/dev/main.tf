@@ -196,6 +196,14 @@ AWS_SESSION_TOKEN=${var.aws_session_token}
 EOF
 }
 
+resource "local_file" "wokwi_env_file" {
+  filename = "${path.module}/../../src/wokwi/.env"
+  content  = <<EOF
+API_URL=http://${aws_instance.app_server.public_ip}:${var.api_port}
+EOF
+}
+
+
 resource "aws_sns_topic" "email_notifications" {
   name = var.sns_topic_name
 }
