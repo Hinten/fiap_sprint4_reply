@@ -30,37 +30,52 @@ def reset_contador_ids():
     """
     Reseta o contador de IDs para cada tabela no banco de dados.
     """
+    engine_name = Database.engine.name.lower()
 
-    # Checa se o engine é Oracle
-    if 'oracle' not in Database.engine.name.lower():
-        logging.debug("O banco de dados não é Oracle. A função reset_contador_ids só é suportada para bancos de dados Oracle.")
+    # PostgreSQL
+    if 'postgresql' in engine_name:
+        session = Database.session()
+        for table_name, sequence_name in get_table_and_sequence_names():
+            primary_key_column = 'id'
+            # Get max id
+            max_id_result = session.execute(text(f'SELECT COALESCE(MAX({primary_key_column}), 0) FROM "{table_name}"'))
+            max_id = max_id_result.scalar() or 0
+            # Set sequence to max_id + 1
+            session.execute(text(f'SELECT setval(\'"{sequence_name}"\', :new_value, false)'), {'new_value': max_id + 1})
+        session.commit()
+        session.close()
         return
 
-    session = Database.session()
-
-    for table_name, sequence_name in get_table_and_sequence_names():
-        primary_key_column = 'ID'
-        reset_sequence_sql = text(f"""
-            DECLARE
-                max_id NUMBER;
-                diff NUMBER;
-                dummy NUMBER;
-            BEGIN
-                SELECT NVL(MAX({primary_key_column}), 0) INTO max_id FROM {table_name};
+    # Oracle (original)
+    if 'oracle' in engine_name:
+        session = Database.session()
+        for table_name, sequence_name in get_table_and_sequence_names():
+            primary_key_column = 'ID'
+            reset_sequence_sql = text(f"""
+                DECLARE
+                    max_id NUMBER;
+                    diff NUMBER;
+                    dummy NUMBER;
                 BEGIN
-                    SELECT {sequence_name}.CURRVAL INTO dummy FROM dual;
-                EXCEPTION
-                    WHEN OTHERS THEN
-                        SELECT {sequence_name}.NEXTVAL INTO dummy FROM dual;
+                    SELECT NVL(MAX({primary_key_column}), 0) INTO max_id FROM {table_name};
+                    BEGIN
+                        SELECT {sequence_name}.CURRVAL INTO dummy FROM dual;
+                    EXCEPTION
+                        WHEN OTHERS THEN
+                            SELECT {sequence_name}.NEXTVAL INTO dummy FROM dual;
+                    END;
+                    SELECT (max_id + 1 - {sequence_name}.CURRVAL) INTO diff FROM dual;
+                    IF diff <> 0 THEN
+                        EXECUTE IMMEDIATE 'ALTER SEQUENCE {sequence_name} INCREMENT BY ' || diff;
+                        EXECUTE IMMEDIATE 'SELECT {sequence_name}.NEXTVAL FROM dual' INTO dummy;
+                        EXECUTE IMMEDIATE 'ALTER SEQUENCE {sequence_name} INCREMENT BY 1';
+                    END IF;
                 END;
-                SELECT (max_id + 1 - {sequence_name}.CURRVAL) INTO diff FROM dual;
-                IF diff <> 0 THEN
-                    EXECUTE IMMEDIATE 'ALTER SEQUENCE {sequence_name} INCREMENT BY ' || diff;
-                    EXECUTE IMMEDIATE 'SELECT {sequence_name}.NEXTVAL FROM dual' INTO dummy;
-                    EXECUTE IMMEDIATE 'ALTER SEQUENCE {sequence_name} INCREMENT BY 1';
-                END IF;
-            END;
-        """)
-        session.execute(reset_sequence_sql)
-    session.commit()
-    session.close()
+            """)
+            session.execute(reset_sequence_sql)
+        session.commit()
+        session.close()
+        return
+
+    logging.debug("Banco de dados não suportado para reset_contador_ids. Apenas Oracle e PostgreSQL são suportados.")
+    return
