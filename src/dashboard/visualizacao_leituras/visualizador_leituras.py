@@ -31,8 +31,24 @@ def grafico_leituras_sensor(sensor_id: int):
 def visualizador_leituras_page():
 
     st.title('Visualizador de Leituras de Sensors em Tempo Real')
+    
+    st.write("""
+            📡 Esta página exibe gráficos de linha para as leituras de todos os sensores cadastrados no sistema. Os gráficos são atualizados automaticamente a cada 10 segundos, permitindo o monitoramento em tempo real dos dados coletados pelos sensores.
+            
+📊 Exibição contínua das leituras dos sensores principais:
+
+
+    🌞 Sensor Lux → Intensidade luminosa.
+
+    🌡️  Sensor Temperatura (°C) → Condições térmicas do ambiente ou equipamento.
+
+    📳 Sensor Vibração → Identificação de oscilações e possíveis falhas mecânicas.
+             """)
 
     todos_sensores_id = [sensor.id for sensor in Sensor.all()]
+    if len(todos_sensores_id) == 0:
+        st.warning("Nenhum sensor cadastrado.")
+        return
 
     for i in range(0, len(todos_sensores_id), 3):
         grupo = list(islice(todos_sensores_id, i, i + 3))
@@ -41,5 +57,17 @@ def visualizador_leituras_page():
         for idx, sensor_id in enumerate(grupo):
             with colunas[idx]:
                 grafico_leituras_sensor(sensor_id)
+    
+    st.write("""
+    📈 Benefícios
 
+        🔎 Detecção de falhas antecipada → Identifica padrões incomuns antes que se tornem problemas graves.
 
+        ⚡ Monitoramento em tempo real → Acompanhamento contínuo e confiável.
+
+        🔗 Escalável → Novos sensores podem ser adicionados facilmente.
+
+        📂 Registro histórico → Possibilidade de salvar e analisar dados passados.
+
+        🛠️ Manutenção preditiva → Planejamento eficiente com base em dados reais.
+             """)  

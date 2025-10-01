@@ -21,8 +21,25 @@ def train_model_view():
     train_dataset = df.drop(columns=['data_leitura'])
     train_dataset[target_column] = train_dataset[target_column].apply(lambda x: bool(x))
     st.write(train_dataset.head())
+
+    st.write("""
+    🔢 A tabela acima apresenta variáveis de sensores e a saída de manutenção:
+
+        - Lux (x10³): intensidade luminosa.
+
+        - Temperatura (°C): registro da temperatura.
+
+        - Vibração: nível de vibração detectado.
+
+        - Manutenção: campo binário (checkbox) que indica se houve necessidade de manutenção ou não.
+             """)
+    
     st.write(train_dataset.dtypes)
 
+    st.write("""
+            📑 Os tipos de dados estão adequados para o treinamento do modelo. As variáveis independentes são numéricas (float64) e a variável dependente é booleana (bool).
+             """)
+    
 
     pairplot_fig = sns.pairplot(
         train_dataset.drop(columns=[target_column]),
@@ -36,6 +53,16 @@ def train_model_view():
     pairplot_fig.figure.suptitle("Pairplot dos Dados", y=1.02, fontsize=16)
 
     st.pyplot(pairplot_fig)
+    
+    st.write("""
+     📊 Grafico de Pairplot dos dados, que é uma forma de visualizar a distribuição individual e as relações entre as variáveis medidas: Lux (x10³), Temperatura (°C) e Vibração.
+
+         - Na diagonal, aparecem histogramas que revelam a distribuição de cada variável individualmente.
+
+         - Fora da diagonal, temos gráficos de dispersão (scatter plots), que permitem observar possíveis correlações entre os pares de variáveis.
+
+         - Tipo de visualização ajuda a identificar padrões, outliers e relações entre os atributos que podem ser relevantes para o modelo de aprendizado de máquina.
+             """)
 
     s = setup(data=train_dataset, target=target_column, session_id=123, use_gpu=use_gpu, train_size=0.7, html=True)
 
@@ -43,6 +70,10 @@ def train_model_view():
     setup_summary = pull()
 
     st.dataframe(setup_summary)
+    
+    st.write("""
+            ✅ A tabela acima resume as transformações aplicadas aos dados, como tratamento de valores ausentes, codificação de variáveis categóricas e normalização. Isso garante que os dados estejam prontos para o treinamento do modelo.
+             """)
 
     metrica = st.selectbox('Selecione a métrica para comparar os modelos',
                            [
