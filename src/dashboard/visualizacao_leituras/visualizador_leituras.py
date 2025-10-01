@@ -2,16 +2,24 @@ from src.database.models.sensor import Sensor, LeituraSensor
 import streamlit as st
 from itertools import islice
 from src.dashboard.plots.generic.grafico_linha import get_grafico_linha
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 @st.fragment(
-    run_every=10
+    run_every=60
 )
-def grafico_leituras_sensor(sensor_id: int):
+def grafico_leituras_sensor(sensor_id: int, periodo: int | None = None):
 
     sensor = Sensor.get_from_id(sensor_id)
-    leituras_do_sensor = LeituraSensor.get_leituras_for_sensor(sensor_id)
+    if periodo is None:
+        leituras_do_sensor = LeituraSensor.get_leituras_for_sensor(sensor_id)
+    else:
+        data_inicial = datetime.now() - timedelta(minutes=periodo)
+        leituras_do_sensor = LeituraSensor.get_leituras_for_sensor(sensor_id, data_inicial=data_inicial)
+
+    if len(leituras_do_sensor) == 0:
+        st.warning(f"Nenhuma leitura encontrada para o sensor {sensor.__str__()} no período selecionado.")
+        return
 
     #gráfico de linha com as leituras_do_sensor
     get_grafico_linha(
@@ -33,9 +41,9 @@ def visualizador_leituras_page():
     st.title('Visualizador de Leituras de Sensors em Tempo Real')
     
     st.write("""
-            📡 Esta página exibe gráficos de linha para as leituras de todos os sensores cadastrados no sistema. Os gráficos são atualizados automaticamente a cada 10 segundos, permitindo o monitoramento em tempo real dos dados coletados pelos sensores.
+    📡 Esta página exibe gráficos de linha para as leituras de todos os sensores cadastrados no sistema. Os gráficos são atualizados automaticamente a cada 10 segundos, permitindo o monitoramento em tempo real dos dados coletados pelos sensores.
             
-📊 Exibição contínua das leituras dos sensores principais:
+    📊 Exibição contínua das leituras dos sensores principais:
 
 
     🌞 Sensor Lux → Intensidade luminosa.
@@ -44,6 +52,14 @@ def visualizador_leituras_page():
 
     📳 Sensor Vibração → Identificação de oscilações e possíveis falhas mecânicas.
              """)
+
+    periodo = st.selectbox(
+        "Período da leitura",
+        options=[10, 60, 120, None],
+        format_func = lambda x: "Todo Período" if x is None else f"Últimos {x} minutos",
+        index=1,
+    )
+
 
     todos_sensores_id = [sensor.id for sensor in Sensor.all()]
     if len(todos_sensores_id) == 0:
@@ -56,7 +72,7 @@ def visualizador_leituras_page():
         colunas = st.columns(3)
         for idx, sensor_id in enumerate(grupo):
             with colunas[idx]:
-                grafico_leituras_sensor(sensor_id)
+                grafico_leituras_sensor(sensor_id, periodo)
     
     st.write("""
     📈 Benefícios
