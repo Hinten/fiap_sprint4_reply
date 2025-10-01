@@ -24,10 +24,10 @@ def grafico_leituras_sensor(sensor_id: int, periodo: int | None = None):
 
     #gráfico de linha com as leituras_do_sensor
     get_grafico_linha(
-        leituras_do_sensor,
-        sensor.__str__(),
-        sensor.limiar_manutencao_maior,
-        sensor.limiar_manutencao_maior,
+        leituras=leituras_do_sensor,
+        title=sensor.__str__(),
+        limiar_manutencao_maior=sensor.limiar_manutencao_maior,
+        limiar_manutencao_menor=sensor.limiar_manutencao_menor,
         show_df=False
     )
 

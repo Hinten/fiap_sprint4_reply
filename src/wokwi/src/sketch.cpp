@@ -82,6 +82,7 @@ void iniciar_sensor() {
   uint64_t chipid = ESP.getEfuseMac();
   sprintf(chipidStr, "%016llX", chipid);
   print_lcd_and_serial("Chip ID: " + String(chipidStr));
+  print_lcd_and_serial("URL: " + String(endpoint_api));
 
   JsonDocument doc;
   doc["serial"] = chipidStr; // Adiciona o Chip ID ao JSON
@@ -240,7 +241,7 @@ void loop() {
   lcd.print(vibracaoMedia, 2);
 
   if (vibracaoMedia > LIMIAR_VIBRACAO) {
-    Serial.print(" ⚠️ Vibração anormal detectada! ⚠️ |");
+    Serial.print("Vibração anormal detectada!");
     lcd.setCursor(0, 1);
     lcd.print("#ALERTA DE VIBRACAO#");
 
