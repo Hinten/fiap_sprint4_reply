@@ -1,13 +1,24 @@
 
 Modelo de Entidade-Relacionamento:
 
+Tabela: MANUTENCAO_EQUIPAMENTO
+  - id (INTEGER NOT NULL) [PK]
+  - equipamento_id (INTEGER NOT NULL) [FK -> EQUIPAMENTO]
+  - data_previsao_manutencao (DATETIME)
+  - motivo (TEXT)
+  - data_inicio_manutencao (DATETIME)
+  - data_fim_manutencao (DATETIME)
+  - descricao (TEXT)
+  - observacoes (TEXT)
+  - custo (FLOAT)
+
 Tabela: EQUIPAMENTO
   - id (INTEGER NOT NULL) [PK]
   - nome (VARCHAR(255) NOT NULL)
   - modelo (VARCHAR(255))
   - localizacao (VARCHAR(255))
-  - descricao (TEXT(2000))
-  - observacoes (TEXT(2000))
+  - descricao (TEXT)
+  - observacoes (TEXT)
   - data_instalacao (DATETIME)
 
 Tabela: TIPO_SENSOR
@@ -18,6 +29,8 @@ Tabela: TIPO_SENSOR
 Tabela: SENSOR
   - id (INTEGER NOT NULL) [PK]
   - tipo_sensor_id (INTEGER NOT NULL) [FK -> TIPO_SENSOR]
+  - limiar_manutencao_maior (FLOAT)
+  - limiar_manutencao_menor (FLOAT)
   - nome (VARCHAR(255))
   - cod_serial (VARCHAR(255))
   - descricao (VARCHAR(255))
@@ -40,15 +53,4 @@ Tabela: EMPRESA
   - cidade (VARCHAR(255))
   - estado (VARCHAR(2))
   - cep (VARCHAR(8))
-
-Tabela: MANUTENCAO_EQUIPAMENTO
-  - id (INTEGER NOT NULL) [PK]
-  - equipamento_id (INTEGER NOT NULL) [FK -> EQUIPAMENTO]
-  - data_previsao_manutencao (DATETIME)
-  - motivo (TEXT(2000))
-  - data_inicio_manutencao (DATETIME)
-  - data_fim_manutencao (DATETIME)
-  - descricao (TEXT(2000))
-  - observacoes (TEXT(2000))
-  - custo (FLOAT)
 

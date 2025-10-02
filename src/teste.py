@@ -9,15 +9,15 @@ from src.logger.config import configurar_logger
 from datetime import datetime, timedelta
 
 
-def teste():
+def criar_export():
     """Função teste do programa."""
-    configurar_logger()
-    Database.init_oracledb("RM561409", '250489')
-    # Database.create_all_tables(drop_if_exists=False)
+
+    Database.init_oracledb("RM", 'SENHA')
+    Database.create_all_tables(drop_if_exists=False)
 
     generate_ddl()
     generate_mer()
 
 
 if __name__ == "__main__":
-    teste()
+    criar_export()

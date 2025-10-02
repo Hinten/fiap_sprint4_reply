@@ -23,28 +23,40 @@
 ### Coordenador(a)
 - <a href="profandre.chiovato@fiap.com.br">André Godoi Chiovato</a>
 - 
-**Confira o vídeo de apresentação do projeto clicando no link:**
+****
 
-[https://www.youtube.com/watch?v=AHPvV46sFlQ](https://www.youtube.com/watch?v=AHPvV46sFlQ)
+# 1. Vídeo e deploy do projeto na nuvem:
 
-# 1. Descrição do Projeto
+INSERIR VIDEO AQUI
 
-A coleta de dados em ambientes industriais modernos é realizada através de sensores conectados a sistemas embarcados, como o ESP32. Esses sensores monitoram variáveis como temperatura, vibração, luminosidade e qualidade do ar, fornecendo informações críticas para análise e predição de falhas.
+- Link do vídeo: LINK AQUI
 
-Com a chegada da Indústria 4.0, empresas têm apostado fortemente na digitalização do chão de fábrica, conectando sensores e dispositivos a plataformas de dados em nuvem. Isso permite a análise em tempo real e a tomada de decisões baseadas em dados.
+Sobre o deploy na nuvem, o grupo realizou o deploy do projeto no ambiente "AWS Academy". No entanto, este ambiente fica disponível no período de apenas 4 horas, sendo encerrado automaticamente após este período.
+Assim, caso queiram o link do projeto rodando na nuvem, pedimos a gentileza de entrar em contato com o grupo para que possamos iniciar o ambiente e disponibilizar o link do dashboard, conforme print abaixo:
 
-Nesta fase do desafio, utilizamos a simuação criada na fase anterior para treinar uma IA a qual prevê se a máquina precisa de manutenção ou não.
+<p align="center">
+<img src="assets/deploy/console_aws_academy.png" alt="console_aws_academy" border="0" width=40% height=40%>
+</p>
 
-# 2. Objetivos do Projeto
+Não obstante, tendo visto esta limitação, o grupo adicionou neste Readme o passo a passo de como fazer o deploy de todo o projeto facilmente na nuvem utilizando Terraform e AWS CLI, conforme explicado na seção "Deploy na Nuvem AWS com Terraform".
 
-- Modelar um banco de dados relacional para armazenar leituras de sensores e informações de equipamentos industriais.
-- Criar e documentar o diagrama ER (Entidade-Relacionamento) e o script SQL de criação das tabelas.
-- Simular a coleta de dados de sensores utilizando ESP32 e enviar os dados para uma API desenvolvida em Python.
-- Implementar uma API para receber, validar e armazenar os dados dos sensores no banco de dados.
-- Desenvolver e documentar um modelo de Machine Learning para prever a necessidade de manutenção dos equipamentos, utilizando dados coletados.
-- Disponibilizar o código-fonte do modelo de ML (Python ou Jupyter Notebook) e a base de dados utilizada para treino/teste (CSV ou equivalente).
-- Apresentar gráficos, prints e principais resultados obtidos com o modelo de ML.
-- Elaborar documentação explicando a modelagem do banco, a implementação do ML e os resultados alcançados.
+Posto isto, também é possível fazer o deploy do projeto na sua própria conta AWS, bastando seguir as instruções da seção "Deploy na Nuvem AWS com Terraform".
+
+# 2. Descrição e Objetivos
+
+Esta entrega tem como objetivo principal integrar todos os componentes desenvolvidos nas Entregas 1, 2 e 3 em um pipeline funcional, capaz de simular ou executar o fluxo completo de dados, desde a coleta até a visualização e geração de alertas. O pipeline deve contemplar:
+
+- Coleta/ingestão de dados a partir do ESP32 (real ou simulado via Wokwi/VSCode/PlatformIO), com pelo menos um sensor ativo, gerando leituras variáveis.
+- Persistência dos dados coletados em um banco de dados relacional, conforme o modelo lógico (DER) e as tabelas definidas anteriormente.
+- Treinamento e/ou inferência de um modelo básico de Machine Learning utilizando os dados armazenados, com apresentação de ao menos uma métrica relevante (ex: acurácia, MAE) e uma visualização pertinente (ex: curva de previsão, matriz de confusão).
+- Visualização dos resultados em um dashboard ou relatório, exibindo KPIs do processo (ex: média/variação do sensor, score do modelo, número de alertas) e implementação de alertas simples baseados em thresholds ou regras definidas.
+
+Além disso, esta entrega exige:
+
+- Publicação do diagrama da arquitetura final, evidenciando o encadeamento dos blocos (fonte de dados → ingestão → armazenamento → ML → visualização/alerta), fluxos de dados, formatos e periodicidades.
+- Demonstração do fluxo completo, com dados percorrendo todas as etapas do pipeline até a visualização dos resultados.
+- Documentação das decisões técnicas e da integração entre as partes, explicitando a ligação com as entregas anteriores.
+- Disponibilização de scripts, prints e instruções detalhadas para reprodutibilidade do processo, incluindo setup local, ordem de execução e parametrizações.
 
 # 3. Justificativa dos Sensores Escolhidos
 
@@ -64,108 +76,33 @@ Esses sensores foram escolhidos por serem amplamente utilizados em ambientes ind
 - LED, relé e buzzer são usados para alertas visuais e sonoros.
 - O LCD exibe informações em tempo real sobre os sensores.
 
-# 5. Trechos Representativos do Código
-
-O código que controla o ESP32 pode ser encontrado no arquivo [src/wokwi/src/sketch.cpp](src/wokwi/src/sketch.cpp). A seguir, apresentamos trechos representativos do código que demonstram a leitura dos sensores, o envio dos dados para a API e o alerta de vibração.
-
-### Leitura dos Sensores e Envio dos Dados
-
-```cpp
-// Leitura do LDR
-int ldrValue = analogRead(LDR_PIN);
-int lux = map(ldrValue, 0, 4095, 0, 2000); 
-doc["lux"] = lux;
-
-// Leitura da temperatura do MPU6050
-int rawTemp = mpu.getTemperature();
-float tempC = rawTemp / 340.0 + 36.53;
-doc["temperatura"] = tempC;
-
-// Leitura da vibração (aceleração)
-mpu.getAcceleration(&ax_raw, &ay_raw, &az_raw);
-float ax = ax_raw / 16384.0;
-float ay = ay_raw / 16384.0;
-float az = az_raw / 16384.0;
-doc["acelerometro_x"] = ax;
-doc["acelerometro_y"] = ay;
-doc["acelerometro_z"] = az;
-```
-
-### Alerta de Vibração
-
-```cpp
-if (vibracaoMedia > LIMIAR_VIBRACAO) {
-  lcd.setCursor(0, 1);
-  lcd.print("#ALERTA DE VIBRACAO#");
-  // Ativa LED, relé e buzzer
-}
-```
-
-### Envio dos Dados para a API
-
-```cpp
-if (iniciou_sensor) {
-  int httpcode = post_data(doc, post_sensor);
-  if (httpcode >= 200 && httpcode < 300) {
-    Serial.println("Dados enviados com sucesso!");
-  }
-}
-```
-
-# 6. Registro do Funcionamento da Simulação
-
-As leituras dos sensores são coletadas pelo ESP32 e enviadas automaticamente para a API via requisições HTTP. O envio ocorre a cada ciclo de leitura, garantindo que os dados estejam sempre atualizados no banco de dados para análise posterior. O monitor serial e o display LCD exibem em tempo real as leituras e alertas, enquanto a API armazena cada registro recebido.
-
-- **Print do Monitor Serial:**
-
-<p align="center">
-  <img src="assets/print_monitor_serial.JPG" alt="Monitor Serial" border="0" width=70% height=70%>
-</p>
-
-- **Print do LCD:**
-
-<p align="center">
-  <img src="assets/print_lcd.JPG" alt="LCD" border="0" width=70% height=70%>
-</p>
-
 ## Conexão com o Wi-Fi e envio de dados para a API
 
 Para que a simulação funcione corretamente, é necessário configurar a conexão com o Wi-Fi simulado do Wokwi e definir o IP do servidor local da API.
 
-No momento, neste projeto, a API e a simulação do ESP32 estão rodando localmente. Para a configuração funcionar corretamente, é necessário alterar o arquivo [platformio.ini](src/wokwi/platformio.ini) e setar a variável 'API_URL' para 'http://**IP DE SUA MÁQUINA NA REDE LOCAL**:8180', conforme exemplo abaixo:
+Assim, é necessário alterar o arquivo [.env](src/wokwi/.env) do Wokwi e setar a variável 'API_URL' para 'http://**IP DE SUA MÁQUINA NA REDE LOCAL**:8180', conforme exemplo abaixo:
 
 ```plaintext
-[env:esp32]
-platform = espressif32
-framework = arduino
-board = esp32dev
-lib_deps = 
-    bblanchon/ArduinoJson@^7.4.1
-    electroniccats/MPU6050@^1.4.3
-    marcoschwartz/LiquidCrystal_I2C@^1.1.4
-build_flags = 
-    '-D API_URL="http://192.168.0.60:8180"'
-    '-D NETWORK_SSID="Wokwi-GUEST"'
-    '-D NETWORK_PASSWORD=""'
+API_URL=http://192.168.0.1:8180
 ```
 
 > NOTA1: Não sete o IP da API para localhost ou 127.0.0.1, pois o ESP32 não conseguirá se conectar a ele. O localhost do ESP32 é o próprio ESP32, e não a máquina onde o servidor está rodando.
 
 > NOTA2: Caso você esteja rodando a simulação e mesmo assim o ESP32 não consiga se conectar à API, verifique se o firewall da sua máquina está bloqueando a porta 8180. Se estiver, libere a porta para que o ESP32 consiga se conectar.
 
-Após configurado o arquivo `platformio.ini`, você poderá iniciar a simulação do ESP32 no Wokwi. O circuito irá coletar os dados dos sensores e enviá-los para a API, que por sua vez irá armazenar os dados no banco de dados.
+> NOTA3: Caso você faça o deploy do projeto na nuvem AWS (conforme explicado abaixo), o script irá atualizar automaticamente a variável API_URL para o ip da api na nuvem, não sendo necessária nenhuma ação pelo usuário.
 
-## API para salvar os dados do sensor
+Após configurado o arquivo [.env](src/wokwi/.env), você poderá iniciar a simulação do ESP32 no Wokwi. O circuito irá coletar os dados dos sensores e enviá-los para a API, que por sua vez irá armazenar os dados no banco de dados.
+
+# 5. API para salvar os dados do sensor
 
 Neste projeto, foi implementada uma API básica utilizando o FastAPI para receber os dados do sensor e armazená-los no banco de dados. A API permite que o ESP32 envie as leituras dos sensores, que são então salvas no banco de dados para posterior análise e visualização.
 
-Para facilitar os testes, a API está configurada para rodar localmente na porta 8180 e será iniciada automaticamente junto ao dashboard ao executar o comando `streamlit run main_dash.py` quando a variável de ambiente `ENABLE_API` for setada como `true`.
+A API pode ser executada separadamente executando o arquivo [api_basica.py](src/api/api_basica.py).
 
-No entanto, caso queira, a API pode ser executada separadamente executando o arquivo [api_basica.py](src/api/api_basica.py).
+Explicações mais detalhadas sobre como iniciar a api serão apresentadas na seção "Instalando e Executando o Projeto", a seguir neste mesmo README.md.
 
-Explicações mais detalhadas sobre como iniciar o dashboard e variáveis de ambiente serão apresentadas na seção "Instalando e Executando o Projeto", a seguir neste mesmo README.md.
-
-# 7. Armazenamento de Dados em Banco SQL com Python
+# 6. Armazenamento de Dados em Banco SQL com Python
 
 <p align="center">
   <img src="assets/DER.png" alt="DER" border="0" width=70% height=70%>
@@ -176,17 +113,26 @@ Explicações mais detalhadas sobre como iniciar o dashboard e variáveis de amb
   <img src="assets/mer.png" alt="MER" border="0" width=70% height=70%>
 </p>
 
-
-
 Modelo de Entidade-Relacionamento:
+
+Tabela: MANUTENCAO_EQUIPAMENTO
+  - id (INTEGER NOT NULL) [PK]
+  - equipamento_id (INTEGER NOT NULL) [FK -> EQUIPAMENTO]
+  - data_previsao_manutencao (DATETIME)
+  - motivo (TEXT)
+  - data_inicio_manutencao (DATETIME)
+  - data_fim_manutencao (DATETIME)
+  - descricao (TEXT)
+  - observacoes (TEXT)
+  - custo (FLOAT)
 
 Tabela: EQUIPAMENTO
   - id (INTEGER NOT NULL) [PK]
   - nome (VARCHAR(255) NOT NULL)
   - modelo (VARCHAR(255))
   - localizacao (VARCHAR(255))
-  - descricao (TEXT(2000))
-  - observacoes (TEXT(2000))
+  - descricao (TEXT)
+  - observacoes (TEXT)
   - data_instalacao (DATETIME)
 
 Tabela: TIPO_SENSOR
@@ -197,6 +143,8 @@ Tabela: TIPO_SENSOR
 Tabela: SENSOR
   - id (INTEGER NOT NULL) [PK]
   - tipo_sensor_id (INTEGER NOT NULL) [FK -> TIPO_SENSOR]
+  - limiar_manutencao_maior (FLOAT)
+  - limiar_manutencao_menor (FLOAT)
   - nome (VARCHAR(255))
   - cod_serial (VARCHAR(255))
   - descricao (VARCHAR(255))
@@ -219,17 +167,6 @@ Tabela: EMPRESA
   - cidade (VARCHAR(255))
   - estado (VARCHAR(2))
   - cep (VARCHAR(8))
-
-Tabela: MANUTENCAO_EQUIPAMENTO
-  - id (INTEGER NOT NULL) [PK]
-  - equipamento_id (INTEGER NOT NULL) [FK -> EQUIPAMENTO]
-  - data_previsao_manutencao (DATETIME)
-  - motivo (TEXT(2000))
-  - data_inicio_manutencao (DATETIME)
-  - data_fim_manutencao (DATETIME)
-  - descricao (TEXT(2000))
-  - observacoes (TEXT(2000))
-  - custo (FLOAT)
 
 A modelagem do banco de dados foi pensada para garantir a rastreabilidade, integridade e flexibilidade do sistema de monitoramento de sensores e equipamentos. Abaixo, explico o motivo da inclusão de cada entidade e campo:
 
@@ -260,6 +197,8 @@ A modelagem do banco de dados foi pensada para garantir a rastreabilidade, integ
 ***Representa cada sensor físico instalado, permitindo rastrear leituras e manutenções.***
 - **id**: Identificador único do sensor.
 - **tipo_sensor_id**: Relaciona o sensor ao seu tipo, garantindo integridade e padronização.
+- **limiar_manutencao_maior**: Define o valor máximo aceitável para o sensor, acionando alertas quando ultrapassado.
+- **limiar_manutencao_menor**: Define o valor mínimo aceitável para o sensor, acionando alertas quando ultrapassado.
 - **nome**: Nome do sensor, facilita a identificação.
 - **cod_serial**: Código serial do sensor, importante para rastreabilidade física.
 - **descricao**: Detalhes adicionais sobre o sensor.
@@ -300,22 +239,7 @@ O script para criação do banco de dados e tabelas pode ser encontrado no arqui
 O sistema foi desenvolvido em Python e utiliza um banco de dados SQLite para armazenar os dados. O código é modularizado, permitindo fácil manutenção e expansão.
 
 ## 📦 Requisitos
-- Python 3.13.2
-- Bibliotecas:
-  - oracledb==3.1.0
-  - pandas==2.2.3
-  - matplotlib==3.10.1
-  - streamlit==1.44.1
-  - SQLAlchemy==2.0.40
-  - fastapi==0.115.12
-  - pydantic==2.11.5
-  - uvicorn==0.34.3
-  - dotenv==0.9.9
-  - seaborn==0.13.2
-  - plotly==6.1.2
-  - joblib==1.5.2
-  - scipy==1.16.1
-  - scikit-learn==1.7.1
+- *Python 3.11.9*
 
 ## 📂 Instalação
 
@@ -339,19 +263,92 @@ O `.env` é um arquivo-texto simples, onde cada linha define uma variável de am
 
 ### 🔑 Variáveis Utilizadas
 
-| Variável      | Descrição                                                                                                | Exemplo de Valor                  |
-|---------------|----------------------------------------------------------------------------------------------------------|-----------------------------------|
-| LOGGING_ENABLED      | Define se o logger da aplicação será ativado (`true` ou `false`)                                         | `true` ou `false`                 |
-| ENABLE_API      | Define se a API que salva os dados do sensor será ativada juntamente com o dashboard (`true` ou `false`) | `true` ou `false`                 |
+O projeto utiliza variáveis de ambiente para configuração dos serviços, bancos de dados e integrações. Abaixo estão as principais variáveis utilizadas:
 
-### ⚙️ Exemplo de arquivo `.env`
+**Variáveis Gerais:**
+- `LOGGING_ENABLED`: Ativa/desativa logs detalhados (`true` ou `false`).
+- `ENABLE_API`: Ativa/desativa a API (`true` ou `false`).
+- `ORACLE_DB_FROM_ENV`: Usa variáveis de ambiente para conexão Oracle (`true` ou `false`).
+- `SQL_LITE`: Usa SQLite como banco de dados (`true` ou `false`).
 
-```plaintext
-LOGGING_ENABLED=true
-ENABLE_API=true
+**Variáveis do PostgreSQL:**
+- `POSTGRE_DB_FROM_ENV`: Usa variáveis de ambiente para conexão PostgreSQL (`true` ou `false`).
+- `POSTGRE_USER`: Usuário do banco PostgreSQL.
+- `POSTGRE_PASSWORD`: Senha do banco PostgreSQL.
+- `POSTGRE_DB`: Nome do banco PostgreSQL.
+- `POSTGRE_HOST`: Host do banco PostgreSQL.
+- `POSTGRE_PORT`: Porta do banco PostgreSQL.
+
+**Variáveis AWS/SNS:**
+- `AWS_ACCESS_KEY_ID`: Chave de acesso AWS.
+- `AWS_SECRET_ACCESS_KEY`: Chave secreta AWS.
+- `AWS_SESSION_TOKEN`: Token de sessão AWS (opcional).
+- `SNS_TOPIC_ARN`: ARN do tópico SNS para notificações.
+- `SNS_REGION`: Região AWS do SNS.
+
+**Portas dos Serviços:**
+- `DASHBOARD_PORT`: Porta exposta para o dashboard (padrão: 8501).
+- `API_PORT`: Porta exposta para a API (padrão: 8180).
+
+**Variável de Simulação Wokwi:**
+- `API_URL`: URL da API para envio dos dados do ESP32 (exemplo: `http://192.168.0.60:8180`).
+
+# 9. Deploy na Nuvem AWS com Terraform
+
+Para facilitar o deploy e os testes do sistema, foi adotada uma abordagem automatizada utilizando Terraform e AWS CLI para provisionamento da infraestrutura na nuvem AWS.
+
+## Pré-requisitos
+
+- **Terraform** instalado na máquina local ([documentação oficial](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)).
+- **AWS CLI** instalado ([documentação oficial](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)).
+- **Credenciais da AWS CLI configuradas** (comando `aws configure`), utilizando uma conta AWS válida.
+
+## Observação sobre Custos
+
+> **Atenção:** O deploy da infraestrutura na AWS gera um pequeno custo de centavos de dólar por dia, principalmente devido à criação da VPC (Virtual Private Cloud) e recursos associados. Recomenda-se destruir a infraestrutura após os testes para evitar cobranças desnecessárias.
+
+## Como realizar o deploy
+
+1. Acesse a pasta `iac/dev` do projeto.
+2. Execute os comandos do Terraform para inicializar e aplicar a infraestrutura:
+
+```cmd
+cd iac\dev
+terraform init
+terraform apply
 ```
 
-# 9. Treinamento do modelo de Machine Learning
+3. Confirme a aplicação quando solicitado. O Terraform irá provisionar toda a infraestrutura necessária na AWS.
+
+4. Para destruir a infraestrutura e evitar custos:
+
+```cmd
+terraform destroy
+```
+
+## Executando o deploy da aplicação no servidor
+
+Após a criação da infraestrutura, é necessário rodar o script `deploy_app_server.bat` na raiz do projeto. Esse script automatiza o processo de:
+- Obter o IP público da instância criada pelo Terraform.
+- Copiar os arquivos necessários (código, Dockerfiles, docker-compose, variáveis de ambiente) para o servidor EC2 via SSH/SCP.
+- Instalar Docker, Docker Compose e Git na máquina remota.
+- Clonar o repositório do projeto na máquina EC2.
+- Corrigir permissões e preparar o ambiente.
+
+> **Por que usar esse script?**
+>
+> O build da imagem Docker diretamente na nuvem é mais rápido para testes, pois a imagem local pode ser muito grande (ex: 1.6GB devido ao PyCaret). Embora não seja a abordagem ideal para produção, agiliza o deploy e os testes durante o desenvolvimento.
+
+Após rodar o script, o ambiente estará pronto, sendo printados no terminal as urls do dashboard e da api.
+
+## Justificativa da abordagem
+
+Esta estratégia foi adotada para agilizar o deploy e os testes do sistema durante o desenvolvimento, permitindo rápida criação e remoção do ambiente de nuvem.
+
+No futuro, iremos aprimorar o processo, realizando o build da imagem Docker localmente e enviando-a para um repositório (como Amazon ECR ou Docker Hub), ou ainda adotando um pipeline de CI/CD para automação completa do deploy, garantindo maior controle, segurança e escalabilidade.
+
+
+# 10. Treinamento do modelo de Machine Learning
 
 O treinamento do modelo de Machine Learning foi realizado utilizando a biblioteca Scikit-Learn em Python, podendo ser verificano no arquivo [treinamento_ml.ipynb](src/machine_learning/jupyter/treinamento_ml.ipynb).
 Nele também estão disponíveis análises exploratórias dos dados, pré-processamento e avaliação dos modelos, bem como células markdown explicativas.
@@ -360,7 +357,7 @@ O dataset utilizado para o treinamento do modelo pode ser encontrado na pasta [l
 
 Ainda, os modelos treinados e otimizados foram salvos em arquivos `.pkl` e podem ser encontrados na pasta [modelos_otimizados_salvos](assets/modelos_otimizados_salvos).
 
-# 10. 📊 Resultados do Machine Learning
+# 11. 📊 Resultados do Machine Learning
 
 Este projeto apresenta, em uma interface interativa com Streamlit, os resultados de um processo de otimização de modelos de machine learning.
 
@@ -392,7 +389,7 @@ Tempo de Treinamento
 <img width="1437" height="777" alt="image" src="assets/acurácia.png" />
 <img width="1437" height="777" alt="image" src="assets/auc.png" />
 
-# 9. Previsão Manual com Modelos Treinados
+# 12. Previsão Manual com Modelos Treinados
 
 Também é possível realizar previsões manuais utilizando modelos de machine learning previamente treinados e salvos em arquivos .joblib, conforme demonstrado na imagem abaixo:
 
@@ -433,7 +430,7 @@ Saída:
 ⚠️ Manutenção Necessária
 
 
-# 11. Importando a Base de dados utilizada pelo Grupo
+# 13. Importando a Base de dados utilizada pelo Grupo
 
 As tabelas com os dados utilizados no sistema podem ser encontradas na pasta em [assets/database_export.zip](assets/database_export.zip).
 
@@ -484,5 +481,3 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 ## 📋 Licença
 
 <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/agodoi/template">MODELO GIT FIAP</a> por <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://fiap.com.br">Fiap</a> está licenciado sobre <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International</a>.</p>
-
-
