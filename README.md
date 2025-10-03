@@ -292,6 +292,11 @@ O sistema foi desenvolvido em Python e utiliza um banco de dados SQLite para arm
     streamlit run main_dash.py
     ```
 
+- Para iniciar a api, execute o seguinte comando no terminal:
+    ```bash
+    uvicorn src.api.api_basica:app --host 0.0.0.0 --port 8180
+    ```
+
 ## Arquivo de Configuração
 
 O projeto utiliza um arquivo especial denominado **`.env`** para armazenar variáveis de ambiente sensíveis, como credenciais de banco de dados e chaves de APIs externas. Por razões de segurança, esse arquivo **não deve ser compartilhado publicamente**.
@@ -408,7 +413,7 @@ Essa nova View permite que o usuário treine vários modelos diferentes de Machi
   <img src="assets/train_model/train_model2.JPG" alt="Train Model View" border="0" width=70% height=70%>
 </p>
 
-O user pode selecionar a métrica que deseja otimizar (ex: Acurácia, F1-Score, ROC AUC) e o sistema treina automaticamente vários modelos, apresentando os resultados em uma tabela interativa, e posteriormente salva o melhor modelo.
+O user pode selecionar a métrica que deseja otimizar (ex: Acurácia, F1-Score, ROC AUC) e o sistema treina automaticamente vários modelos, apresentando os resultados em uma tabela interativa, mostrando visualizações pertinentes, como a matriz de confusão e posteriormente salva o melhor modelo.
 
 <p align="center">
   <img src="assets/train_model/train_model3.JPG" alt="Train Model View" border="0" width=70% height=70%>
@@ -542,6 +547,7 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 
 - <b>.streamlit</b>: Pasta que contém arquivos de configuração do Streamlit, como o tema da interface e a organização da barra lateral.
 - <b>assets</b>: Diretório destinado ao armazenamento de elementos não estruturados do projeto, como imagens e ícones utilizados no dashboard.
+- <b>iac</b>: Pasta que contém os arquivos de infraestrutura como código (IaC) desenvolvidos em Terraform, utilizados para provisionar e gerenciar a infraestrutura necessária para o funcionamento do sistema na nuvem.
 - <b>src</b>: Diretório principal que contém todo o código-fonte desenvolvido ao longo das fases do projeto. Ele está organizado nos seguintes submódulos:
   - <b>dashboard</b>: Código responsável pela construção do dashboard, desenvolvido em Python com uso da biblioteca Streamlit. ([dashboard](src/dashboard/))
   - <b>database</b>: Módulo responsável pelas operações de banco de dados, incluindo conexões, inserções, listagens, edições e exclusões de registros.
@@ -550,16 +556,15 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
   - <b>plots</b>: Contém o código responsável pela geração de gráficos e visualizações, utilizado para exibir dados de forma clara e intuitiva no dashboard.
   - <b>wokwi</b>: Contém o código do sensor ESP32 utilizado na simulação de sensores.
   - <b>wokwi_api</b>: Contém o código responsável por criar a API que vai salvar as leituras dos sensores no banco de dados.
+- <b>.dockerignore</b>: Arquivo que especifica quais arquivos e pastas devem ser ignorados pelo Docker ao construir a imagem do container, ajudando a reduzir o tamanho da imagem e evitar a inclusão de arquivos desnecessários.
 - <b>.env</b>: Arquivo de configuração que contém as chaves de API e outras variáveis de ambiente necessárias para o funcionamento do sistema. É necessário criar este arquivo na raiz do projeto, conforme orientações na seção "Arquivo de Configuração".
 - <b>.gitignore</b>: Arquivo que especifica quais arquivos e pastas devem ser ignorados pelo Git, evitando que informações sensíveis ou desnecessárias sejam versionadas. É importante garantir que o arquivo `.env` esteja incluído neste arquivo para evitar o upload de chaves de API e outras informações sensíveis.
+- <b>deploy_app_server.bat</b>: Script em batch que automatiza o processo de deploy da aplicação no servidor EC2 na AWS, incluindo a cópia dos arquivos necessários e a configuração do ambiente.
+- <b>Dockerfile</b>: Arquivo que define a imagem Docker para o projeto e suas dependências, permitindo a criação de containers consistentes para execução do sistema.
+- <b>docker-compose.yml</b>: Arquivo de configuração do Docker Compose que define os serviços, redes e volumes necessários para executar o sistema em containers Docker.
 - <b>README</b>: Arquivo de documentação do projeto (este que está sendo lido), com orientações gerais, instruções de uso e contextualização.
 - <b>main_dash</b>: Arquivo principal para a execução do dashboard. Está localizado na raiz do projeto com o objetivo de evitar problemas com importações de módulos internos.
 - <b>requirements.txt</b>: Arquivo que lista todas as dependências do projeto, necessário para a instalação do ambiente virtual. Deve ser utilizado com o comando `pip install -r requirements.txt` para instalar as bibliotecas necessárias.
-
-## 🗃 Histórico de versionamento
-
-* **0.2.0 - 11/06/2025** – README versão final
-* **0.1.0 - 23/05/2025** – Versão preliminar da nossa aplicação
 
 ## 📋 Licença
 
