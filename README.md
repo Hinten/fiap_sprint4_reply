@@ -51,12 +51,32 @@ Esta entrega tem como objetivo principal integrar todos os componentes desenvolv
 - Treinamento e/ou inferência de um modelo básico de Machine Learning utilizando os dados armazenados, com apresentação de ao menos uma métrica relevante (ex: acurácia, MAE) e uma visualização pertinente (ex: curva de previsão, matriz de confusão).
 - Visualização dos resultados em um dashboard ou relatório, exibindo KPIs do processo (ex: média/variação do sensor, score do modelo, número de alertas) e implementação de alertas simples baseados em thresholds ou regras definidas.
 
-Além disso, esta entrega exige:
+---
 
-- Publicação do diagrama da arquitetura final, evidenciando o encadeamento dos blocos (fonte de dados → ingestão → armazenamento → ML → visualização/alerta), fluxos de dados, formatos e periodicidades.
-- Demonstração do fluxo completo, com dados percorrendo todas as etapas do pipeline até a visualização dos resultados.
-- Documentação das decisões técnicas e da integração entre as partes, explicitando a ligação com as entregas anteriores.
-- Disponibilização de scripts, prints e instruções detalhadas para reprodutibilidade do processo, incluindo setup local, ordem de execução e parametrizações.
+## 📌 Resumo do Fluxo do Projeto
+
+1. **Coleta de Dados:** ESP32 (real ou simulado) lê sensores e envia dados via HTTP para a API.
+2. **Ingestão:** API FastAPI recebe e armazena os dados no banco relacional.
+3. **Persistência:** Dados salvos em PostgreSQL conforme DER definido.
+4. **Machine Learning:** Treinamento/inferência de modelos com PyCaret usando dados do banco.
+5. **Visualização:** Dashboard Streamlit exibe KPIs, gráficos e alertas em tempo real.
+6. **Notificações:** Alertas automáticos por e-mail via AWS SNS quando houver previsão do Machine Learing.
+
+---
+
+## 🔗 Entregas Anteriores e Integração
+
+| Fase/Entrega | Repositório/Link | Descrição/Integração                                                                                   |
+|--------------|------------------|--------------------------------------------------------------------------------------------------------|
+| Sprint 1     | [Sprint 1](https://github.com/Hinten/fiap_sprint1_reply) | Planejamento da arquitetura inicial e definição dos blocos do pipeline.                                |
+| Sprint 2     | [Sprint 2](https://github.com/Hinten/fiap_sprint2_reply) | Simulação do circuito ESP32 e sensores, envio de dados para API local e modelagem do banco relacional. |
+| Sprint 3     | [Sprint 3](https://github.com/Lesasouza/fiap_sprint3_reply) | Primeiros experimentos de ML.                                                                          |
+| Sprint 4     | (Este repositório) | Integração completa: coleta, ingestão, persistência, ML, dashboard e alertas.                          |
+
+> **Como as entregas se conectam:**  
+> Cada fase evoluiu o projeto, partindo do planejamento (Sprint 1), passando pela simulação e ingestão de dados (Sprint 2), treinamento de IA (Sprint 3), até a integração total e observabilidade (Sprint 4). O pipeline final costura todos os componentes, garantindo reprodutibilidade e rastreabilidade.
+
+---
 
 # 3. Justificativa dos Sensores Escolhidos
 
@@ -95,6 +115,23 @@ API_URL=http://192.168.0.1:8180
 > NOTA3: Caso você faça o deploy do projeto na nuvem AWS (conforme explicado abaixo), o script irá atualizar automaticamente a variável API_URL para o ip da api na nuvem, não sendo necessária nenhuma ação pelo usuário.
 
 Após configurado o arquivo [.env](src/wokwi/.env), você poderá iniciar a simulação do ESP32 no Wokwi. O circuito irá coletar os dados dos sensores e enviá-los para a API, que por sua vez irá armazenar os dados no banco de dados.
+
+## Registro do Funcionamento da Simulação
+
+As leituras dos sensores são coletadas pelo ESP32 e enviadas automaticamente para a API via requisições HTTP. O envio ocorre a cada ciclo de leitura, garantindo que os dados estejam sempre atualizados no banco de dados para análise posterior. O monitor serial e o display LCD exibem em tempo real as leituras e alertas, enquanto a API armazena cada registro recebido.
+
+- **Print do Monitor Serial:**
+
+<p align="center">
+  <img src="assets/print_monitor_serial.JPG" alt="Monitor Serial" border="0" width=70% height=70%>
+</p>
+
+- **Print do LCD:**
+
+<p align="center">
+  <img src="assets/print_lcd.JPG" alt="LCD" border="0" width=70% height=70%>
+</p>
+
 
 # 5. API para salvar os dados do sensor
 
