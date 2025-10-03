@@ -468,7 +468,7 @@ Caso o user cadastre um sensor com limiares de alerta, nos campos "Limiar De Man
 </p>
  
 <p align="center">
-  <img src="assets/notificacoes/tempo_real_limiar.JPG" alt="Tempo Real" border="0" width=70% height=70%>
+  <img src="assets/notificacoes/tempo_real_limiar_grafico.JPG" alt="Tempo Real" border="0" width=70% height=70%>
 </p>
 
 Por fim, nesta página, o user poderá fazer previsões com os valores das leituras em tempo real, clicando no botão "Fazer Previsão", caso o modelo identifique que a manutenção é necessária, o user poderá enviar um email de alerta clicando no botão "Enviar Alerta de Manutenção".
