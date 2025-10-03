@@ -6,9 +6,9 @@
 
 <br>
 
-# Projeto: fiap_sprint3_reply
+# Projeto: fiap_sprint4_reply
 
-## Atividade em Grupo: FIAP - 1TIAOB - 2025/1 - Fase5 Sprint 3 - Reply
+## Atividade em Grupo: FIAP - 1TIAOB - 2025/1 - Fase6 Sprint 4 - Reply
 
 ## 👨‍🎓 Integrantes: 
 - <a href="">Alice C. M. Assis - RM 566233</a>
@@ -67,6 +67,8 @@ Além disso, esta entrega exige:
 Esses sensores foram escolhidos por serem amplamente utilizados em ambientes industriais e facilmente simuláveis no Wokwi.
 
 # 4. Esquema do Circuito Simulado
+
+O circuito simulado é o mesmo feito quando da entrega 2 (https://github.com/Hinten/fiap_sprint2_reply), foram feitas pequenas modificações, principalmente na conexão WIFI e variáveis de ambiente, para que o ESP32 consiga se conectar a API local e enviar os dados dos sensores.
 
 <p align="center">
   <img src="assets/ciruito.JPG" alt="Circuito Sensor" border="0" width=70% height=70%>
@@ -232,7 +234,7 @@ Essas classes podem ser encontradas na pasta `src/database/models`, e todas elas
 ## Script de Criação do Banco de Dados
 
 O script para criação do banco de dados e tabelas pode ser encontrado no arquivo [assets/table_creation.ddl](assets/table_creation.ddl).
-**Este script não precisa ser executado manualmente, pois o banco de dados é criado automaticamente ao iniciar o dashboard.**
+**Este script não precisa ser executado manualmente, pois o banco de dados é criado automaticamente ao iniciar o dashboard ou API.**
 
 # 8. Instalando e Executando o Projeto
 
@@ -297,6 +299,14 @@ O projeto utiliza variáveis de ambiente para configuração dos serviços, banc
 
 Para facilitar o deploy e os testes do sistema, foi adotada uma abordagem automatizada utilizando Terraform e AWS CLI para provisionamento da infraestrutura na nuvem AWS.
 
+## Diagrama da Arquitetura
+
+<p align="center">
+  <img src="assets/Diagrama_reply.drawio.png" alt="Diagrama da arquitetura" border="0" width=70% height=70%>
+</p>
+
+Comparado com o primeiro planejamento, que pode ser visto no github https://github.com/Hinten/fiap_sprint1_reply, o projeto vem evoluindo bem, estando quase todo o planejamento inicial implementado, faltando apenas a a parte de treinamento de IA automatizado.
+
 ## Pré-requisitos
 
 - **Terraform** instalado na máquina local ([documentação oficial](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)).
@@ -347,49 +357,85 @@ Esta estratégia foi adotada para agilizar o deploy e os testes do sistema duran
 
 No futuro, iremos aprimorar o processo, realizando o build da imagem Docker localmente e enviando-a para um repositório (como Amazon ECR ou Docker Hub), ou ainda adotando um pipeline de CI/CD para automação completa do deploy, garantindo maior controle, segurança e escalabilidade.
 
-
 # 10. Treinamento do modelo de Machine Learning
 
-O treinamento do modelo de Machine Learning foi realizado utilizando a biblioteca Scikit-Learn em Python, podendo ser verificano no arquivo [treinamento_ml.ipynb](src/machine_learning/jupyter/treinamento_ml.ipynb).
-Nele também estão disponíveis análises exploratórias dos dados, pré-processamento e avaliação dos modelos, bem como células markdown explicativas.
+Comparado ao trabalho anterior, constante no github https://github.com/Lesasouza/fiap_sprint3_reply, foi elaborada uma nova View de treinamento de modelos de Machine Learning no dashboard utilizando o Pycaret.
 
-O dataset utilizado para o treinamento do modelo pode ser encontrado na pasta [leituras_com_equipamento.csv](src/machine_learning/jupyter/leituras_com_equipamento.csv).
+<p align="center">
+  <img src="assets/train_model/train_model.JPG" alt="Train Model View" border="0" width=70% height=70%>
+</p>
 
-Ainda, os modelos treinados e otimizados foram salvos em arquivos `.pkl` e podem ser encontrados na pasta [modelos_otimizados_salvos](assets/modelos_otimizados_salvos).
+Essa nova View permite que o usuário treine vários modelos diferentes de Machine Learning com apenas um clique, utilizando a biblioteca PyCaret para simplificar o processo.
 
-# 11. 📊 Resultados do Machine Learning
+<p align="center">
+  <img src="assets/train_model/train_model2.JPG" alt="Train Model View" border="0" width=70% height=70%>
+</p>
 
-Este projeto apresenta, em uma interface interativa com Streamlit, os resultados de um processo de otimização de modelos de machine learning.
+O user pode selecionar a métrica que deseja otimizar (ex: Acurácia, F1-Score, ROC AUC) e o sistema treina automaticamente vários modelos, apresentando os resultados em uma tabela interativa, e posteriormente salva o melhor modelo.
 
-São exibidas métricas de desempenho, comparações gráficas e análise de tempos de treinamento, auxiliando na interpretação dos modelos avaliados.
+<p align="center">
+  <img src="assets/train_model/train_model3.JPG" alt="Train Model View" border="0" width=70% height=70%>
+</p>
 
-🚀 Funcionalidades
+<p align="center">
+  <img src="assets/train_model/train_model4.JPG" alt="Train Model View" border="0" width=70% height=70%>
+</p>
 
-✅ Carregamento automático dos resultados e tempos de treinamento dos modelos.
+<p align="center">
+  <img src="assets/train_model/train_model5.JPG" alt="Train Model View" border="0" width=70% height=70%>
+</p>
 
-✅ Exibição em tabela interativa com as principais métricas de avaliação.
+<p align="center">
+  <img src="assets/train_model/train_model6.JPG" alt="Train Model View" border="0" width=70% height=70%>
+</p>
 
-✅ Visualizações gráficas:
+<p align="center">
+  <img src="assets/train_model/train_model7.JPG" alt="Train Model View" border="0" width=70% height=70%>
+</p>
 
-Acurácia
+# 11. 📊 Notificações via EMAIL
 
-F1-Score
+O sistema implementa notificações automáticas via email utilizando o serviço Amazon SNS (Simple Notification Service) da AWS. Para que o user receba as notificações, é necessário configurar o serviço SNS na AWS e adicionar o email do destinatário como assinante do tópico SNS.
 
-ROC AUC
+<p align="center">
+  <img src="assets/notificacoes/subscricao_email.JPG" alt="Subscrição Email" border="0" width=70% height=70%>
+</p>
 
-Tempo de Treinamento
+Após a adicionar o email, o usuário receberá um email de confirmação, sendo necessário clicar no link para confirmar a subscrição.
 
-✅ Resumos explicativos dos resultados e insights obtidos.
+<p align="center">
+  <img src="assets/notificacoes/subscricao_email_confirmar.JPG" alt="Confirmar Subscrição Email" border="0" width=70% height=70%>
+</p>
 
-✅ Conclusão sobre melhores modelos considerando precisão, interpretabilidade e custo computacional.
+Confirmada a subscrição, o usuário começará a receber as notificações enviadas pelo sistema. Para ter certeza que o email está funcionando, o usuário pode enviar um email de teste clicando no botão "Enviar E-mail de Teste".
 
-📊 Exemplos de Resultados
+# 12. 📊 Visualização de leituras em tempo real e notificação de alertas
 
-<img width="1437" height="777" alt="image" src="assets/f1 score.png" />
-<img width="1437" height="777" alt="image" src="assets/acurácia.png" />
-<img width="1437" height="777" alt="image" src="assets/auc.png" />
+A página principal do aplicativo se tornou uma View para visualização das leituras dos sensores em tempo real, com gráficos atualizados a cada 60 segundos.
 
-# 12. Previsão Manual com Modelos Treinados
+> Nota: Tentamos implementar atualizações em um período de tempo menor, mas aparentemente o Streamlit tem um memoryleak que acaba congelando a máquina. Estamos trabalhando para solucionar esse problema nas próximas entregas.
+ 
+<p align="center">
+  <img src="assets/tempo_real/tempo_real.JPG" alt="Tempo Real" border="0" width=70% height=70%>
+</p>
+
+Caso o user cadastre um sensor com limiares de alerta, nos campos "Limiar De Manutenção Maior" ou "Limiar De Manutenção Menor" o gráfico de visualização mostrará linhas as quais apontam que as leituras estão ultrapassando os limiares, conforme abaixo:.
+ 
+<p align="center">
+  <img src="assets/notificacoes/tempo_real_limiar.JPG" alt="Tempo Real" border="0" width=70% height=70%>
+</p>
+ 
+<p align="center">
+  <img src="assets/notificacoes/tempo_real_limiar.JPG" alt="Tempo Real" border="0" width=70% height=70%>
+</p>
+
+Por fim, nesta página, o user poderá fazer previsões com os valores das leituras em tempo real, clicando no botão "Fazer Previsão", caso o modelo identifique que a manutenção é necessária, o user poderá enviar um email de alerta clicando no botão "Enviar Alerta de Manutenção".
+ 
+<p align="center">
+  <img src="assets/notificacoes/tempo_real_limiar_previsao_alerta.JPG" alt="Tempo Real" border="0" width=70% height=70%>
+</p>
+
+# 13. Previsão Manual com Modelos Treinados
 
 Também é possível realizar previsões manuais utilizando modelos de machine learning previamente treinados e salvos em arquivos .joblib, conforme demonstrado na imagem abaixo:
 
@@ -430,7 +476,7 @@ Saída:
 ⚠️ Manutenção Necessária
 
 
-# 13. Importando a Base de dados utilizada pelo Grupo
+# 14. Importando a Base de dados utilizada pelo Grupo
 
 As tabelas com os dados utilizados no sistema podem ser encontradas na pasta em [assets/database_export.zip](assets/database_export.zip).
 

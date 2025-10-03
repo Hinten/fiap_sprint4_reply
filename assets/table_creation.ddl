@@ -63,7 +63,9 @@ CREATE TABLE "MANUTENCAO_EQUIPAMENTO" (
 CREATE TABLE "SENSOR" (
 	id INTEGER NOT NULL, 
 	tipo_sensor_id INTEGER NOT NULL, 
-	nome VARCHAR2(255 CHAR), 
+	limiar_manutencao_maior FLOAT,
+	limiar_manutencao_menor FLOAT,
+	nome VARCHAR2(255 CHAR),
 	cod_serial VARCHAR2(255 CHAR), 
 	descricao VARCHAR2(255 CHAR), 
 	data_instalacao DATE, 
