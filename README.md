@@ -347,7 +347,7 @@ Para facilitar o deploy e os testes do sistema, foi adotada uma abordagem automa
   <img src="assets/Diagrama_reply.drawio.png" alt="Diagrama da arquitetura" border="0" width=70% height=70%>
 </p>
 
-Comparado com o primeiro planejamento, que pode ser visto no github https://github.com/Hinten/fiap_sprint1_reply, o projeto vem evoluindo bem, estando quase todo o planejamento inicial implementado, faltando apenas a a parte de treinamento de IA automatizado.
+Comparado com o primeiro planejamento, que pode ser visto no github https://github.com/Hinten/fiap_sprint1_reply, o projeto vem evoluindo bem, estando quase todo o planejamento inicial implementado, faltando apenas pequenos apontamentos e otimizações.
 
 ## Pré-requisitos
 
