@@ -455,7 +455,7 @@ Confirmada a subscrição, o usuário começará a receber as notificações env
 
 A página principal do aplicativo se tornou uma View para visualização das leituras dos sensores em tempo real, com gráficos atualizados a cada 60 segundos.
 
-> Nota: Tentamos implementar atualizações em um período de tempo menor, mas aparentemente o Streamlit tem um memoryleak que acaba congelando a máquina. Estamos trabalhando para solucionar esse problema nas próximas entregas.
+> Nota: Tentamos implementar atualizações em um período de tempo menor, mas aparentemente o Streamlit tem um memory leak que acaba congelando a máquina. Estamos trabalhando para solucionar esse problema nas próximas entregas.
  
 <p align="center">
   <img src="assets/tempo_real/tempo_real.JPG" alt="Tempo Real" border="0" width=70% height=70%>
