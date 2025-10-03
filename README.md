@@ -380,7 +380,7 @@ terraform destroy
 
 ## Executando o deploy da aplicação no servidor
 
-Após a criação da infraestrutura, é necessário rodar o script `deploy_app_server.bat` na raiz do projeto. Esse script automatiza o processo de:
+Após a criação da infraestrutura, é necessário rodar o script [deploy_app_server.bat](deploy_app_server.bat) na raiz do projeto. Esse script automatiza o processo de:
 - Obter o IP público da instância criada pelo Terraform.
 - Copiar os arquivos necessários (código, Dockerfiles, docker-compose, variáveis de ambiente) para o servidor EC2 via SSH/SCP.
 - Instalar Docker, Docker Compose e Git na máquina remota.
