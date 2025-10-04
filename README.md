@@ -27,9 +27,13 @@
 
 # 1. Vídeo e deploy do projeto na nuvem:
 
-INSERIR VIDEO AQUI
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=IDIRm9l1ybo" target="_blank">
+    <img src="assets/Banner_Replay_Sprint4.jpg" alt="Circuito Sensor" border="0" width="70%" height="70%">
+  </a>
+</p>
 
-- Link do vídeo: LINK AQUI
+- Link do vídeo: https://www.youtube.com/watch?v=IDIRm9l1ybo
 
 Sobre o deploy na nuvem, o grupo realizou o deploy do projeto no ambiente "AWS Academy". No entanto, este ambiente fica disponível no período de apenas 4 horas, sendo encerrado automaticamente após este período.
 Assim, caso queiram o link do projeto rodando na nuvem, pedimos a gentileza de entrar em contato com o grupo para que possamos iniciar o ambiente e disponibilizar o link do dashboard, conforme print abaixo:
