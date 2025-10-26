@@ -1116,20 +1116,6 @@ textarea:focus {
 }
 
 /* ============================================================================
-[data-testid="stError"],
-.stError {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
-  border-left: 4px solid var(--error);
-}
-
-/* Info Alert */
-[data-testid="stInfo"],
-.stInfo {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
-  border-left: 4px solid var(--info);
-}
-
-/* ============================================================================
    Responsive Design - Mobile First
    ============================================================================ */
 
