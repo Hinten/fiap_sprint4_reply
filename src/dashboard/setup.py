@@ -1,8 +1,11 @@
 import logging
 from src.database.tipos_base.database import Database
 import streamlit as st
+from src.dashboard.styles_loader import apply_custom_theme
 
 def setup():
+    # Apply custom CSS theme
+    apply_custom_theme()
 
     Database.init_from_session(st.session_state.get('engine'), st.session_state.get('session'))
 

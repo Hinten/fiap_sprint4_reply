@@ -1,0 +1,688 @@
+/* ============================================================================
+   FIAP Sprint 4 Reply - Custom Dashboard CSS
+   Design Concept: Modern Corporate Light with Blue-Teal Accents
+   
+   Theme: Professional IoT monitoring dashboard with harmonious colors,
+   modern typography, balanced spacing, subtle shadows, and elegant interactions.
+   ============================================================================ */
+
+/* CSS Variables - Design System */
+:root {
+  /* Color Palette */
+  --bg-primary: #f6f8fb;
+  --bg-gradient-start: #f6f8fb;
+  --bg-gradient-end: #ffffff;
+  --card-bg: #ffffff;
+  --text-primary: #0f1724;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  
+  /* Accent Colors */
+  --accent-primary: #1f6feb;
+  --accent-primary-dark: #155ab8;
+  --accent-secondary: #00bfa6;
+  --accent-secondary-dark: #00a890;
+  
+  /* Status Colors */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(15, 23, 36, 0.04);
+  --shadow-md: 0 4px 16px rgba(15, 23, 36, 0.08);
+  --shadow-lg: 0 8px 24px rgba(15, 23, 36, 0.12);
+  --shadow-hover: 0 12px 32px rgba(31, 111, 235, 0.15);
+  
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.35s ease;
+}
+
+/* ============================================================================
+   Base Styles
+   ============================================================================ */
+
+/* Import Google Font - Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Main App Container */
+.stApp {
+  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 60%);
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Page Container with Better Padding */
+section.main > div.block-container {
+  padding-top: var(--spacing-xl);
+  padding-left: var(--spacing-xl);
+  padding-right: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  max-width: 1400px;
+}
+
+/* ============================================================================
+   Typography
+   ============================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+h2 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-md);
+}
+
+h3 {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+p, .stMarkdown p {
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   Sidebar Styling
+   ============================================================================ */
+
+[data-testid="stSidebar"] {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 251, 253, 0.95) 100%);
+  border-right: 1px solid rgba(15, 23, 36, 0.06);
+  box-shadow: var(--shadow-md);
+}
+
+[data-testid="stSidebar"] > div:first-child {
+  padding: var(--spacing-lg);
+}
+
+/* Sidebar Headers */
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Sidebar Links */
+[data-testid="stSidebar"] a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  font-weight: 500;
+}
+
+[data-testid="stSidebar"] a:hover {
+  color: var(--accent-primary);
+}
+
+/* ============================================================================
+   Buttons
+   ============================================================================ */
+
+/* Primary Buttons */
+.stButton > button,
+button[kind="primary"],
+button[kind="primaryFormSubmit"] {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.stButton > button:hover,
+button[kind="primary"]:hover,
+button[kind="primaryFormSubmit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  background: linear-gradient(135deg, var(--accent-primary-dark) 0%, var(--accent-primary) 100%);
+}
+
+.stButton > button:active,
+button[kind="primary"]:active,
+button[kind="primaryFormSubmit"]:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Secondary Buttons */
+button[kind="secondary"] {
+  background: var(--card-bg);
+  color: var(--accent-primary);
+  border: 2px solid var(--accent-primary);
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: all var(--transition-base);
+}
+
+button[kind="secondary"]:hover {
+  background: var(--accent-primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================================
+   Input Fields
+   ============================================================================ */
+
+/* Text Inputs */
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input,
+.stTextArea textarea,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  border: 1px solid rgba(15, 23, 36, 0.12);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.stTextInput > div > div > input:focus,
+.stNumberInput > div > div > input:focus,
+.stTextArea textarea:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.1), var(--shadow-md);
+}
+
+/* Select Boxes */
+.stSelectbox > div > div,
+.stMultiSelect > div > div {
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(15, 23, 36, 0.12);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================================
+   Cards and Containers
+   ============================================================================ */
+
+/* Generic Container/Card Styling */
+.element-container {
+  margin-bottom: var(--spacing-md);
+}
+
+/* Dividers */
+.stDivider {
+  margin: var(--spacing-lg) 0;
+  border-color: rgba(15, 23, 36, 0.06);
+}
+
+/* ============================================================================
+   Metrics
+   ============================================================================ */
+
+[data-testid="stMetric"] {
+  background: var(--card-bg);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(15, 23, 36, 0.04);
+  transition: all var(--transition-base);
+}
+
+[data-testid="stMetric"]:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+[data-testid="stMetric"] label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-testid="stMetric"] [data-testid="stMetricValue"] {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+[data-testid="stMetric"] [data-testid="stMetricDelta"] {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/* ============================================================================
+   Tabs
+   ============================================================================ */
+
+.stTabs [data-baseweb="tab-list"] {
+  gap: var(--spacing-sm);
+  background: transparent;
+  border-bottom: 2px solid rgba(15, 23, 36, 0.06);
+}
+
+.stTabs [data-baseweb="tab"] {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 600;
+  transition: all var(--transition-base);
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+  background: rgba(31, 111, 235, 0.05);
+  color: var(--accent-primary);
+}
+
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+  color: #ffffff;
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================================
+   Dataframes and Tables
+   ============================================================================ */
+
+.stDataFrame,
+[data-testid="stDataFrame"] {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(15, 23, 36, 0.06);
+}
+
+.stDataFrame table {
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+}
+
+.stDataFrame thead th {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+  color: #ffffff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--spacing-md);
+  border: none;
+}
+
+.stDataFrame tbody td {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid rgba(15, 23, 36, 0.06);
+  color: var(--text-primary);
+}
+
+.stDataFrame tbody tr:hover {
+  background: rgba(31, 111, 235, 0.02);
+}
+
+/* ============================================================================
+   Charts and Plots
+   ============================================================================ */
+
+.stPlotlyChart,
+.js-plotly-plot {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  background: var(--card-bg);
+  padding: var(--spacing-md);
+}
+
+/* ============================================================================
+   Expander
+   ============================================================================ */
+
+.streamlit-expanderHeader {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  border: 1px solid rgba(15, 23, 36, 0.06);
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all var(--transition-base);
+}
+
+.streamlit-expanderHeader:hover {
+  background: rgba(31, 111, 235, 0.02);
+  border-color: var(--accent-primary);
+}
+
+.streamlit-expanderContent {
+  background: var(--card-bg);
+  border: 1px solid rgba(15, 23, 36, 0.06);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+/* ============================================================================
+   Alerts and Messages
+   ============================================================================ */
+
+.stAlert {
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Success Alert */
+[data-testid="stSuccess"],
+.stSuccess {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border-left: 4px solid var(--success);
+}
+
+/* Warning Alert */
+[data-testid="stWarning"],
+.stWarning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+  border-left: 4px solid var(--warning);
+}
+
+/* Error Alert */
+[data-testid="stError"],
+.stError {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border-left: 4px solid var(--error);
+}
+
+/* Info Alert */
+[data-testid="stInfo"],
+.stInfo {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+  border-left: 4px solid var(--info);
+}
+
+/* ============================================================================
+   Forms
+   ============================================================================ */
+
+.stForm {
+  background: var(--card-bg);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(15, 23, 36, 0.06);
+}
+
+/* ============================================================================
+   Progress and Spinners
+   ============================================================================ */
+
+.stProgress > div > div {
+  background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  border-radius: var(--radius-md);
+}
+
+.stSpinner > div {
+  border-color: var(--accent-primary);
+}
+
+/* ============================================================================
+   File Uploader
+   ============================================================================ */
+
+[data-testid="stFileUploader"] {
+  border-radius: var(--radius-md);
+  border: 2px dashed rgba(15, 23, 36, 0.12);
+  padding: var(--spacing-xl);
+  background: var(--card-bg);
+  transition: all var(--transition-base);
+}
+
+[data-testid="stFileUploader"]:hover {
+  border-color: var(--accent-primary);
+  background: rgba(31, 111, 235, 0.02);
+}
+
+/* ============================================================================
+   Columns
+   ============================================================================ */
+
+[data-testid="column"] {
+  padding: var(--spacing-sm);
+}
+
+/* ============================================================================
+   Toast Notifications
+   ============================================================================ */
+
+.stToast {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(15, 23, 36, 0.08);
+}
+
+/* ============================================================================
+   Slider
+   ============================================================================ */
+
+.stSlider [role="slider"] {
+  background: var(--accent-primary);
+  border: 3px solid #ffffff;
+  box-shadow: var(--shadow-md);
+}
+
+.stSlider [data-testid="stThumbValue"] {
+  background: var(--accent-primary);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* ============================================================================
+   Checkbox and Radio
+   ============================================================================ */
+
+.stCheckbox label,
+.stRadio label {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.stCheckbox input:checked,
+.stRadio input:checked {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+/* ============================================================================
+   Responsive Design
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  section.main > div.block-container {
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  section.main > div.block-container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+    padding-top: var(--spacing-lg);
+  }
+  
+  h1 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  h2 {
+    font-size: var(--font-size-xl);
+  }
+  
+  .stButton > button {
+    width: 100%;
+    padding: 14px 20px;
+  }
+  
+  [data-testid="stMetric"] {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ============================================================================
+   Animations
+   ============================================================================ */
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease both;
+}
+
+/* Pulse Animation for emphasis */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* ============================================================================
+   Utility Classes
+   ============================================================================ */
+
+/* Text Utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-accent {
+  color: var(--accent-primary);
+}
+
+/* Spacing Utilities */
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+
+/* ============================================================================
+   Custom Scrollbar
+   ============================================================================ */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 36, 0.02);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 36, 0.15);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-base);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+/* ============================================================================
+   Print Styles
+   ============================================================================ */
+
+@media print {
+  .stApp {
+    background: white;
+  }
+  
+  [data-testid="stSidebar"] {
+    display: none;
+  }
+  
+  .stButton {
+    display: none;
+  }
+}
