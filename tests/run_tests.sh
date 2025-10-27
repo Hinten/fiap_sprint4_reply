@@ -84,6 +84,11 @@ case "${1:-all}" in
         echo -e "${GREEN}Use './tests/run_tests.sh [opção]' para rodar testes específicos${NC}"
         ;;
 
+    "crud")
+        echo -e "${BLUE}Rodando testes CRUD...${NC}\n"
+        run_test "Testes CRUD" "python -m pytest tests/crud/ -v"
+        ;;
+
     "help"|"-h"|"--help")
         echo "Uso: ./tests/run_tests.sh [opção]"
         echo ""
@@ -92,6 +97,7 @@ case "${1:-all}" in
         echo "  unit        - Apenas testes unitários"
         echo "  integration - Apenas testes de integração"
         echo "  memory      - Apenas testes de memory leak"
+        echo "  crud        - Apenas testes CRUD dos models"
         echo "  coverage    - Testes com relatório de cobertura"
         echo "  quick       - Testes rápidos (pula testes marcados como slow)"
         echo "  failed      - Re-roda apenas testes que falharam"
@@ -115,4 +121,3 @@ esac
 echo -e "${BLUE}======================================${NC}"
 echo -e "${GREEN}✓ Concluído!${NC}"
 echo -e "${BLUE}======================================${NC}"
-

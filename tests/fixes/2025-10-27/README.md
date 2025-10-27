@@ -22,6 +22,7 @@ Plano de ação detalhado para implementação das correções. Inclui passos ex
 5. **🟢 BAIXO:** Validação de paths no SQLite
 6. **🟢 BAIXO:** Validação de tipos de entrada
 7. **🟢 NOVO:** Uso incorreto da API Database no Dashboard
+8. **🟢 NOVO:** Erros nos testes CRUD dos models
 
 ## Status:
 ✅ Todas as correções foram implementadas  

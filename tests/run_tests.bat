@@ -24,6 +24,7 @@ if "%TEST_TYPE%"=="summary" goto summary
 if "%TEST_TYPE%"=="help" goto help
 if "%TEST_TYPE%"=="-h" goto help
 if "%TEST_TYPE%"=="--help" goto help
+if "%TEST_TYPE%"=="crud" goto crud
 
 echo Opção inválida: %TEST_TYPE%
 echo Use 'tests\run_tests.bat help' para ver opções disponíveis
@@ -95,6 +96,7 @@ echo   all         - Roda todos os testes (padrão)
 echo   unit        - Apenas testes unitários
 echo   integration - Apenas testes de integração
 echo   memory      - Apenas testes de memory leak
+echo   crud        - Apenas testes CRUD dos models
 echo   coverage    - Testes com relatório de cobertura
 echo   quick       - Testes rápidos (pula testes marcados como slow)
 echo   failed      - Re-roda apenas testes que falharam
@@ -106,6 +108,12 @@ echo Exemplos:
 echo   tests\run_tests.bat unit
 echo   tests\run_tests.bat coverage
 echo   tests\run_tests.bat quick
+goto end
+
+:crud
+echo Rodando testes CRUD...
+echo.
+python -m pytest tests/crud/ -v
 goto end
 
 :end

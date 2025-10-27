@@ -9,6 +9,12 @@
 - **Mudanças:** Remoção de método inexistente `init_from_session`
 - **Status:** ✅ Implementado
 
+#### 🟢 Bug #8: Erros nos Testes CRUD (NOVO)
+- **Arquivos:** `tests/crud/*.py`
+- **Correção:** Corrigidos 8 erros nos testes CRUD dos models
+- **Mudanças:** DetachedInstanceError, métodos __str__, mocks, foreign key constraints
+- **Status:** ✅ Implementado
+
 ## ✅ Checklist de Validação
 
 - [x] Bug #1: Shutdown gracioso implementado
@@ -20,3 +26,4 @@
 - [x] Bug #7: API Database corrigida no Dashboard
 - [x] Testes atualizados para nova API
 - [x] Validação de importação realizada
+- [x] Bug #8: Testes CRUD corrigidos

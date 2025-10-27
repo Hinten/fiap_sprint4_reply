@@ -142,6 +142,32 @@ Verificam vazamentos de memória (memory leaks).
 **Exemplos:**
 - `test_memory_leaks.py` - Detecta vazamentos no dashboard e banco de dados
 
+### Testes CRUD (`tests/crud/`)
+
+Testam operações básicas de Create, Read, Update e Delete para todos os models do banco de dados.
+
+**Models testados:**
+- `Empresa` - Empresa
+- `Equipamento` - Equipamento
+- `ManutencaoEquipamento` - Manutenção de Equipamento
+- `TipoSensor` - Tipo de Sensor
+- `Sensor` - Sensor
+- `LeituraSensor` - Leitura de Sensor
+
+**Exemplos:**
+- `test_empresa_crud.py` - Testes CRUD para Empresa
+- `test_equipamento_crud.py` - Testes CRUD para Equipamento
+- `test_sensor_crud.py` - Testes CRUD para Sensor e relacionados
+
+**Como rodar apenas testes CRUD:**
+```bash
+# Com script helper
+./tests/run_tests.sh crud
+
+# Com pytest direto
+pytest tests/crud/ -v
+```
+
 ## 🔍 Verificação de Memory Leaks
 
 ### Método 1: Testes Automáticos com pytest
@@ -398,4 +424,3 @@ Se tiver dúvidas sobre os testes:
 3. Execute `pytest -h` para ver todas as opções
 
 ## 📚 Recursos Adicionais
-
