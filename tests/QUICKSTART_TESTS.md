@@ -27,8 +27,8 @@ pip install -r requirements.txt
 pytest
 
 # Ou usar o helper script
-./run_tests.sh        # Linux/Mac
-run_tests.bat         # Windows
+./tests/run_tests.sh        # Linux/Mac
+tests\run_tests.bat         # Windows
 ```
 
 ✅ **Pronto!** Você deve ver algo como:
@@ -43,19 +43,19 @@ run_tests.bat         # Windows
 pytest -v
 
 # Apenas testes rápidos
-./run_tests.sh quick
+./tests/run_tests.sh quick
 
 # Com cobertura de código
-./run_tests.sh coverage
+./tests/run_tests.sh coverage
 
 # Ver quais testes existem
-./run_tests.sh summary
+./tests/run_tests.sh summary
 ```
 
 ## 📚 Documentação Completa
 
-- **TESTS.md** - Guia completo de testes
-- **BUG_REPORT.md** - Bugs encontrados e soluções
+- **tests/TESTS.md** - Guia completo de testes
+- **tests/BUG_REPORT.md** - Bugs encontrados e soluções
 - **tests/README.md** - Estrutura dos testes
 
 ## 🐛 Bugs Importantes
@@ -64,14 +64,14 @@ pytest -v
 - **Thread daemon na API** (`src/api/api_basica.py:60`)
   - Causa: Thread finalizada abruptamente
   - Impacto: Conexões podem não fechar
-  - Ver: BUG_REPORT.md para solução
+  - Ver: tests/BUG_REPORT.md para solução
 
 ### 🟡 MÉDIO - Corrigir em Breve
 - Estado global no Database
 - Parsing de booleanos limitado
 - Handlers de log acumulam
 
-Veja **BUG_REPORT.md** para detalhes completos.
+Veja **tests/BUG_REPORT.md** para detalhes completos.
 
 ## ❓ Problemas Comuns
 
@@ -83,7 +83,7 @@ pip install pytest pytest-cov pytest-mock
 ### Testes falhando
 ```bash
 # Re-rodar apenas os que falharam
-./run_tests.sh failed
+./tests/run_tests.sh failed
 ```
 
 ### Ver detalhes de falhas
@@ -93,19 +93,20 @@ pytest -vv --tb=long
 
 ## 🎯 Próximos Passos
 
-1. ✅ Rode os testes: `./run_tests.sh`
-2. 📖 Leia: **TESTS.md**
-3. 🐛 Revise: **BUG_REPORT.md**
+1. ✅ Rode os testes: `./tests/run_tests.sh`
+2. 📖 Leia: **tests/TESTS.md**
+3. 🐛 Revise: **tests/BUG_REPORT.md**
 4. 🔧 Corrija bugs críticos
 5. 📈 Expanda cobertura de testes
 
 ## 💡 Dicas
 
-- Use `./run_tests.sh help` para ver todas as opções
+- Use `./tests/run_tests.sh help` para ver todas as opções
 - Execute `pytest -k "palavra"` para rodar testes específicos
 - Use `pytest --lf` para re-rodar apenas testes que falharam
 - Adicione `-vv` para output super detalhado
 
 ---
 
-**Dúvidas?** Consulte [TESTS.md](TESTS.md) para documentação completa.
+**Dúvidas?** Consulte tests/TESTS.md para documentação completa.
+

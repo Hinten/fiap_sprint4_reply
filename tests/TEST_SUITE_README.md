@@ -1,82 +1,9 @@
-# 🧪 Suíte de Testes - FIAP Sprint 4 Reply
-
-## 🎯 Visão Geral
-
-Esta suíte de testes foi criada para:
-- ✅ Identificar e documentar bugs no projeto
-- ✅ Detectar memory leaks no dashboard
-- ✅ Garantir qualidade do código
-- ✅ Facilitar manutenção e desenvolvimento
-
-## 📊 Status Atual
-
-```
-✅ 33 testes passando
-⏭️ 6 testes pulados (requerem dependências opcionais)
-🐛 6 bugs identificados e documentados
-⚡ Tempo de execução: ~3.2 segundos
-```
-
-## 🚀 Início Rápido (30 segundos)
-
-```bash
-# 1. Instalar dependências
-pip install -r requirements.txt
-
-# 2. Rodar testes
-./run_tests.sh        # Linux/Mac
-run_tests.bat         # Windows
-```
-
-**Leia:** [QUICKSTART_TESTS.md](QUICKSTART_TESTS.md) para guia de 2 minutos.
-
-## 📚 Documentação
-
-### Para Desenvolvedores
-
-1. **[QUICKSTART_TESTS.md](QUICKSTART_TESTS.md)** 
-   - 🚀 Início rápido (2 minutos)
-   - Comandos essenciais
-   - Problemas comuns
-
-2. **[TESTS.md](TESTS.md)** 
-   - 📖 Guia completo de testes
-   - Como rodar cada tipo de teste
-   - Interpretação de resultados
-   - Verificação de memory leaks
-
-3. **[tests/README.md](tests/README.md)** 
-   - 📁 Estrutura dos testes
-   - Estatísticas rápidas
-
-### Para Gestores/Líderes
-
-4. **[BUG_REPORT.md](BUG_REPORT.md)** 
-   - 🐛 Relatório executivo de bugs
-   - Severidade e impacto
-   - Soluções recomendadas
-   - Checklist de correções
-
-5. **[TEST_IMPLEMENTATION_SUMMARY.md](TEST_IMPLEMENTATION_SUMMARY.md)** 
-   - 📊 Resumo da implementação
-   - Métricas e estatísticas
-   - Lições aprendidas
-
-## 🔧 Scripts Helper
-
-### run_tests.sh / run_tests.bat
-
-Scripts automatizados para rodar testes facilmente:
-
-```bash
-./run_tests.sh all         # Todos os testes
-./run_tests.sh unit        # Apenas unitários
-./run_tests.sh integration # Apenas integração
-./run_tests.sh memory      # Apenas memory leaks
-./run_tests.sh coverage    # Com cobertura
-./run_tests.sh quick       # Testes rápidos
-./run_tests.sh summary     # Ver lista de testes
-./run_tests.sh help        # Ver ajuda
+./tests/run_tests.sh integration # Apenas integração
+./tests/run_tests.sh memory      # Apenas memory leaks
+./tests/run_tests.sh coverage    # Com cobertura
+./tests/run_tests.sh quick       # Testes rápidos
+./tests/run_tests.sh summary     # Ver lista de testes
+./tests/run_tests.sh help        # Ver ajuda
 ```
 
 ## 🐛 Bugs Encontrados
@@ -85,7 +12,7 @@ Scripts automatizados para rodar testes facilmente:
 1. **Thread Daemon Não Gerenciada** (`src/api/api_basica.py:60`)
    - Thread finalizada abruptamente ao sair
    - Conexões DB podem não fechar
-   - **Ver solução em:** [BUG_REPORT.md](BUG_REPORT.md#bug-1-thread-daemon-não-gerenciada-adequadamente)
+   - **Ver solução em:** [BUG_REPORT.md](../BUG_REPORT.md#bug-1-thread-daemon-não-gerenciada-adequadamente)
 
 ### 🟡 MÉDIO - Corrigir em Breve
 2. Estado Global no Database
@@ -96,7 +23,7 @@ Scripts automatizados para rodar testes facilmente:
 5. Falta Validação de Path
 6. Falta Validação de Tipos
 
-**Detalhes completos:** [BUG_REPORT.md](BUG_REPORT.md)
+**Detalhes completos:** [BUG_REPORT.md](../BUG_REPORT.md)
 
 ## 📂 Estrutura dos Testes
 
@@ -144,7 +71,7 @@ start htmlcov\index.html # Windows
 ```
 
 ## 📈 Métricas de Qualidade
-
+# 🧪 Suíte de Testes - FIAP Sprint 4 Reply
 ### Cobertura
 - Database module: ✅ Bem testado
 - API module: ✅ Testado
@@ -182,16 +109,16 @@ jobs:
 
 ### Precisa de Ajuda?
 
-1. **Início rápido:** [QUICKSTART_TESTS.md](QUICKSTART_TESTS.md)
-2. **Guia completo:** [TESTS.md](TESTS.md)
+1. **Início rápido:** [tests/QUICKSTART_TESTS.md](QUICKSTART_TESTS.md)
+2. **Guia completo:** [tests/TESTS.md](TESTS.md)
 3. **Detalhes de bugs:** [BUG_REPORT.md](BUG_REPORT.md)
-4. **Comandos:** `./run_tests.sh help`
+4. **Comandos:** `./tests/run_tests.sh help`
 
 ### Problemas Comuns
 
 **Testes falhando?**
 ```bash
-./run_tests.sh failed  # Re-roda só os que falharam
+./tests/run_tests.sh failed  # Re-roda só os que falharam
 pytest -vv --tb=long   # Ver detalhes completos
 ```
 
@@ -208,14 +135,14 @@ pytest -vv --tb=long --capture=no
 ## ✅ Checklist para Desenvolvedores
 
 Antes de fazer commit:
-- [ ] Rode `./run_tests.sh quick` (1.5s)
+- [ ] Rode `./tests/run_tests.sh quick` (1.5s)
 - [ ] Todos os testes passaram?
 - [ ] Sem novos warnings?
 - [ ] Código limpo?
 
 Antes de fazer deploy:
-- [ ] Rode `./run_tests.sh all` (3.2s)
-- [ ] Rode `./run_tests.sh coverage`
+- [ ] Rode `./tests/run_tests.sh all` (3.2s)
+- [ ] Rode `./tests/run_tests.sh coverage`
 - [ ] Cobertura >= 80%?
 - [ ] Bugs críticos corrigidos?
 
@@ -224,7 +151,7 @@ Antes de fazer deploy:
 ### Imediato
 1. ⚠️ Corrigir Bug #1 (thread daemon) - **CRÍTICO**
 2. Revisar e corrigir bugs médios
-3. Rodar `./run_tests.sh coverage` para ver cobertura
+3. Rodar `./tests/run_tests.sh coverage` para ver cobertura
 
 ### Curto Prazo
 4. Configurar CI/CD
@@ -242,4 +169,77 @@ Antes de fazer deploy:
 **Data:** 27 de Outubro de 2025  
 **Status:** ✅ Suite completa e funcional
 
-**Dúvidas?** Comece pelo [QUICKSTART_TESTS.md](QUICKSTART_TESTS.md)!
+**Dúvidas?** Comece pelo [tests/QUICKSTART_TESTS.md](QUICKSTART_TESTS.md)!
+
+## 🎯 Visão Geral
+
+Esta suíte de testes foi criada para:
+- ✅ Identificar e documentar bugs no projeto
+- ✅ Detectar memory leaks no dashboard
+- ✅ Garantir qualidade do código
+- ✅ Facilitar manutenção e desenvolvimento
+
+## 📊 Status Atual
+
+```
+✅ 33 testes passando
+⏭️ 6 testes pulados (requerem dependências opcionais)
+🐛 6 bugs identificados e documentados
+⚡ Tempo de execução: ~3.2 segundos
+```
+
+## 🚀 Início Rápido (30 segundos)
+
+```bash
+# 1. Instalar dependências
+pip install -r requirements.txt
+
+# 2. Rodar testes
+./tests/run_tests.sh        # Linux/Mac
+tests\run_tests.bat         # Windows
+```
+
+**Leia:** [tests/QUICKSTART_TESTS.md](QUICKSTART_TESTS.md) para guia de 2 minutos.
+
+## 📚 Documentação
+
+### Para Desenvolvedores
+
+1. **[tests/QUICKSTART_TESTS.md](QUICKSTART_TESTS.md)** 
+   - 🚀 Início rápido (2 minutos)
+   - Comandos essenciais
+   - Problemas comuns
+
+2. **[tests/TESTS.md](TESTS.md)** 
+   - 📖 Guia completo de testes
+   - Como rodar cada tipo de teste
+   - Interpretação de resultados
+   - Verificação de memory leaks
+
+3. **[tests/README.md](README.md)** 
+   - 📁 Estrutura dos testes
+   - Estatísticas rápidas
+
+### Para Gestores/Líderes
+
+4. **[BUG_REPORT.md](BUG_REPORT.md)** 
+   - 🐛 Relatório executivo de bugs
+   - Severidade e impacto
+   - Soluções recomendadas
+   - Checklist de correções
+
+5. **[TEST_IMPLEMENTATION_SUMMARY.md](../TEST_IMPLEMENTATION_SUMMARY.md)** 
+   - 📊 Resumo da implementação
+   - Métricas e estatísticas
+   - Lições aprendidas
+
+## 🔧 Scripts Helper
+
+### tests/run_tests.sh / tests/run_tests.bat
+
+Scripts automatizados para rodar testes facilmente:
+
+```bash
+./tests/run_tests.sh all         # Todos os testes
+./tests/run_tests.sh unit        # Apenas unitários
+

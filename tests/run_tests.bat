@@ -1,11 +1,11 @@
 @echo off
-REM Script para rodar diferentes cenários de testes no Windows
-REM Uso: run_tests.bat [opção]
+REM Script para rodar diferentes cenários de testes no Windows (localizado em tests\run_tests.bat)
+REM Uso: tests\run_tests.bat [opção]
 
 setlocal enabledelayedexpansion
 
 echo ======================================
-echo   FIAP Sprint 4 - Test Runner
+echo   FIAP Sprint 4 - Test Runner (tests)
 echo ======================================
 echo.
 
@@ -26,7 +26,7 @@ if "%TEST_TYPE%"=="-h" goto help
 if "%TEST_TYPE%"=="--help" goto help
 
 echo Opção inválida: %TEST_TYPE%
-echo Use 'run_tests.bat help' para ver opções disponíveis
+echo Use 'tests\run_tests.bat help' para ver opções disponíveis
 exit /b 1
 
 :unit
@@ -84,11 +84,11 @@ echo Sumário dos testes...
 echo.
 python -m pytest --collect-only -q
 echo.
-echo Use 'run_tests.bat [opção]' para rodar testes específicos
+echo Use 'tests\run_tests.bat [opção]' para rodar testes específicos
 goto end
 
 :help
-echo Uso: run_tests.bat [opção]
+echo Uso: tests\run_tests.bat [opção]
 echo.
 echo Opções disponíveis:
 echo   all         - Roda todos os testes (padrão)
@@ -103,9 +103,9 @@ echo   summary     - Mostra sumário dos testes disponíveis
 echo   help        - Mostra esta mensagem
 echo.
 echo Exemplos:
-echo   run_tests.bat unit
-echo   run_tests.bat coverage
-echo   run_tests.bat quick
+echo   tests\run_tests.bat unit
+echo   tests\run_tests.bat coverage
+echo   tests\run_tests.bat quick
 goto end
 
 :end

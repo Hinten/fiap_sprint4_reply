@@ -43,10 +43,10 @@ As dependências de teste incluem:
 
 ```bash
 # No Linux/Mac
-./run_tests.sh [opção]
+./tests/run_tests.sh [opção]
 
 # No Windows
-run_tests.bat [opção]
+tests\run_tests.bat [opção]
 ```
 
 **Opções disponíveis:**
@@ -61,9 +61,9 @@ run_tests.bat [opção]
 
 **Exemplos:**
 ```bash
-./run_tests.sh unit      # Apenas testes unitários
-./run_tests.sh coverage  # Com cobertura de código
-./run_tests.sh quick     # Testes rápidos
+./tests/run_tests.sh unit      # Apenas testes unitários
+./tests/run_tests.sh coverage  # Com cobertura de código
+./tests/run_tests.sh quick     # Testes rápidos
 ```
 
 ### Opção 2: Comandos pytest Diretos
@@ -399,8 +399,3 @@ Se tiver dúvidas sobre os testes:
 
 ## 📚 Recursos Adicionais
 
-- [Documentação do pytest](https://docs.pytest.org/)
-- [Memory Profiler](https://pypi.org/project/memory-profiler/)
-- [Tracemalloc](https://docs.python.org/3/library/tracemalloc.html)
-- [FastAPI Testing](https://fastapi.tiangolo.com/tutorial/testing/)
-- [Streamlit Testing](https://docs.streamlit.io/library/advanced-features/testing)

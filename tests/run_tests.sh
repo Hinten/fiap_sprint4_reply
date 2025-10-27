@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script para rodar diferentes cenários de testes
-# Uso: ./run_tests.sh [opção]
+# Uso: ./tests/run_tests.sh [opção]
 
 set -e
 
@@ -20,11 +20,11 @@ echo ""
 run_test() {
     local test_name="$1"
     local test_command="$2"
-    
+
     echo -e "${YELLOW}▶ Executando: ${test_name}${NC}"
     echo -e "${BLUE}Comando: ${test_command}${NC}"
     echo ""
-    
+
     if eval "$test_command"; then
         echo -e "${GREEN}✓ ${test_name} - SUCESSO${NC}"
     else
@@ -40,52 +40,52 @@ case "${1:-all}" in
         echo -e "${BLUE}Rodando apenas testes unitários...${NC}\n"
         run_test "Testes Unitários" "python -m pytest tests/unit/ -v"
         ;;
-    
+
     "integration")
         echo -e "${BLUE}Rodando testes de integração...${NC}\n"
         run_test "Testes de Integração" "python -m pytest tests/integration/ -v"
         ;;
-    
+
     "memory")
         echo -e "${BLUE}Rodando testes de memória...${NC}\n"
         run_test "Testes de Memory Leak" "python -m pytest tests/memory/ -v"
         ;;
-    
+
     "coverage")
         echo -e "${BLUE}Rodando testes com cobertura de código...${NC}\n"
         run_test "Cobertura de Código" "python -m pytest --cov=src --cov-report=html --cov-report=term"
         echo -e "${GREEN}Relatório HTML gerado em: htmlcov/index.html${NC}"
         ;;
-    
+
     "quick")
         echo -e "${BLUE}Rodando testes rápidos (sem slow)...${NC}\n"
         run_test "Testes Rápidos" "python -m pytest -m 'not slow' -v"
         ;;
-    
+
     "failed")
         echo -e "${BLUE}Re-rodando apenas testes que falharam anteriormente...${NC}\n"
         run_test "Testes Falhados" "python -m pytest --lf -v"
         ;;
-    
+
     "verbose")
         echo -e "${BLUE}Rodando todos os testes (modo verbose)...${NC}\n"
         run_test "Todos os Testes (Verbose)" "python -m pytest -vv --tb=long"
         ;;
-    
+
     "all")
         echo -e "${BLUE}Rodando todos os testes...${NC}\n"
         run_test "Todos os Testes" "python -m pytest -v"
         ;;
-    
+
     "summary")
         echo -e "${BLUE}Sumário dos testes...${NC}\n"
         python -m pytest --collect-only -q
         echo ""
-        echo -e "${GREEN}Use './run_tests.sh [opção]' para rodar testes específicos${NC}"
+        echo -e "${GREEN}Use './tests/run_tests.sh [opção]' para rodar testes específicos${NC}"
         ;;
-    
+
     "help"|"-h"|"--help")
-        echo "Uso: ./run_tests.sh [opção]"
+        echo "Uso: ./tests/run_tests.sh [opção]"
         echo ""
         echo "Opções disponíveis:"
         echo "  all         - Roda todos os testes (padrão)"
@@ -100,14 +100,14 @@ case "${1:-all}" in
         echo "  help        - Mostra esta mensagem"
         echo ""
         echo "Exemplos:"
-        echo "  ./run_tests.sh unit"
-        echo "  ./run_tests.sh coverage"
-        echo "  ./run_tests.sh quick"
+        echo "  ./tests/run_tests.sh unit"
+        echo "  ./tests/run_tests.sh coverage"
+        echo "  ./tests/run_tests.sh quick"
         ;;
-    
+
     *)
         echo -e "${RED}Opção inválida: $1${NC}"
-        echo "Use './run_tests.sh help' para ver opções disponíveis"
+        echo "Use './tests/run_tests.sh help' para ver opções disponíveis"
         exit 1
         ;;
 esac
@@ -115,3 +115,4 @@ esac
 echo -e "${BLUE}======================================${NC}"
 echo -e "${GREEN}✓ Concluído!${NC}"
 echo -e "${BLUE}======================================${NC}"
+

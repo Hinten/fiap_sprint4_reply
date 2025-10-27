@@ -37,4 +37,4 @@ pytest --cov=src --cov-report=html
 
 ## 📚 Documentação Completa
 
-Veja [TESTS.md](../TESTS.md) na raiz do projeto para documentação detalhada.
+Veja [TESTS.md](TESTS.md) na pasta `tests/` para documentação detalhada.
