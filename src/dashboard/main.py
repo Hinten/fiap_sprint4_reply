@@ -1,11 +1,11 @@
 import logging
-import os
 from src.dashboard.login import login_view, login_sqlite, login_oracle_from_env, logint_postgres_from_env
 import streamlit as st
 from src.dashboard.navigator import navigation
 from src.dashboard.setup import setup
 from src.logger.config import configurar_logger
 from src.dashboard.styles_loader import apply_custom_theme
+from src.utils.env_utils import parse_bool_env
 
 
 def main():
@@ -21,9 +21,9 @@ def main():
     # Apply custom CSS theme once at dashboard startup
     apply_custom_theme()
 
-    sql_lite:bool = str(os.environ.get("SQL_LITE", 'false')).lower() == "true"
-    oracle = str(os.environ.get("ORACLE_DB_FROM_ENV", 'false')).lower() == "true"
-    postgres:bool = str(os.environ.get("POSTGRE_DB_FROM_ENV", 'false')).lower() == "true"
+    sql_lite:bool = parse_bool_env("SQL_LITE")
+    oracle = parse_bool_env("ORACLE_DB_FROM_ENV")
+    postgres:bool = parse_bool_env("POSTGRE_DB_FROM_ENV")
 
     if not st.session_state.get('logged_in', False):
         logging.debug('acessando login')

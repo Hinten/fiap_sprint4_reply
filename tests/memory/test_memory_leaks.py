@@ -176,13 +176,13 @@ class TestGlobalVariablesLeaks:
         from src.database.tipos_base.database import Database
         
         # Engine e session devem ser sobrescritos, não acumulados
-        initial_engine = Database.engine
+        initial_engine = Database.get_engine()
         
         # Re-inicializa
         Database.init_sqlite()
         
         # Engine deve ser o mesmo objeto ou substituído, não duplicado
-        assert Database.engine is not None
+        assert Database.get_engine() is not None
 
 
 class TestPlotlyMemoryLeaks:

@@ -27,11 +27,12 @@ class LoggerColorFormatter(logging.Formatter):
         return super().format(record)
 
 
-def configurar_logger(file_name: str = 'app.log', level: int = None):
+def configurar_logger(file_name: str = 'app.log', level: int = None, force_reconfigure: bool = False):
     """
     Configura o logger para o aplicativo.
     :param file_name: nome do arquivo de log. Se não for fornecido, o nome padrão é 'app.log'.
     :param level: nível de log. Se não for fornecido, o nível padrão é DEBUG se DEBUG for True, caso contrário, INFO.
+    :param force_reconfigure: Se True, remove handlers existentes antes
     :return:
     """
 
@@ -41,13 +42,19 @@ def configurar_logger(file_name: str = 'app.log', level: int = None):
 
     logger = logging.getLogger()
 
+    if force_reconfigure:
+        # Remove handlers existentes
+        for handler in logger.handlers[:]:
+            handler.close()
+            logger.removeHandler(handler)
+
     level = level or logging.DEBUG if DEBUG else logging.INFO
 
     logger.setLevel(level)
 
-    if not any(getattr(h, "name", None) == "console_handler_format" for h in logger.handlers):
+    format_string = '[%(levelname)s] %(asctime)s %(filename)s: %(message)s'
 
-        format_string = '[%(levelname)s] %(asctime)s %(filename)s: %(message)s'
+    if not any(getattr(h, "name", None) == "console_handler_format" for h in logger.handlers):
 
         console_handler = logging.StreamHandler()
         console_handler.setLevel(level)

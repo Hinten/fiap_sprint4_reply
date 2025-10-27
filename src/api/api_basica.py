@@ -7,13 +7,16 @@ import uvicorn
 import threading
 import os
 from src.database.tipos_base.database import Database
+import atexit
+import signal
+from src.utils.env_utils import parse_bool_env
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    sql_lite: bool = str(os.environ.get("SQL_LITE", 'false')).lower() == "true"
-    oracle = str(os.environ.get("ORACLE_DB_FROM_ENV", 'false')).lower() == "true"
-    postgre = str(os.environ.get("POSTGRE_DB_FROM_ENV", 'false')).lower() == "true"
+    sql_lite: bool = parse_bool_env("SQL_LITE")
+    oracle = parse_bool_env("ORACLE_DB_FROM_ENV")
+    postgre = parse_bool_env("POSTGRE_DB_FROM_ENV")
 
     if oracle:
         user = os.environ.get('ORACLE_USER')
@@ -57,13 +60,33 @@ def iniciar_api():
     uvicorn.run(app, host="0.0.0.0", port=8180)
 
 
+_api_thread = None
+_shutdown_event = threading.Event()
+
+def shutdown_api():
+    """Desliga a API graciosamente."""
+    print("Desligando API...")
+    _shutdown_event.set()
+    
+    if _api_thread is not None:
+        if _api_thread.is_alive():
+            _api_thread.join(timeout=10)
+            if _api_thread.is_alive():
+                print("AVISO: API não respondeu ao shutdown em 10 segundos")
+
 def inciar_api_thread_paralelo():
     """
-    Inicia a API em uma thread separada.
-    Isso permite que a API seja executada em segundo plano enquanto outras tarefas podem ser executadas
+    Inicia a API em uma thread separada com shutdown gracioso.
     """
-    api_thread = threading.Thread(target=iniciar_api, daemon=True)
-    api_thread.start()
+    global _api_thread
+
+    _api_thread = threading.Thread(target=iniciar_api, daemon=False)
+    _api_thread.start()
+
+    # Registra shutdown
+    atexit.register(shutdown_api)
+    signal.signal(signal.SIGTERM, lambda s, f: shutdown_api())
+    signal.signal(signal.SIGINT, lambda s, f: shutdown_api())
 
 # if __name__ == "__main__":
 #

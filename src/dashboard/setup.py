@@ -4,8 +4,7 @@ import streamlit as st
 
 
 def setup():
-    Database.init_from_session(st.session_state.get('engine'), st.session_state.get('session'))
-
+    # Database já foi inicializado no login, apenas verifica se as tabelas foram criadas
     if not st.session_state.get('init_tables', False):
         logging.info("Criando tabelas...")
         st.toast("Criando tabelas...")

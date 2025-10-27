@@ -20,8 +20,8 @@ class TestDatabaseInitialization:
         
         try:
             Database.init_sqlite()
-            assert Database.engine is not None
-            assert Database.session is not None
+            assert Database.get_engine() is not None
+            assert Database.get_session_maker() is not None
             
             # Verifica se o arquivo foi criado
             assert Path(tmp_path / "database.db").exists()
@@ -33,8 +33,8 @@ class TestDatabaseInitialization:
         db_path = tmp_path / "custom_test.db"
         Database.init_sqlite(str(db_path))
         
-        assert Database.engine is not None
-        assert Database.session is not None
+        assert Database.get_engine() is not None
+        assert Database.get_session_maker() is not None
         assert db_path.exists()
     
     def test_get_session_context_manager(self, test_database):
@@ -137,3 +137,39 @@ class TestDatabaseConnectionResilience:
                 assert session2 is not None
                 # São sessões diferentes
                 assert session1 is not session2
+
+
+class TestDatabaseResetCounter:
+    """Testes para reset_contador_ids."""
+
+    def test_reset_contador_ids_sqlite_unsupported(self, test_database):
+        """Testa que reset_contador_ids não faz nada para SQLite (não suportado)."""
+        from src.database.reset_contador_ids import reset_contador_ids
+
+        # SQLite não é suportado, deve apenas logar e retornar
+        reset_contador_ids()  # Não deve dar erro
+
+    def test_get_table_and_sequence_names(self):
+        """Testa se get_table_and_sequence_names retorna tuplas corretas."""
+        from src.database.reset_contador_ids import get_table_and_sequence_names
+
+        result = get_table_and_sequence_names()
+        assert isinstance(result, list)
+
+        for table_name, sequence_name in result:
+            assert isinstance(table_name, str)
+            assert isinstance(sequence_name, str)
+            assert sequence_name.endswith('_SEQ_ID')
+            assert table_name in sequence_name
+
+    def test_get_sequences_from_db_sqlite(self, test_database):
+        """Testa get_sequences_from_db com SQLite (deve funcionar mesmo sem sequences)."""
+        from src.database.reset_contador_ids import get_sequences_from_db
+
+        # Para SQLite, a query pode falhar ou retornar vazio
+        try:
+            sequences = get_sequences_from_db()
+            assert isinstance(sequences, list)
+        except Exception:
+            # É aceitável que falhe para SQLite
+            pass

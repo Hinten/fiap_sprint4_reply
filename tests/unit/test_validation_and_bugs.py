@@ -168,11 +168,11 @@ class TestConcurrencyBugs:
         
         # Verifica se engine é compartilhado
         Database.init_sqlite()
-        engine1 = Database.engine
-        
+        engine1 = Database.get_engine()
+
         Database.init_sqlite()
-        engine2 = Database.engine
-        
+        engine2 = Database.get_engine()
+
         # Engines podem ser diferentes (novo init sobrescreve)
         # Mas isso pode deixar conexões antigas abertas
         # BUG POTENCIAL: Conexões antigas não são fechadas
@@ -225,7 +225,7 @@ class TestDataValidation:
         try:
             Database.init_sqlite(None)
             # Deve usar valor default
-            assert Database.engine is not None
+            assert Database.get_engine() is not None
         except Exception as e:
             # Ou falhar graciosamente
             assert isinstance(e, (TypeError, ValueError))
