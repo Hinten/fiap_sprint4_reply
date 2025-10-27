@@ -14,3 +14,15 @@ terraform.tfstate
 terraform.tfstate.backup
 .terraform.lock.hcl
 .env-docker
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+.tox/
+
+# Memory profiler
+*.dat
+mprofile*.png

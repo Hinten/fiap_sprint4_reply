@@ -39,6 +39,35 @@ As dependências de teste incluem:
 
 ## 🏃 Como Rodar os Testes
 
+### Opção 1: Usar o Script Helper (Recomendado)
+
+```bash
+# No Linux/Mac
+./run_tests.sh [opção]
+
+# No Windows
+run_tests.bat [opção]
+```
+
+**Opções disponíveis:**
+- `all` - Roda todos os testes (padrão)
+- `unit` - Apenas testes unitários
+- `integration` - Apenas testes de integração
+- `memory` - Apenas testes de memory leak
+- `coverage` - Testes com relatório de cobertura
+- `quick` - Testes rápidos (pula testes lentos)
+- `summary` - Mostra sumário dos testes
+- `help` - Mostra ajuda
+
+**Exemplos:**
+```bash
+./run_tests.sh unit      # Apenas testes unitários
+./run_tests.sh coverage  # Com cobertura de código
+./run_tests.sh quick     # Testes rápidos
+```
+
+### Opção 2: Comandos pytest Diretos
+
 ### Rodar Todos os Testes
 
 ```bash
