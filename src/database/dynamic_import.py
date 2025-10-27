@@ -9,7 +9,7 @@ from src.database.tipos_base.model import Model
 logger = logging.getLogger(__name__)
 
 
-def import_models(sort:bool=False) -> dict[str, type[Model]]:
+def import_models(sort: bool = False) -> dict[str, type[Model]]:
     """
     Importa todas as classes que herdam de Model na pasta src/database/models.
     
@@ -47,6 +47,10 @@ def _dynamic_import_models() -> None:
     Esta função é chamada quando o arquivo gerado estaticamente não está disponível.
     """
     models_path = os.path.join(os.path.dirname(__file__), "models")
+    
+    if not os.path.exists(models_path):
+        logger.warning(f"Models directory not found: {models_path}")
+        return
 
     for file in os.listdir(models_path):
         if file.endswith(".py") and file != "__init__.py":
@@ -56,8 +60,13 @@ def _dynamic_import_models() -> None:
             # Isso é necessário para que o import funcione corretamente e o módulo seja encontrado.
 
             src_path = list(models_path.split(os.sep))
-            src_path = src_path[src_path.index('src'):]
-            src_path = '.'.join(src_path)
+            try:
+                src_index = src_path.index('src')
+                src_path = '.'.join(src_path[src_index:])
+            except ValueError:
+                logger.error(f"Could not find 'src' in path: {models_path}")
+                continue
+                
             module_name = f"{src_path}.{file[:-3]}"
             
             try:
@@ -78,11 +87,20 @@ def _collect_model_classes() -> dict[str, type[Model]]:
     models = {}
     models_path = os.path.join(os.path.dirname(__file__), "models")
     
+    if not os.path.exists(models_path):
+        logger.warning(f"Models directory not found: {models_path}")
+        return models
+    
     for file in os.listdir(models_path):
         if file.endswith(".py") and file != "__init__.py":
             src_path = list(models_path.split(os.sep))
-            src_path = src_path[src_path.index('src'):]
-            src_path = '.'.join(src_path)
+            try:
+                src_index = src_path.index('src')
+                src_path = '.'.join(src_path[src_index:])
+            except ValueError:
+                logger.error(f"Could not find 'src' in path: {models_path}")
+                continue
+                
             module_name = f"{src_path}.{file[:-3]}"
             
             # Try to get the module if it's already imported
@@ -95,7 +113,7 @@ def _collect_model_classes() -> dict[str, type[Model]]:
     
     return models
 
-def get_model_by_name(name:str) -> type[Model]:
+def get_model_by_name(name: str) -> type[Model]:
     """
     Retorna uma instância do modelo baseado no nome.
     :param name: Nome do modelo.
@@ -108,7 +126,7 @@ def get_model_by_name(name:str) -> type[Model]:
     else:
         raise ValueError(f"Model '{name}' não encontrado.")
 
-def get_model_by_table_name(table_name:str) -> type[Model]:
+def get_model_by_table_name(table_name: str) -> type[Model]:
     """
     Retorna uma instância do modelo baseado no nome da tabela.
     :param table_name: Nome da tabela.
