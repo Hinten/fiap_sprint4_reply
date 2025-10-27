@@ -2,8 +2,8 @@ import logging
 from src.database.tipos_base.database import Database
 import streamlit as st
 
-def setup():
 
+def setup():
     Database.init_from_session(st.session_state.get('engine'), st.session_state.get('session'))
 
     if not st.session_state.get('init_tables', False):

@@ -1,12 +1,11 @@
 import logging
 import os
-
-from src.dashboard.api_sensor import iniciar_api_sensor
 from src.dashboard.login import login_view, login_sqlite, login_oracle_from_env, logint_postgres_from_env
 import streamlit as st
 from src.dashboard.navigator import navigation
 from src.dashboard.setup import setup
 from src.logger.config import configurar_logger
+from src.dashboard.styles_loader import apply_custom_theme
 
 
 def main():
@@ -18,6 +17,9 @@ def main():
     """
     configurar_logger("dashboard.log")
     st.set_page_config(layout="wide") # deixa a página mais larga
+
+    # Apply custom CSS theme once at dashboard startup
+    apply_custom_theme()
 
     sql_lite:bool = str(os.environ.get("SQL_LITE", 'false')).lower() == "true"
     oracle = str(os.environ.get("ORACLE_DB_FROM_ENV", 'false')).lower() == "true"
