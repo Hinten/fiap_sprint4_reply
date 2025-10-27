@@ -2,7 +2,6 @@ import logging
 from src.database.tipos_base.database import Database, DEFAULT_DSN
 import streamlit as st
 import os
-from src.dashboard.styles_loader import apply_custom_theme
 
 
 def cached_login(username, password, dsn):
@@ -23,9 +22,8 @@ def cached_login(username, password, dsn):
 
 
 def login_view():
-    # Apply custom CSS theme
-    apply_custom_theme()
-    
+    # Theme applied centrally in main.py
+
     #título
 
     st.title("Saudações, seja bem-vindo(a) ao Dashboard!")
@@ -59,9 +57,8 @@ def login_sqlite():
     Função para armazenar em cache as credenciais de login.
     :return:
     """
-    # Apply custom CSS theme
-    apply_custom_theme()
-    
+    # Theme applied centrally in main.py
+
     if not st.session_state.get('logged_in', False):
         Database.init_sqlite()
         st.session_state.logged_in = True
@@ -69,10 +66,10 @@ def login_sqlite():
         st.session_state.session = Database.session
         st.rerun()
 
+
 def login_oracle_from_env():
-    # Apply custom CSS theme
-    apply_custom_theme()
-    
+    # Theme applied centrally in main.py
+
     user = os.environ.get('ORACLE_USER')
     senha = os.environ.get('ORACLE_PASSWORD')
     dsn = os.environ.get('ORACLE_DSN')
@@ -83,9 +80,8 @@ def login_oracle_from_env():
     cached_login(user, senha, dsn)
 
 def logint_postgres_from_env():
-    # Apply custom CSS theme
-    apply_custom_theme()
-    
+    # Theme applied centrally in main.py
+
     user = os.environ.get('POSTGRE_USER')
     senha = os.environ.get('POSTGRE_PASSWORD')
     database = os.environ.get('POSTGRE_DB')
