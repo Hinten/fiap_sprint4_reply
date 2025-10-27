@@ -1,0 +1,63 @@
+[tool.pytest.ini_options]
+# Configuração do pytest
+
+# Diretórios de teste
+testpaths = ["tests"]
+
+# Padrão de arquivos de teste
+python_files = ["test_*.py", "*_test.py"]
+
+# Padrão de classes de teste
+python_classes = ["Test*"]
+
+# Padrão de funções de teste
+python_functions = ["test_*"]
+
+# Marcadores personalizados
+markers = [
+    "slow: marca testes que demoram muito tempo",
+    "integration: testes de integração",
+    "unit: testes unitários",
+    "memory: testes de vazamento de memória",
+    "security: testes de segurança"
+]
+
+# Opções padrão
+addopts = [
+    "-v",                    # Verbose
+    "--strict-markers",      # Erro se usar marcador não definido
+    "--tb=short",           # Traceback curto
+    "--disable-warnings",    # Desabilita warnings deprecation
+]
+
+# Timeout padrão (segundos)
+timeout = 300
+
+# Captura de output
+console_output_style = "progress"
+
+[tool.coverage.run]
+# Configuração de cobertura
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+# Relatório de cobertura
+precision = 2
+show_missing = true
+skip_covered = false
+
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "pass",
+]
