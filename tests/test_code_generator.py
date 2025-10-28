@@ -18,7 +18,7 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from tools.generate_model_imports import (
+from generators.generate_model_imports import (
     file_contains_model_subclass,
     find_modules_with_models,
     generate_imports_file,
@@ -263,7 +263,7 @@ class TestIntegration:
         output_file = project_root / "src" / "database" / "generated_models_imports.py"
         
         # Patch PROJECT_ROOT in the module
-        import tools.generate_model_imports as gen_module
+        import generators.generate_model_imports as gen_module
         original_root = gen_module.PROJECT_ROOT
         original_models_dir = gen_module.MODELS_DIR
         original_output = gen_module.OUTPUT_FILE

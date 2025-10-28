@@ -7,8 +7,8 @@ COPY .env /app/.env
 COPY .streamlit /app/.streamlit
 
 # Copy and run the static code generator for Model imports
-COPY tools/generate_model_imports.py /app/tools/generate_model_imports.py
-RUN python /app/tools/generate_model_imports.py
+COPY generators/generate_model_imports.py /app/generators/generate_model_imports.py
+RUN python /app/generators/generate_model_imports.py
 
 EXPOSE 8180
 
