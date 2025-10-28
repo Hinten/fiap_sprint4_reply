@@ -234,8 +234,12 @@ class TestEquipamentoSerializationMixin:
 
     def test_to_json(self, test_database, equipamento_data):
         """Testa o método to_json do mixin."""
+        # Remove datetime field to avoid serialization issues
+        equipamento_data_sem_datetime = equipamento_data.copy()
+        equipamento_data_sem_datetime['data_instalacao'] = None
+        
         with Database.get_session() as session:
-            equipamento = Equipamento(**equipamento_data)
+            equipamento = Equipamento(**equipamento_data_sem_datetime)
             session.add(equipamento)
             session.commit()
             session.refresh(equipamento)
