@@ -222,7 +222,6 @@ Then run `deploy_app_server.bat` to copy files and start services on EC2.
 
 ## Known Issues and Workarounds
 
-1. **Streamlit memory leak**: Dashboard auto-refresh set to 60 seconds (not lower) to avoid memory issues. This is a known Streamlit limitation.
 2. **Test skips**: 6 tests are skipped due to optional dependencies or environment-specific requirements (e.g., Oracle DB, specific API conditions). This is normal.
 3. **Firewall for ESP32**: If ESP32 simulator can't reach API, check firewall rules for port 8180.
 
