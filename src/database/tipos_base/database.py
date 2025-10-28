@@ -6,8 +6,9 @@ from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 import json
 import os
-
 from sqlalchemy.sql.ddl import CreateTable
+import threading
+import tempfile
 
 from src.settings import SQL_ALCHEMY_DEBUG
 
@@ -15,28 +16,52 @@ DEFAULT_DSN = "oracle.fiap.com.br:1521/ORCL"
 
 class Database:
 
-    engine:Engine
-    session:sessionmaker
+    _engine: Optional[Engine] = None
+    _session: Optional[sessionmaker] = None
+    _lock = threading.Lock()
 
     @staticmethod
     def init_sqlite(path:Optional[str] = None):
         """
-        Inicializa a conexão com o banco de dados SQLite.
+        Inicializa a conexão com o banco de dados SQLite com validação de tipos e path.
         :param path: Caminho do banco de dados SQLite.
         :return:
         """
+        # Validação de tipo
+        if path is not None and not isinstance(path, str):
+            raise TypeError(f"path deve ser string ou None, não {type(path)}")
 
-        if path is None:
-            path = os.path.join(os.getcwd(), "database.db")
+        # Validação de valor
+        if path is not None and not path.strip():
+            raise ValueError("path não pode ser string vazia")
 
-        # Cria o engine de conexão
-        engine = create_engine(f"sqlite:///{path}", echo=SQL_ALCHEMY_DEBUG)
+        with Database._lock:
+            # Fecha engine antigo se existir
+            if Database._engine is not None:
+                Database._engine.dispose()
 
-        # Testa a conexão
-        with engine.connect() as _:
-            print(f"Conexão bem-sucedida ao banco de dados SQLite!\n Path: {path}")
-        Database.engine = engine
-        Database.session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+            if path is None:
+                path = os.path.join(os.getcwd(), "database.db")
+
+            # Validação básica
+            path = os.path.abspath(path)
+
+            # Verifica se não está tentando acessar fora do projeto
+            project_root = os.path.abspath(os.getcwd())
+            temp_dir = os.path.abspath(tempfile.gettempdir())
+            if not (path.startswith(project_root) or path.startswith(temp_dir) or path.startswith('/tmp')):
+                raise ValueError(f"Path não permitido: {path}")
+
+            # Verifica se diretório existe ou pode ser criado
+            directory = os.path.dirname(path)
+            os.makedirs(directory, exist_ok=True)
+
+            Database._engine = create_engine(f"sqlite:///{path}", echo=SQL_ALCHEMY_DEBUG)
+            Database._session = sessionmaker(autocommit=False, autoflush=False, bind=Database._engine)
+
+            # Testa a conexão
+            with Database._engine.connect() as _:
+                print(f"Conexão bem-sucedida ao banco de dados SQLite!\n Path: {path}")
 
     @staticmethod
     def init_oracledb(user:str, password:str, dsn:str=DEFAULT_DSN):
@@ -47,15 +72,18 @@ class Database:
         :param dsn: DSN do banco de dados.
         :return:
         '''
+        with Database._lock:
+            # Fecha engine antigo se existir
+            if Database._engine is not None:
+                Database._engine.dispose()
 
-        # Cria o engine de conexão
-        engine = create_engine(f"oracle+oracledb://{user}:{password}@{dsn}", echo=SQL_ALCHEMY_DEBUG)
+            # Cria o engine de conexão
+            Database._engine = create_engine(f"oracle+oracledb://{user}:{password}@{dsn}", echo=SQL_ALCHEMY_DEBUG)
+            Database._session = sessionmaker(autocommit=False, autoflush=False, bind=Database._engine)
 
-        # Testa a conexão
-        with engine.connect() as _:
-            print("Conexão bem-sucedida ao banco de dados Oracle!")
-        Database.engine = engine
-        Database.session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+            # Testa a conexão
+            with Database._engine.connect() as _:
+                print("Conexão bem-sucedida ao banco de dados Oracle!")
 
     @staticmethod
     def init_postgresdb(user: str, password: str, host: str = "localhost", port: int = 5432, dbname: str = "postgres"):
@@ -68,23 +96,16 @@ class Database:
         :param dbname: Nome do banco de dados.
         :return:
         """
-        engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}", echo=SQL_ALCHEMY_DEBUG)
-        with engine.connect() as _:
-            print(f"Conexão bem-sucedida ao banco de dados PostgreSQL! Host: {host}, DB: {dbname}")
-        Database.engine = engine
-        Database.session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        with Database._lock:
+            # Fecha engine antigo se existir
+            if Database._engine is not None:
+                Database._engine.dispose()
 
+            Database._engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}", echo=SQL_ALCHEMY_DEBUG)
+            Database._session = sessionmaker(autocommit=False, autoflush=False, bind=Database._engine)
 
-    @staticmethod
-    def init_from_session(engine:Engine, session:sessionmaker):
-        """
-        Inicializa a conexão com o banco de dados a partir de um engine e sessionLocal já existentes.
-        :param engine: Engine do banco de dados.
-        :param session: SessionLocal do banco de dados.
-        :return:
-        """
-        Database.engine = engine
-        Database.session = session
+            with Database._engine.connect() as _:
+                print("Conexão bem-sucedida ao banco de dados PostgreSQL!")
 
     @staticmethod
     def init_oracledb_from_file(path:str = r"E:\PythonProject\fiap_fase3_cap1\login.json"):
@@ -104,7 +125,9 @@ class Database:
     @staticmethod
     @contextmanager
     def get_session() -> Generator[Session, None, None]:
-        db = Database.session()
+        if Database._session is None:
+            raise RuntimeError("Database não inicializada. Chame um método init_* primeiro.")
+        db = Database._session()
         try:
             yield db
         finally:
@@ -116,7 +139,7 @@ class Database:
         Lista as tabelas do banco de dados.
         :return: List[str] - Lista com os nomes das tabelas.
         """
-        engine = cls.engine
+        engine = cls._engine
         metadata = MetaData()
         metadata.reflect(bind=engine)
         tables = metadata.tables.keys()
@@ -129,7 +152,7 @@ class Database:
         :return: Lista com os nomes das sequences.
         """
         metadata = MetaData()
-        metadata.reflect(bind=cls.engine)
+        metadata.reflect(bind=cls._engine)
         sequences = [seq.name for seq in metadata._sequences.values()]
         return sequences
 
@@ -150,7 +173,7 @@ class Database:
         import_models(sort=True)
 
         try:
-            Model.metadata.create_all(bind=cls.engine)
+            Model.metadata.create_all(bind=cls._engine)
             print("Tabelas criadas com sucesso.")
         except Exception as e:
             print("Erro ao criar tabelas no banco de dados.")
@@ -168,7 +191,7 @@ class Database:
         import_models(sort=True)
 
         try:
-            Model.metadata.drop_all(bind=cls.engine)
+            Model.metadata.drop_all(bind=cls._engine)
             print("Tabelas removidas com sucesso.")
         except Exception as e:
             print("Erro ao remover tabelas do banco de dados.")
@@ -190,7 +213,7 @@ class Database:
         output = StringIO()
 
         for table in Model.metadata.sorted_tables:
-            ddl_statement = str(CreateTable(table).compile(cls.engine))
+            ddl_statement = str(CreateTable(table).compile(cls._engine))
             output.write(ddl_statement + ";\n\n")
 
         return output.getvalue()
@@ -221,3 +244,13 @@ class Database:
             mer_output += "\n"
 
         return mer_output
+
+    @classmethod
+    def get_engine(cls):
+        """Método para compatibilidade com testes existentes."""
+        return cls._engine
+
+    @classmethod
+    def get_session_maker(cls):
+        """Método para compatibilidade com testes existentes."""
+        return cls._session
