@@ -9,6 +9,7 @@ from src.dashboard.machine_learning.train_model_view import train_model_page
 from src.database.dynamic_import import import_models
 from src.dashboard.menu import menu
 from src.dashboard.machine_learning.manual import previsao_manual_page
+from src.dashboard.chat.chat_page import chat_page
 
 
 def get_generic_pages() -> list:
@@ -38,6 +39,7 @@ def navigation():
 
     current_page = st.navigation([
         principal_page,
+        chat_page,
         *get_generic_pages(),
         exportar_db_page,
         importar_db_page,
