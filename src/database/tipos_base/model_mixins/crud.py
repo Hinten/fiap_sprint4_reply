@@ -56,8 +56,11 @@ class _ModelCrudMixin:
         """
 
         with Database.get_session() as session:
-            session.merge(self)
+            merged = session.merge(self)
             session.commit()
+            session.refresh(merged)
+            # Atualiza o ID da instância atual com o ID do objeto merged
+            self.id = merged.id
 
         return self
 
@@ -73,7 +76,10 @@ class _ModelCrudMixin:
                 setattr(self, key, value)
 
         with Database.get_session() as session:
+            # Adiciona a instância à sessão antes de commitar
+            merged = session.merge(self)
             session.commit()
+            session.refresh(merged)
 
         return self
 
@@ -83,7 +89,9 @@ class _ModelCrudMixin:
         :return: Model - Instância removida.
         """
         with Database.get_session() as session:
-            session.delete(self)
+            # Merge para garantir que a instância está anexada à sessão
+            merged = session.merge(self)
+            session.delete(merged)
             session.commit()
 
         return self

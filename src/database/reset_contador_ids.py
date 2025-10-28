@@ -8,7 +8,7 @@ def get_sequences_from_db():
     """
     Retorna uma lista com os nomes das sequences existentes no banco de dados Oracle.
     """
-    session = Database.session()
+    session = Database.get_session_maker()()
     result = session.execute(text("SELECT sequence_name FROM user_sequences"))
     sequences = [row.sequence_name for row in result]
     session.close()
@@ -30,11 +30,11 @@ def reset_contador_ids():
     """
     Reseta o contador de IDs para cada tabela no banco de dados.
     """
-    engine_name = Database.engine.name.lower()
+    engine_name = Database.get_engine().name.lower()
 
     # PostgreSQL
     if 'postgresql' in engine_name:
-        session = Database.session()
+        session = Database.get_session_maker()()
         for table_name, sequence_name in get_table_and_sequence_names():
             primary_key_column = 'id'
             # Get max id
@@ -48,7 +48,7 @@ def reset_contador_ids():
 
     # Oracle (original)
     if 'oracle' in engine_name:
-        session = Database.session()
+        session = Database.get_session_maker()()
         for table_name, sequence_name in get_table_and_sequence_names():
             primary_key_column = 'ID'
             reset_sequence_sql = text(f"""

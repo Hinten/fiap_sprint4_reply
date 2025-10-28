@@ -3,7 +3,7 @@ from typing import List, Self, Union, Any
 from datetime import datetime, date, time, timedelta
 
 from sqlalchemy import Sequence, String, ForeignKey, Float, DateTime, Enum
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, joinedload
 
 import numpy as np
 
@@ -166,7 +166,8 @@ class Sensor(Model):
         with Database.get_session() as session:
             tipo_sensor_obj = session.query(TipoSensor).filter(TipoSensor.tipo == tipo_sensor).all()
             tipo_ids = [ts.id for ts in tipo_sensor_obj]
-            return session.query(Sensor).filter(Sensor.tipo_sensor_id.in_(tipo_ids)).all()
+            # Eager-load tipo_sensor before closing the session to prevent DetachedInstanceError
+            return session.query(Sensor).options(joinedload(Sensor.tipo_sensor)).filter(Sensor.tipo_sensor_id.in_(tipo_ids)).all()
 
 
 class LeituraSensor(Model):

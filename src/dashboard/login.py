@@ -17,8 +17,8 @@ def cached_login(username, password, dsn):
         Database.init_oracledb(username, password, dsn)
         logging.info("Conexão bem-sucedida ao banco de dados Oracle!")
         st.session_state.logged_in = True
-        st.session_state.engine = Database.engine
-        st.session_state.session = Database.session
+        st.session_state.engine = Database.get_engine()
+        st.session_state.session = Database.get_session_maker()
 
 
 def login_view():
@@ -62,8 +62,8 @@ def login_sqlite():
     if not st.session_state.get('logged_in', False):
         Database.init_sqlite()
         st.session_state.logged_in = True
-        st.session_state.engine = Database.engine
-        st.session_state.session = Database.session
+        st.session_state.engine = Database.get_engine()
+        st.session_state.session = Database.get_session_maker()
         st.rerun()
 
 
@@ -94,6 +94,6 @@ def logint_postgres_from_env():
     if not st.session_state.get('logged_in', False):
         Database.init_postgresdb(user, senha, host, int(port), database)
         st.session_state.logged_in = True
-        st.session_state.engine = Database.engine
-        st.session_state.session = Database.session
+        st.session_state.engine = Database.get_engine()
+        st.session_state.session = Database.get_session_maker()
         st.rerun()
