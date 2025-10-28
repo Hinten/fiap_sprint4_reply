@@ -9,6 +9,7 @@ from src.database.models.manutencao_equipamento import ManutencaoEquipamento
 from src.database.models.equipamento import Equipamento
 from src.database.tipos_base.database import Database
 from sqlalchemy.orm import joinedload
+from sqlalchemy import text
 
 
 class TestManutencaoEquipamentoCRUD:
@@ -137,17 +138,17 @@ class TestManutencaoEquipamentoCRUD:
             session.commit()
             session.refresh(manutencao)
             
-            # Recarregar equipamento para ter acesso aos dados
-            session.refresh(equipamento_fixture)
-            
-            expected = f"{manutencao.id} - {equipamento_fixture.nome} - {manutencao_data['data_inicio_manutencao']} a {manutencao_data['data_fim_manutencao']}"
-            assert str(manutencao) == expected
+            # Load the equipamento within the active session to avoid refreshing a detached instance
+            equipamento_current = session.query(Equipamento).filter_by(id=equipamento_fixture.id).first()
+
+            expected = f"{manutencao.id} - {equipamento_current.nome} - {manutencao_data['data_inicio_manutencao']} a {manutencao_data['data_fim_manutencao']}"
+            assert str(manutencao) == expected, f"Esperado: {expected}, Obtido: {str(manutencao)}"
 
     def test_manutencao_equipamento_foreign_key_constraint(self, test_database):
         """Testa constraint de chave estrangeira."""
         with Database.get_session() as session:
             # Habilitar foreign keys no SQLite
-            session.execute("PRAGMA foreign_keys = ON")
+            session.execute(text("PRAGMA foreign_keys = ON"))
             
             # Tentar criar manutenção com equipamento_id inexistente
             manutencao = ManutencaoEquipamento(

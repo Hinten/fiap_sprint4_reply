@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from src.database.models.sensor import TipoSensor, Sensor, LeituraSensor, TipoSensorEnum
 from src.database.models.equipamento import Equipamento
 from src.database.tipos_base.database import Database
+from sqlalchemy import text
 
 
 class TestTipoSensorCRUD:
@@ -399,7 +400,7 @@ class TestLeituraSensorCRUD:
         """Testa constraint de chave estrangeira."""
         with Database.get_session() as session:
             # Habilitar foreign keys no SQLite
-            session.execute("PRAGMA foreign_keys = ON")
+            session.execute(text("PRAGMA foreign_keys = ON"))
             
             # Tentar criar leitura com sensor_id inexistente
             leitura = LeituraSensor(
