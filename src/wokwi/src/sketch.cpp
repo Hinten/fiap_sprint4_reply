@@ -160,15 +160,11 @@ void loop() {
   // Linha 0: Temperatura
   snprintf(buffer, sizeof(buffer), "Temp: %.1f C", tempC);
   displayPrintAt(0, 0, buffer);
-  
-  Serial.print(F("Temperatura: "));
-  Serial.print(tempC, 1);
-  Serial.print(F(" C |"));
 
   // Linha 1: Condição de luminosidade
+  // Adiciona informação extra de Lux ao Serial (não mostrado no LCD por falta de espaço)
   if (lux < 500) {
     displayPrintAt(0, 1, "Condicao: Escuro");
-    Serial.print(F(" Condicao: Escuro"));
     Serial.print(F(" (Lux: "));
     Serial.print(lux);
     Serial.print(F(") |"));
@@ -177,7 +173,6 @@ void loop() {
     noTone(BUZZER_PIN);
   } else {
     displayPrintAt(0, 1, "Condicao: Claro");
-    Serial.print(F(" Condicao: Claro"));
     Serial.print(F(" (Lux: "));
     Serial.print(lux);
     Serial.print(F(") |"));
@@ -233,6 +228,7 @@ void loop() {
   vibracaoMedia = somaVibracao / NUM_AMOSTRAS;
   doc["vibracao_media"] = vibracaoMedia; // Adiciona a vibração média ao JSON
 
+  // Informação adicional no Serial com mais precisão (2 decimais vs LCD que pode mostrar menos)
   Serial.print(F(" Vibracao media: "));
   Serial.print(vibracaoMedia, 2);
   Serial.print(F(" |"));
@@ -242,7 +238,6 @@ void loop() {
   displayPrintAt(0, 0, buffer);
 
   if (vibracaoMedia > LIMIAR_VIBRACAO) {
-    Serial.print(F("Vibracao anormal detectada!"));
     displayPrintAt(0, 1, "#ALERTA DE VIBRACAO#");
 
     for (int i = 0; i < 3; i++) { // Buzzer e LED piscam juntos por 3x
@@ -257,14 +252,12 @@ void loop() {
     }
   
   } else {
-    Serial.print(F(" Vibracao normal |"));
     displayPrintAt(0, 1, "Vibracao normal!");
   }
 
   // Alerta de temperatura
   if (tempC > 70.0) {
     displayPrintAt(0, 1, "#ALERTA: >70 C#");
-    Serial.print(F(" TEMPERATURA ALTA! |"));
 
     for (int i = 0; i < 3; i++) {
       digitalWrite(LED_PIN, HIGH);
@@ -284,7 +277,7 @@ void loop() {
   snprintf(buffer, sizeof(buffer), "x:%.1f y:%.1f z:%.1f", ax, ay, az);
   displayPrintAt(0, 3, buffer);
 
-  //Imprime os dados no Serial
+  // Dados adicionais no Serial com mais precisão (2 decimais)
   Serial.print(F(" X:"));
   Serial.print(ax, 2);
   Serial.print(F(" Y:"));
