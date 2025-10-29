@@ -1,0 +1,35 @@
+{
+  "random_forest_demo": {
+    "path": "modelos_salvos/random_forest_demo.pkl",
+    "metadata": {
+      "accuracy": 0.92,
+      "precision": 0.9,
+      "recall": 0.89,
+      "model_type": "RandomForest",
+      "description": "Modelo Random Forest otimizado"
+    },
+    "saved_at": "2025-10-29T19:39:21.040921"
+  },
+  "logistic_regression_demo": {
+    "path": "modelos_salvos/logistic_regression_demo.pkl",
+    "metadata": {
+      "accuracy": 0.88,
+      "precision": 0.87,
+      "recall": 0.86,
+      "model_type": "LogisticRegression",
+      "description": "Modelo de Regressão Logística"
+    },
+    "saved_at": "2025-10-29T19:39:21.041378"
+  },
+  "gradient_boosting_demo": {
+    "path": "modelos_salvos/gradient_boosting_demo.pkl",
+    "metadata": {
+      "accuracy": 0.94,
+      "precision": 0.93,
+      "recall": 0.92,
+      "model_type": "GradientBoosting",
+      "description": "Modelo Gradient Boosting com melhor performance"
+    },
+    "saved_at": "2025-10-29T19:39:21.041847"
+  }
+}
