@@ -277,6 +277,124 @@ Essas classes podem ser encontradas na pasta `src/database/models`, e todas elas
 O script para criação do banco de dados e tabelas pode ser encontrado no arquivo [assets/table_creation.ddl](assets/table_creation.ddl).
 **Este script não precisa ser executado manualmente, pois o banco de dados é criado automaticamente ao iniciar o dashboard ou API.**
 
+# 7.5. Assistente de IA com Chat Generativo
+
+O sistema agora inclui um **assistente de IA generativo** integrado ao dashboard, permitindo que usuários interajam com o sistema por meio de linguagem natural. O assistente é especializado em **manutenção preditiva de equipamentos industriais** e pode:
+
+- Analisar dados de sensores (temperatura, vibração, luminosidade)
+- Interpretar previsões de falhas e recomendações de manutenção
+- Fornecer insights sobre o estado de saúde dos equipamentos
+- Explicar padrões anormais detectados pelos modelos de machine learning
+- Sugerir ações preventivas baseadas em dados históricos
+
+## 🤖 Arquitetura do Chat
+
+O chat foi desenvolvido com base no **Google Gemini 2.0 Flash** e possui uma arquitetura extensível de ferramentas (tools):
+
+```
+src/large_language_model/
+├── __init__.py
+├── client.py                    # Cliente do Google Gemini
+├── dynamic_tools.py             # Sistema de descoberta automática de tools
+├── system_instructions.py       # Instruções do sistema para o modelo
+├── tipos_base/
+│   ├── __init__.py
+│   └── base_tools.py           # Classe base para criação de tools
+└── tools/
+    ├── __init__.py
+    ├── datetime_tool.py        # Tool de exemplo: obter data/hora atual
+    └── [suas_tools_aqui].py    # Adicione novas tools aqui
+```
+
+## 🔧 Como Criar uma Nova Tool
+
+As **tools** são funções que o modelo de linguagem pode chamar para obter informações ou executar ações no sistema. Para criar uma nova tool:
+
+1. Crie um arquivo `.py` em `src/large_language_model/tools/`
+2. Crie uma função com docstring descritiva
+3. Crie uma classe que herda de `BaseTool`
+4. A tool será automaticamente descoberta e registrada
+
+**Exemplo - Tool para consultar temperatura de um equipamento:**
+
+```python
+# src/large_language_model/tools/equipamento_temperatura_tool.py
+from src.large_language_model.tipos_base.base_tools import BaseTool
+from src.database.models.equipamento import Equipamento
+from src.database.models.leitura_sensor import LeituraSensor
+
+def get_equipamento_temperatura(equipamento_id: int) -> str:
+    """
+    Retorna a temperatura atual de um equipamento específico.
+    
+    :param equipamento_id: ID do equipamento a ser consultado
+    :return: String com a temperatura atual e informações do equipamento
+    """
+    equipamento = Equipamento.get_from_id(equipamento_id)
+    if not equipamento:
+        return f"Equipamento {equipamento_id} não encontrado."
+    
+    # Buscar última leitura de temperatura
+    leitura = LeituraSensor.query.filter_by(
+        equipamento_id=equipamento_id
+    ).order_by(LeituraSensor.data_leitura.desc()).first()
+    
+    if leitura:
+        return f"Equipamento '{equipamento.nome}': {leitura.temperatura}°C"
+    return f"Nenhuma leitura encontrada para {equipamento.nome}"
+
+class EquipamentoTemperaturaTool(BaseTool):
+    """
+    Ferramenta para consultar temperatura de equipamentos.
+    """
+    
+    @property
+    def function_declaration(self):
+        return get_equipamento_temperatura
+    
+    def call_chat_display(self) -> str:
+        return "🌡️ Consultando temperatura do equipamento..."
+    
+    def call_result_display(self, result: str) -> str:
+        return f"✅ {result}"
+```
+
+**Pronto!** A tool será automaticamente detectada e ficará disponível para o modelo usar.
+
+## 🔑 Configuração da API Key
+
+Para usar o chat, é necessário obter uma chave de API do Google Gemini:
+
+1. Acesse [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Crie uma nova API key
+3. Adicione no arquivo `.env` na raiz do projeto:
+
+```bash
+# Generative AI Configuration
+GEMINI_API=sua_chave_de_api_aqui
+```
+
+## 📱 Como Usar o Chat
+
+1. Execute o dashboard normalmente: `streamlit run main_dash.py`
+2. No menu lateral, clique em **"🤖 Chat IA"**
+3. Digite suas perguntas sobre os equipamentos, sensores ou previsões
+4. O assistente pode chamar tools automaticamente para responder com dados reais
+
+**Exemplos de perguntas:**
+- "Qual é a data e hora atual?"
+- "Me explique como funciona o sistema de manutenção preditiva"
+- "Quais são os principais indicadores que devo monitorar?"
+- "Como interpretar alertas de temperatura alta?"
+
+## 🎯 Modelos Disponíveis
+
+Você pode escolher entre dois modelos no próprio chat:
+- **Gemini 2.0 Flash** (padrão): Mais rápido e eficiente
+- **Gemini 2.0 Flash Lite**: Versão mais leve para consultas simples
+
+Para trocar de modelo ou iniciar um novo chat, use o botão **"Novo Chat"** no canto superior direito da interface.
+
 # 8. Instalando e Executando o Projeto
 
 O sistema foi desenvolvido em Python e utiliza um banco de dados SQLite para armazenar os dados. O código é modularizado, permitindo fácil manutenção e expansão.
@@ -555,6 +673,7 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 - <b>src</b>: Diretório principal que contém todo o código-fonte desenvolvido ao longo das fases do projeto. Ele está organizado nos seguintes submódulos:
   - <b>dashboard</b>: Código responsável pela construção do dashboard, desenvolvido em Python com uso da biblioteca Streamlit. ([dashboard](src/dashboard/))
   - <b>database</b>: Módulo responsável pelas operações de banco de dados, incluindo conexões, inserções, listagens, edições e exclusões de registros.
+  - <b>large_language_model</b>: Pacote do assistente de IA generativo, incluindo cliente Google Gemini, sistema de tools extensível e instruções do sistema.
   - <b>logger</b>: Código responsável por registrar (logar) todas as operações executadas no sistema, garantindo rastreabilidade.
   - <b>machine_learning</b>: Contém o código e notebooks relacionados ao desenvolvimento e treinamento dos modelos de Machine Learning.
   - <b>plots</b>: Contém o código responsável pela geração de gráficos e visualizações, utilizado para exibir dados de forma clara e intuitiva no dashboard.
