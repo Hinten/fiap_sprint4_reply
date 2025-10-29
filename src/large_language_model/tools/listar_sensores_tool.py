@@ -2,11 +2,16 @@
 Tool for listing all installed sensors in the system.
 Provides information about sensors including ID, name, type, equipment association, and thresholds.
 """
+from sqlalchemy import inspect
+from sqlalchemy.orm import selectinload
+
+from src.database.tipos_base.database import Database
 from src.large_language_model.tipos_base.base_tools import BaseTool
 from src.database.models.sensor import Sensor
+from typing import Optional
 
 
-def listar_sensores(equipamento_id: int = None) -> str:
+def listar_sensores(equipamento_id: Optional[int] = None) -> str:
     """
     Lista todos os sensores instalados no sistema.
     
@@ -20,8 +25,13 @@ def listar_sensores(equipamento_id: int = None) -> str:
     try:
         if equipamento_id is not None:
             # Filter sensors by equipment
-            all_sensors = Sensor.all()
-            sensores = [s for s in all_sensors if s.equipamento_id == equipamento_id]
+            with Database.get_session() as session:
+                query = session.query(Sensor).filter(Sensor.equipamento_id == equipamento_id)
+
+                for rel in inspect(Sensor).mapper.relationships:
+                    query = query.options(selectinload(getattr(Sensor, rel.key)))
+
+                sensores = query.order_by(Sensor.id).all()
             
             if not sensores:
                 return f"Nenhum sensor encontrado para o equipamento ID {equipamento_id}."
