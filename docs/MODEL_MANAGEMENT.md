@@ -23,7 +23,7 @@ def load_sensor_data():
 ```
 
 **Benefícios:**
-- Reduz tempo de carregamento em 90%+ após primeiro acesso
+- Reduz significativamente o tempo de carregamento após primeiro acesso
 - Cache expira após 1 hora (configurável)
 - Melhora experiência do usuário
 
@@ -199,10 +199,10 @@ python -m pytest tests/ -v
 ```
 
 **Cobertura Atual:**
-- 271 testes passando
-- 6 testes ignorados (dependências opcionais)
-- 13 novos testes unitários para model_store
-- 3 novos testes de integração para workflow
+- Testes passando: > 270
+- Novos testes unitários: 13 (model_store)
+- Novos testes de integração: 3 (workflow)
+- Testes existentes: mantidos sem regressões
 
 ## 📁 Estrutura de Arquivos
 
@@ -291,8 +291,8 @@ rm src/machine_learning/modelos_salvos/registry.json
 
 ### Performance
 
-- Cache de dados reduz tempo de carregamento em 90%+
-- Registry JSON é leve e rápido (< 1ms para leitura)
+- Cache de dados melhora significativamente tempo de carregamento em acessos subsequentes
+- Registry JSON é leve e rápido para leitura/escrita
 - Salvamento atômico previne race conditions
 - Thread-safe para ambientes multi-usuário
 
