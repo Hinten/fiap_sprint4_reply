@@ -24,6 +24,9 @@ jobs:
 
     # You can define any steps you want, and they will run before the agent starts.
     # If you do not check out your code, Copilot will do this for you.
+    env:
+      GEMINI_API: ${{ secrets.GEMINI_API }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -37,3 +40,6 @@ jobs:
 
       - name: check python version
         run: python --version
+
+      - name: checa se recebeu a api key do gemini
+        run: python src/large_language_model/client.py

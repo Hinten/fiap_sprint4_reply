@@ -102,7 +102,13 @@ class GenerativeModelClient:
 
 
 if __name__ == "__main__":
-    instance = GenerativeModelClient()
+
+    api_key = os.getenv("GEMINI_API")
+    if not api_key:
+        raise SystemExit("GEMINI_API não definida")
+    print("GEMINI_API disponível")
+
+    # instance = GenerativeModelClient()
 
     # Exemplo de uso:
     # chat = instance.get_chat()
