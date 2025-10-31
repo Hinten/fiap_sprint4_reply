@@ -212,7 +212,7 @@ void setup() {
     
     // Configura pinos de saída
     buzzer.setup();
-    
+    buzzer.playStartupTune();  // Toca melodia de inicialização
     
     // Inicializa I2C
     Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
