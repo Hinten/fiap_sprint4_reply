@@ -1,8 +1,16 @@
 import streamlit as st
 from pycaret.classification import *
 from src.machine_learning.dateset_manipulation import get_dataframe_leituras_sensores
+from src.utils.model_store import save_model as save_model_to_registry, list_models, get_models_summary
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
+
+
+@st.cache_data(ttl=3600, show_spinner="Carregando dados...")
+def load_sensor_data():
+    """Carrega dados dos sensores com cache para evitar recarregamentos."""
+    return get_dataframe_leituras_sensores()
 
 
 def train_model_view():
@@ -10,7 +18,8 @@ def train_model_view():
 
     use_gpu = st.checkbox('Usar GPU?', value=True)
 
-    df = get_dataframe_leituras_sensores()
+    # Carrega dados com cache
+    df = load_sensor_data()
 
     if df.empty:
         st.warning("O DataFrame está vazio. Verifique se há dados disponíveis.")
@@ -89,33 +98,148 @@ def train_model_view():
 
     turbo = st.checkbox("Modo turbo (mais rápido, menos preciso)", value=True)
 
-    _best_models = None
+    # Inicializa no session_state
+    if 'top_models' not in st.session_state:
+        st.session_state.top_models = None
+    if 'compare_df' not in st.session_state:
+        st.session_state.compare_df = None
 
     if st.button('Treinar e comparar modelos'):
 
         with st.spinner("Treinando modelos (este processo pode demorar um pouco)..."):
-            _best_models = s.compare_models(n_select=1, sort=metrica, fold=5, turbo=turbo)
+            # Compara e seleciona os top 5 modelos
+            top_models = s.compare_models(n_select=5, sort=metrica, fold=5, turbo=turbo)
             compare_df = pull()
-            st.write("Resumo da comparação dos modelos:")
-            st.dataframe(compare_df)
+            
+            # Armazena no session_state
+            st.session_state.top_models = top_models
+            st.session_state.compare_df = compare_df
+            
+            st.success("✅ Treinamento concluído! Veja abaixo a comparação dos top 5 modelos.")
 
-    if _best_models:
-
-        best_model = finalize_model(_best_models)
-        st.success(f"✅ Melhor modelo selecionado:\n\n**{_best_models.__str__()}**")
-
-        model_results = predict_model(best_model)
+    # Exibe resultados se existirem
+    if st.session_state.top_models is not None:
+        
+        st.write("### 📊 Comparação de Todos os Modelos")
+        st.dataframe(st.session_state.compare_df, use_container_width=True)
+        
+        # Garante que top_models seja uma lista
+        top_models_list = st.session_state.top_models if isinstance(st.session_state.top_models, list) else [st.session_state.top_models]
+        
+        st.write("### 🏆 Top 5 Modelos Selecionados")
+        
+        # Cria dataframe para visualização dos top 5
+        top_5_info = []
+        for idx, model in enumerate(top_models_list[:5], 1):
+            model_name = model.__class__.__name__
+            # Busca métricas do compare_df
+            if 'Model' in st.session_state.compare_df.columns:
+                model_row = st.session_state.compare_df[
+                    st.session_state.compare_df['Model'].str.contains(model_name, case=False, na=False)
+                ]
+                if not model_row.empty:
+                    metrics_dict = model_row.iloc[0].to_dict()
+                    metrics_dict['Rank'] = idx
+                    top_5_info.append(metrics_dict)
+        
+        if top_5_info:
+            top_5_df = pd.DataFrame(top_5_info)
+            st.dataframe(top_5_df, use_container_width=True)
+            
+            # Gráfico comparativo dos top 5
+            if metrica in top_5_df.columns:
+                st.write(f"### 📈 Comparação Visual por {metrica}")
+                chart_df = top_5_df[['Model', metrica]].copy()
+                chart_df = chart_df.set_index('Model')
+                st.bar_chart(chart_df)
+        
+        st.write("### 💾 Salvar Modelos")
+        st.write("Selecione abaixo quais modelos você deseja salvar:")
+        
+        # Interface para salvar cada modelo
+        for idx, model in enumerate(top_models_list[:5], 1):
+            model_class_name = model.__class__.__name__
+            
+            with st.expander(f"Modelo {idx}: {model_class_name}"):
+                col1, col2 = st.columns([3, 1])
+                
+                with col1:
+                    # Nome padrão com timestamp para evitar conflitos
+                    from datetime import datetime
+                    default_name = f"{model_class_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                    model_name_input = st.text_input(
+                        "Nome do modelo:",
+                        value=default_name,
+                        key=f"name_{idx}_{model_class_name}"
+                    )
+                    
+                    # Campo para descrição/notas
+                    model_notes = st.text_area(
+                        "Notas/Descrição (opcional):",
+                        key=f"notes_{idx}_{model_class_name}",
+                        height=80
+                    )
+                
+                with col2:
+                    # Métricas do modelo
+                    if top_5_info and idx <= len(top_5_info):
+                        metric_value = top_5_info[idx-1].get(metrica, 'N/A')
+                        st.metric(metrica, f"{metric_value:.4f}" if isinstance(metric_value, (int, float)) else metric_value)
+                
+                # Botão para salvar
+                if st.button(f"💾 Salvar {model_class_name}", key=f"save_{idx}_{model_class_name}"):
+                    try:
+                        # Finaliza o modelo antes de salvar
+                        finalized_model = finalize_model(model)
+                        
+                        # Prepara metadados
+                        metadata = {
+                            "model_type": model_class_name,
+                            "metric_used": metrica,
+                            "rank": idx,
+                            "notes": model_notes if model_notes else ""
+                        }
+                        
+                        # Adiciona métricas disponíveis
+                        if top_5_info and idx <= len(top_5_info):
+                            for key, value in top_5_info[idx-1].items():
+                                if key not in ['Model', 'Rank'] and isinstance(value, (int, float)):
+                                    metadata[key] = float(value)
+                        
+                        # Salva usando o model_store
+                        save_model_to_registry(finalized_model, model_name_input, metadata)
+                        
+                        st.success(f"✅ Modelo '{model_name_input}' salvo com sucesso!")
+                        
+                        # Exibe informações salvas
+                        st.info(f"📁 Salvo em: modelos_salvos/{model_name_input}.pkl")
+                        
+                    except ValueError as e:
+                        st.error(f"❌ Erro: {str(e)}")
+                    except Exception as e:
+                        st.error(f"❌ Erro ao salvar modelo: {str(e)}")
+        
+        # Seção para visualizar modelo específico
+        st.write("### 🔍 Análise Detalhada do Melhor Modelo")
+        
+        best_model = top_models_list[0]
+        best_model_finalized = finalize_model(best_model)
+        
+        st.success(f"**Melhor modelo**: {best_model.__class__.__name__}")
+        
+        model_results = predict_model(best_model_finalized)
         st.write("Resultados do modelo no conjunto de dados de teste:")
         st.dataframe(model_results)
 
         fig = plt.figure()
-        s.plot_model(best_model, plot='threshold', display_format='streamlit')
+        s.plot_model(best_model_finalized, plot='threshold', display_format='streamlit')
 
         fig = plt.figure()
-        s.plot_model(best_model, plot='confusion_matrix', display_format='streamlit')
-
-        save_model(best_model, 'best_classification_model')
-        st.success("Modelo salvo como 'best_classification_model.pkl'")
+        s.plot_model(best_model_finalized, plot='confusion_matrix', display_format='streamlit')
+        
+        # Salva automaticamente o melhor modelo (compatibilidade com código antigo)
+        save_model(best_model_finalized, 'best_classification_model')
+        st.info("ℹ️ O melhor modelo também foi salvo automaticamente como 'best_classification_model.pkl' (método legado do PyCaret)")
 
 
 train_model_page = st.Page(

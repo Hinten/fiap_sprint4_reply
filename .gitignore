@@ -26,3 +26,7 @@ htmlcov/
 # Memory profiler
 *.dat
 mprofile*.png
+
+# Demo models (temporary)
+src/machine_learning/modelos_salvos/*_demo.pkl
+src/machine_learning/modelos_salvos/registry.json
