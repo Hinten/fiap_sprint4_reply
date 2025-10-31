@@ -2,12 +2,14 @@
 Example tool: Count equipment by company.
 This demonstrates how to create a tool that queries the database.
 """
+from typing import Optional
+
 from src.large_language_model.tipos_base.base_tools import BaseTool
 from src.database.models.equipamento import Equipamento
 from src.database.models.empresa import Empresa
 
 
-def count_equipamentos_por_empresa(empresa_id: int = None) -> str:
+def count_equipamentos_por_empresa(empresa_id: Optional[int] = None) -> str:
     """
     Conta quantos equipamentos estão cadastrados por empresa.
     Se empresa_id for fornecido, retorna apenas para aquela empresa.

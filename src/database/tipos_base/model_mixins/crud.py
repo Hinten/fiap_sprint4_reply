@@ -2,6 +2,8 @@ from abc import abstractmethod
 
 import logging
 
+from sqlalchemy.orm import selectinload
+
 from src.database.tipos_base.database import Database
 from sqlalchemy import inspect, BinaryExpression, UnaryExpression
 from typing import Self
@@ -29,12 +31,18 @@ class _ModelCrudMixin:
     @classmethod
     def all(cls) -> list[Self]:
         """
-        Retorna todos os registros da tabela.
+        Retorna todos os registros da tabela, pré-carregando relações para evitar
+        lazy-load após a sessão ser fechada.
         :return: list[Model] - Lista de instâncias do modelo.
         """
         with Database.get_session() as session:
-            #order by id
-            return session.query(cls).order_by(cls.id).all()
+            query = session.query(cls)
+
+            # Pré-carrega todas as relações do mapper para evitar DetachedInstanceError
+            for rel in inspect(cls).mapper.relationships:
+                query = query.options(selectinload(getattr(cls, rel.key)))
+
+            return query.order_by(cls.id).all()
 
     def save(self) -> Self:
         """
