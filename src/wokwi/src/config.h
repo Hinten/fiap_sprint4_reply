@@ -25,4 +25,49 @@ const int LCD_I2C_ADDRESS = 0x27;
 // Delay para paginação de conteúdo (quando necessário para LCD 16x2)
 const int DISPLAY_PAGE_DELAY_MS = 2000;
 
+// ===== CONFIGURAÇÃO DE REDE E API =====
+#ifndef NETWORK_SSID
+#define NETWORK_SSID "Wokwi-GUEST"
+#endif
+
+#ifndef NETWORK_PASSWORD
+#define NETWORK_PASSWORD ""
+#endif
+
+#ifndef API_URL
+#define API_URL "http://localhost:8180"
+#endif
+
+// API Endpoints
+#define API_BASE_URL API_URL
+#define API_INIT_URL "/init/"
+#define API_LEITURA_URL "/leitura/"
+
+// ===== CONFIGURAÇÃO DE PINOS =====
+// I2C
+const int I2C_SDA_PIN = 21;
+const int I2C_SCL_PIN = 22;
+
+// Sensores
+const int LDR_PIN = 34;
+const int MPU6050_INTERRUPT_PIN = 2;  // Opcional
+
+// Atuadores
+const int RELAY_PIN = 32;
+const int LED_PIN = 15;
+const int BUZZER_PIN = 2;
+
+// ===== CONFIGURAÇÃO DE SENSORES =====
+// LDR
+const float LDR_VCC = 3.3;
+const float LDR_RESISTOR = 10000.0;
+
+// MPU6050
+const float VIBRATION_THRESHOLD = 1.0;  // Limiar de vibração
+const int VIBRATION_SAMPLES = 100;      // Número de amostras para cálculo
+
+// ===== CONFIGURAÇÃO DE TIMING =====
+const unsigned long PRIMARY_TASK_INTERVAL = 5000;   // 5 segundos
+const unsigned long SECONDARY_TASK_DELAY = 100;     // 100ms
+
 #endif // CONFIG_H
