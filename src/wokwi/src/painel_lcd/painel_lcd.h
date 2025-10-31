@@ -16,11 +16,23 @@ class PainelLCD {
     bool lcdEnabled;
 
 public:
-    PainelLCD(uint8_t i2cAddr = LCD_I2C_ADDRESS, uint8_t lcdCols = 20, uint8_t lcdRows = 4,
-              uint8_t i2cSda = 21, uint8_t i2cScl = 22, LcdType lcdType = SELECTED_LCD)
-        : i2cAddr(i2cAddr), lcdCols(lcdCols), lcdRows(lcdRows),
-          i2cSda(i2cSda), i2cScl(i2cScl), lcdType(lcdType),
-          lcd(nullptr), lcdEnabled(false) {}
+        PainelLCD(uint8_t i2cAddr = LCD_I2C_ADDRESS, LcdType lcdType = SELECTED_LCD,
+              uint8_t i2cSda = 21, uint8_t i2cScl = 22)
+        : i2cAddr(i2cAddr), i2cSda(i2cSda), i2cScl(i2cScl), lcdType(lcdType),
+          lcd(nullptr), lcdEnabled(false) {
+        // Define cols and rows based on lcdType
+        if (lcdType == LCD_16x2) {
+            lcdCols = 16;
+            lcdRows = 2;
+        } else if (lcdType == LCD_20x4) {
+            lcdCols = 20;
+            lcdRows = 4;
+        } else {
+            // Default to 20x4 if unknown
+            lcdCols = 20;
+            lcdRows = 4;
+        }
+    }
 
     ~PainelLCD() {
         if (lcd != nullptr) {

@@ -7,18 +7,15 @@
 #include "api/api.h"
 #include "sensores/sensor_ldr/sensor_ldr.h"
 #include "sensores/mpu6050/MPU6050Sensor.h"
+#include "buzzer/buzzer.h"
 
 // ===== INSTÂNCIAS GLOBAIS =====
-PainelLCD painel(LCD_I2C_ADDRESS, 20, 4, I2C_SDA_PIN, I2C_SCL_PIN, SELECTED_LCD);
+PainelLCD painel(LCD_I2C_ADDRESS, SELECTED_LCD, I2C_SDA_PIN, I2C_SCL_PIN);
 ConexaoWifi conexaoWifi(NETWORK_SSID, NETWORK_PASSWORD, &painel, 10000);
 Api api(API_BASE_URL, API_INIT_URL, API_LEITURA_URL, &conexaoWifi, &painel);
 SensorLDR sensorLdr(LDR_PIN, LDR_VCC, LDR_RESISTOR);
 MPU6050Sensor sensorMpu;
-
-// ===== PINOS DE SAÍDA =====
-const int RELAY_PIN = 32;
-const int LED_PIN = 15;
-const int BUZZER_PIN = 2;
+BuzzerLed buzzer(BUZZER_PIN, LED_PIN, RELAY_PIN);
 
 // ===== VARIÁVEIS DE CONTROLE =====
 struct SensorData {
@@ -37,18 +34,6 @@ bool sensorIniciado = false;
 unsigned long ultimoMillis = 0;
 
 // ===== FUNÇÕES AUXILIARES =====
-void alertaBuzzerLed(int repeticoes = 3, int frequencia = 1000, int duracao = 300) {
-    for (int i = 0; i < repeticoes; i++) {
-        digitalWrite(LED_PIN, HIGH);
-        digitalWrite(RELAY_PIN, HIGH);
-        tone(BUZZER_PIN, frequencia);
-        delay(duracao);
-        digitalWrite(LED_PIN, LOW);
-        digitalWrite(RELAY_PIN, LOW);
-        noTone(BUZZER_PIN);
-        delay(duracao);
-    }
-}
 
 void iniciarSensor() {
     if (sensorIniciado) {
@@ -80,6 +65,7 @@ void iniciarSensor() {
     }
 }
 
+bool hasSentData = false;
 // ===== PRIMARY TASK - LEITURA DE SENSORES =====
 void primaryTask() {
     // Lê temperatura do MPU6050
@@ -116,12 +102,13 @@ void primaryTask() {
     if (sensorData.lux < 500) {
         snprintf(buffer, sizeof(buffer), "Lux: %.0f (Escuro)", sensorData.lux);
         painel.printLCDSerial(0, 1, buffer);
-        digitalWrite(LED_PIN, LOW);
-        digitalWrite(RELAY_PIN, LOW);
+        // buzzer.turnOff();
+        buzzer.alertaBuzzerLed(3, 1000, 300);
     } else {
         snprintf(buffer, sizeof(buffer), "Lux: %.0f (Claro)", sensorData.lux);
         painel.printLCDSerial(0, 1, buffer);
-        alertaBuzzerLed(3, 1000, 300);
+        buzzer.turnOff();
+        // buzzer.alertaBuzzerLed(3, 1000, 300);
     }
     
     delay(1000);
@@ -133,7 +120,7 @@ void primaryTask() {
     
     if (sensorData.vibration > VIBRATION_THRESHOLD) {
         painel.printLCDSerial(0, 1, "#ALERTA VIBRACAO#");
-        alertaBuzzerLed(3, 1000, 300);
+        buzzer.alertaBuzzerLed(3, 1000, 300);
     } else {
         painel.printLCDSerial(0, 1, "Vibracao normal");
     }
@@ -141,7 +128,7 @@ void primaryTask() {
     // Alerta de temperatura
     if (sensorData.temperature > 70.0) {
         painel.printLCDSerial(0, 1, "#ALERTA: >70 C#");
-        alertaBuzzerLed(3, 1500, 300);
+        buzzer.alertaBuzzerLed(3, 1500, 300);
     }
     
     // Linha 2 e 3: Acelerômetro (se LCD 20x4)
@@ -165,12 +152,20 @@ void primaryTask() {
     Serial.print(sensorData.accelY, 2);
     Serial.print(F(" Z:"));
     Serial.println(sensorData.accelZ, 2);
+
+    hasSentData = false;
 }
 
 // ===== SECONDARY TASK - ENVIO DE DADOS =====
 void secondaryTask() {
+
+    if (hasSentData){
+        return;
+    }
+
     // Verifica conexão WiFi
     if (!conexaoWifi.estaConectado()) {
+        buzzer.alertaBuzzerLed(2, 2000, 500);
         Serial.println(F("WiFi desconectado. Tentando reconectar..."));
         conexaoWifi.connect();
         return;
@@ -196,6 +191,7 @@ void secondaryTask() {
     
     if (response.status_code >= 200 && response.status_code < 300) {
         Serial.println(F("Dados enviados com sucesso!"));
+        hasSentData = true;
     } else {
         Serial.print(F("Falha ao enviar dados. Status: "));
         Serial.println(response.status_code);
@@ -215,13 +211,8 @@ void setup() {
     Serial.println(F("Version 2.0 - Modular Architecture"));
     
     // Configura pinos de saída
-    pinMode(RELAY_PIN, OUTPUT);
-    pinMode(LED_PIN, OUTPUT);
-    pinMode(BUZZER_PIN, OUTPUT);
+    buzzer.setup();
     
-    // Configura PWM para buzzer
-    ledcSetup(0, 2000, 8);
-    ledcAttachPin(BUZZER_PIN, 0);
     
     // Inicializa I2C
     Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);

@@ -55,7 +55,7 @@ const int MPU6050_INTERRUPT_PIN = 2;  // Opcional
 // Atuadores
 const int RELAY_PIN = 32;
 const int LED_PIN = 15;
-const int BUZZER_PIN = 2;
+const int BUZZER_PIN = 25;
 
 // ===== CONFIGURAÇÃO DE SENSORES =====
 // LDR
