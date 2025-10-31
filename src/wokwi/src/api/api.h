@@ -4,8 +4,10 @@
 #include <Arduino.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-#include "../conexao_wifi/conexao_wifi.h"
-#include "../painel_lcd/painel_lcd.h"
+
+// Forward declarations to avoid circular dependencies
+class ConexaoWifi;
+class PainelLCD;
 
 struct Response {
     const int status_code;
