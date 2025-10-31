@@ -4,7 +4,7 @@
 
 BuzzerLed::BuzzerLed(int pinBuzzer, int pinLed, int pinRelay)
     : _pinBuzzer(pinBuzzer), _pinLed(pinLed), _pinRelay(pinRelay),
-      _relayState(false), _ledState(false) {
+      _relayState(false), _ledState(false), _ledPwmConfigured(false) {
 }
 
 void BuzzerLed::setup() {
@@ -249,16 +249,13 @@ void BuzzerLed::ledSetBrightness(uint8_t brightness) {
     
     #ifdef ESP32
     // Usa PWM no ESP32
-    static int ledPwmChannel = 1; // Canal diferente do buzzer
-    static bool pwmConfigured = false;
-    
-    if (!pwmConfigured) {
-        ledcSetup(ledPwmChannel, 5000, 8); // 5kHz, 8 bits
-        ledcAttachPin(_pinLed, ledPwmChannel);
-        pwmConfigured = true;
+    if (!_ledPwmConfigured) {
+        ledcSetup(_ledPwmChannel, 5000, 8); // 5kHz, 8 bits
+        ledcAttachPin(_pinLed, _ledPwmChannel);
+        _ledPwmConfigured = true;
     }
     
-    ledcWrite(ledPwmChannel, brightness);
+    ledcWrite(_ledPwmChannel, brightness);
     _ledState = (brightness > 0);
     #else
     // Usa analogWrite em outras plataformas
@@ -394,7 +391,10 @@ void BuzzerLed::successEffect() {
 
 bool BuzzerLed::isPwmPin(int pin) const {
     #ifdef ESP32
-    // No ESP32, quase todos os pinos podem ser PWM
+    // No ESP32, a maioria dos pinos GPIO podem ser PWM
+    // Exceções: pinos somente-leitura (ex: 34-39 no ESP32 padrão)
+    // Pinos 34-39 são ADC1 e não suportam PWM
+    if (pin >= 34 && pin <= 39) return false;
     return (pin >= 0);
     #else
     // Para Arduino, verifica pinos PWM comuns

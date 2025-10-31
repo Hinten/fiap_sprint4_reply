@@ -198,9 +198,11 @@ private:
     int _pinRelay;
     bool _relayState;
     bool _ledState;
+    bool _ledPwmConfigured;
     
-    // Canal PWM para o buzzer (ESP32)
-    const int _pwmChannel = 0;
+    // Canais PWM (ESP32)
+    const int _pwmChannel = 0;      // Canal para buzzer
+    const int _ledPwmChannel = 1;   // Canal para LED
     const int _pwmResolution = 8;
 
     /**
