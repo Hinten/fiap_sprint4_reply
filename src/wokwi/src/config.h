@@ -17,7 +17,7 @@ enum LcdType {
 
 // ===== CONFIGURAÇÃO DO USUÁRIO =====
 // Altere esta linha para escolher o tipo de LCD:
-const LcdType SELECTED_LCD = LCD_20x4;
+const LcdType SELECTED_LCD = LCD_16x2;
 
 // Configurações do LCD I2C
 const int LCD_I2C_ADDRESS = 0x27;
