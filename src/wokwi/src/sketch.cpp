@@ -212,7 +212,6 @@ void setup() {
     
     // Configura pinos de saída
     buzzer.setup();
-    buzzer.playStartupTune();  // Toca melodia de inicialização
     
     // Inicializa I2C
     Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
@@ -229,6 +228,7 @@ void setup() {
         painel.printLCDSerial(0, 1, "MPU6050 FALHOU!");
         while (true) {
             delay(1000);
+            buzzer.criticalAlert();
         }
     }
     delay(1000);
@@ -242,6 +242,7 @@ void setup() {
     
     Serial.println(F("\n=== Setup completo! ===\n"));
     delay(1000);
+    buzzer.playStartupTune();  // Toca melodia de inicialização
 }
 
 // ===== LOOP =====
