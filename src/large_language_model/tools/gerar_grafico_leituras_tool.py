@@ -10,6 +10,9 @@ matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import io
 import base64
+import tempfile
+import os
+from PIL import Image
 from sqlalchemy.orm import joinedload
 from src.database.tipos_base.database import Database
 
@@ -18,19 +21,18 @@ def gerar_grafico_leituras(
     sensor_id: int,
     dias: int = 7,
     data_especifica: str = None
-) -> str:
+) -> dict:
     """
     Gera um gráfico com as leituras de um sensor.
     
     Cria um gráfico de linha mostrando as leituras de um sensor ao longo do tempo.
     Pode mostrar os últimos N dias ou leituras de uma data específica.
-    O gráfico é retornado como uma descrição textual detalhada, pois a interface
-    de chat não suporta exibição direta de imagens.
+    O gráfico é salvo em arquivo temporário e exibido ao usuário.
     
     :param sensor_id: ID do sensor para gerar o gráfico
     :param dias: Número de dias para incluir no gráfico (padrão: 7 dias)
     :param data_especifica: Data específica no formato YYYY-MM-DD para filtrar leituras (opcional)
-    :return: Descrição textual do gráfico gerado com estatísticas das leituras
+    :return: Dicionário com estatísticas das leituras e caminho do arquivo temporário
     """
     try:
         # Verificar se o sensor existe
@@ -42,7 +44,11 @@ def gerar_grafico_leituras(
             ).filter(Sensor.id == sensor_id).one_or_none()
 
         if not sensor:
-            return f"Erro: Sensor com ID {sensor_id} não encontrado."
+            return {
+                "erro": f"Sensor com ID {sensor_id} não encontrado.",
+                "imagem_path": None,
+                "obs": "Erro ao gerar gráfico - sensor não encontrado"
+            }
         
         # Definir período de análise
         if data_especifica:
@@ -52,7 +58,11 @@ def gerar_grafico_leituras(
                 data_final = data_obj
                 titulo_periodo = f"em {data_obj.strftime('%d/%m/%Y')}"
             except ValueError:
-                return f"Erro: Data inválida. Use o formato YYYY-MM-DD. Recebido: {data_especifica}"
+                return {
+                    "erro": f"Data inválida. Use o formato YYYY-MM-DD. Recebido: {data_especifica}",
+                    "imagem_path": None,
+                    "obs": "Erro ao gerar gráfico - formato de data inválido"
+                }
         else:
             data_final = date.today()
             data_inicial = data_final - timedelta(days=dias)
@@ -66,7 +76,11 @@ def gerar_grafico_leituras(
         )
         
         if not leituras:
-            return f"Nenhuma leitura encontrada para o sensor {sensor.nome or sensor_id} {titulo_periodo}."
+            return {
+                "erro": f"Nenhuma leitura encontrada para o sensor {sensor.nome or sensor_id} {titulo_periodo}.",
+                "imagem_path": None,
+                "obs": "Erro ao gerar gráfico - sem leituras no período"
+            }
         
         # Preparar dados para o gráfico
         timestamps = [leitura.data_leitura for leitura in leituras]
@@ -102,11 +116,18 @@ def gerar_grafico_leituras(
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
         
-        # Converter gráfico para base64 (para possível uso futuro em interfaces web)
+        # Converter gráfico para base64
         buffer = io.BytesIO()
         plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
         buffer.seek(0)
         image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+        
+        # Salvar imagem em arquivo temporário
+        temp_file = tempfile.NamedTemporaryFile(mode='wb', suffix='.png', delete=False)
+        temp_file.write(base64.b64decode(image_base64))
+        temp_file.close()
+        temp_file_path = temp_file.name
+        
         plt.close()
         
         # Calcular estatísticas para a descrição textual
@@ -114,35 +135,12 @@ def gerar_grafico_leituras(
         minimo = min(valores)
         maximo = max(valores)
         
-        # Criar descrição textual do gráfico
-        resultado = f"📈 Gráfico Gerado - {tipo_sensor}\n\n"
-        resultado += f"🏷️ Sensor: {sensor.nome or f'ID {sensor_id}'}\n"
-        
-        if sensor.equipamento:
-            resultado += f"📦 Equipamento: {sensor.equipamento.nome}\n"
-        
-        resultado += f"📅 Período: {titulo_periodo}\n"
-        resultado += f"📊 Total de Leituras: {len(leituras)}\n\n"
-        
-        resultado += "📊 RESUMO DOS DADOS:\n"
-        resultado += f"   • Valor Médio: {media:.2f} {unidade}\n"
-        resultado += f"   • Valor Mínimo: {minimo:.2f} {unidade} em {timestamps[valores.index(minimo)].strftime('%d/%m/%Y %H:%M')}\n"
-        resultado += f"   • Valor Máximo: {maximo:.2f} {unidade} em {timestamps[valores.index(maximo)].strftime('%d/%m/%Y %H:%M')}\n"
-        resultado += f"   • Variação: {maximo - minimo:.2f} {unidade}\n\n"
-        
         # Verificar se há violações de limiar
         violacoes_superior = sum(1 for v in valores if sensor.limiar_manutencao_maior is not None and v > sensor.limiar_manutencao_maior)
         violacoes_inferior = sum(1 for v in valores if sensor.limiar_manutencao_menor is not None and v < sensor.limiar_manutencao_menor)
         
-        if violacoes_superior > 0 or violacoes_inferior > 0:
-            resultado += "⚠️ ALERTAS:\n"
-            if violacoes_superior > 0:
-                resultado += f"   • {violacoes_superior} leitura(s) ACIMA do limiar superior\n"
-            if violacoes_inferior > 0:
-                resultado += f"   • {violacoes_inferior} leitura(s) ABAIXO do limiar inferior\n"
-            resultado += "\n"
-        
         # Análise de tendência simples
+        tendencia = "ESTÁVEL"
         if len(valores) >= 4:
             primeiro_quarto = valores[:len(valores)//4]
             ultimo_quarto = valores[-len(valores)//4:]
@@ -150,24 +148,40 @@ def gerar_grafico_leituras(
             media_final = sum(ultimo_quarto) / len(ultimo_quarto)
             
             if media_final > media_inicial * 1.1:
-                resultado += "📈 TENDÊNCIA: Valores em CRESCIMENTO no período\n"
+                tendencia = "CRESCIMENTO"
             elif media_final < media_inicial * 0.9:
-                resultado += "📉 TENDÊNCIA: Valores em QUEDA no período\n"
-            else:
-                resultado += "➡️ TENDÊNCIA: Valores ESTÁVEIS no período\n"
+                tendencia = "QUEDA"
         
-        # Nota sobre o gráfico gerado (não exibido diretamente no chat)
-        resultado += "\n💡 NOTA: O gráfico foi gerado internamente para análise.\n"
-        resultado += "   Use a interface web do dashboard para visualização completa.\n"
-        
-        # Note: The base64 image is generated but not returned in the text response
-        # as the LLM chat interface typically doesn't support image display directly.
-        # The image could be saved to a file or stored for web interface display.
-        
-        return resultado
+        # Retornar dicionário com informações
+        return {
+            "sensor_id": sensor_id,
+            "sensor_nome": sensor.nome or f"ID {sensor_id}",
+            "tipo_sensor": tipo_sensor,
+            "equipamento": sensor.equipamento.nome if sensor.equipamento else None,
+            "periodo": titulo_periodo,
+            "total_leituras": len(leituras),
+            "estatisticas": {
+                "media": round(media, 2),
+                "minimo": round(minimo, 2),
+                "maximo": round(maximo, 2),
+                "variacao": round(maximo - minimo, 2),
+                "unidade": unidade
+            },
+            "alertas": {
+                "violacoes_superior": violacoes_superior,
+                "violacoes_inferior": violacoes_inferior
+            },
+            "tendencia": tendencia,
+            "imagem_path": temp_file_path,
+            "obs": "O gráfico está sendo exibido ao usuário na interface"
+        }
         
     except Exception as e:
-        return f"Erro ao gerar gráfico: {str(e)}"
+        return {
+            "erro": f"Erro ao gerar gráfico: {str(e)}",
+            "imagem_path": None,
+            "obs": "Erro ao gerar gráfico"
+        }
 
 
 class GerarGraficoLeiturasTool(BaseTool):
@@ -183,5 +197,24 @@ class GerarGraficoLeiturasTool(BaseTool):
     def call_chat_display(self) -> str:
         return "📈 Gerando gráfico de leituras..."
     
-    def call_result_display(self, result: str) -> str:
-        return result
+    def call_result_display(self, result: dict) -> Image.Image:
+        """
+        Retorna a imagem do gráfico gerado para exibição no chat.
+        
+        :param result: Dicionário com os dados do resultado, incluindo o caminho da imagem
+        :return: Imagem PIL para exibição no Streamlit
+        """
+        if isinstance(result, dict) and result.get('imagem_path'):
+            try:
+                # Carregar a imagem do arquivo temporário
+                img = Image.open(result['imagem_path'])
+                return img
+            except Exception as e:
+                # Se houver erro ao carregar, retornar mensagem de erro como texto
+                return f"Erro ao carregar imagem: {str(e)}"
+        
+        # Se não tiver imagem, retornar informação de erro
+        if isinstance(result, dict) and result.get('erro'):
+            return result['erro']
+        
+        return "Erro ao gerar gráfico"

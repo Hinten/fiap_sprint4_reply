@@ -331,31 +331,48 @@ class TestGerarGraficoLeiturasTool:
         assert tool is not None
         assert tool.function_name == "gerar_grafico_leituras"
     
-    @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.Sensor')
-    def test_gerar_grafico_sensor_not_found(self, mock_sensor):
+    @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.Database')
+    def test_gerar_grafico_sensor_not_found(self, mock_database):
         """Test graph generation when sensor doesn't exist."""
-        mock_sensor.get_from_id.return_value = None
+        # Mock the session context manager
+        mock_session = Mock()
+        mock_session.__enter__ = Mock(return_value=mock_session)
+        mock_session.__exit__ = Mock(return_value=False)
+        mock_session.query.return_value.options.return_value.filter.return_value.one_or_none.return_value = None
+        mock_database.get_session.return_value = mock_session
+        
         result = gerar_grafico_leituras(sensor_id=999)
-        assert "não encontrado" in result
+        assert isinstance(result, dict)
+        assert "erro" in result
+        assert "não encontrado" in result["erro"]
     
     @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.LeituraSensor')
-    @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.Sensor')
-    def test_gerar_grafico_no_readings(self, mock_sensor, mock_leitura):
+    @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.Database')
+    def test_gerar_grafico_no_readings(self, mock_database, mock_leitura):
         """Test graph generation when no readings exist."""
         mock_sens = Mock()
         mock_sens.id = 1
         mock_sens.nome = "Sensor Teste"
-        mock_sensor.get_from_id.return_value = mock_sens
+        
+        # Mock the session context manager
+        mock_session = Mock()
+        mock_session.__enter__ = Mock(return_value=mock_session)
+        mock_session.__exit__ = Mock(return_value=False)
+        mock_session.query.return_value.options.return_value.filter.return_value.one_or_none.return_value = mock_sens
+        mock_database.get_session.return_value = mock_session
         
         mock_leitura.get_leituras_for_sensor.return_value = []
         
         result = gerar_grafico_leituras(sensor_id=1)
-        assert "Nenhuma leitura encontrada" in result
+        assert isinstance(result, dict)
+        assert "erro" in result
+        assert "Nenhuma leitura encontrada" in result["erro"]
     
+    @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.tempfile.NamedTemporaryFile')
     @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.plt')
     @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.LeituraSensor')
-    @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.Sensor')
-    def test_gerar_grafico_with_readings(self, mock_sensor, mock_leitura, mock_plt):
+    @patch('src.large_language_model.tools.gerar_grafico_leituras_tool.Database')
+    def test_gerar_grafico_with_readings(self, mock_database, mock_leitura, mock_plt, mock_tempfile):
         """Test graph generation with readings."""
         mock_tipo = Mock()
         mock_tipo.nome = "Temperatura"
@@ -368,7 +385,13 @@ class TestGerarGraficoLeiturasTool:
         mock_sens.equipamento = None
         mock_sens.limiar_manutencao_maior = None
         mock_sens.limiar_manutencao_menor = None
-        mock_sensor.get_from_id.return_value = mock_sens
+        
+        # Mock the session context manager
+        mock_session = Mock()
+        mock_session.__enter__ = Mock(return_value=mock_session)
+        mock_session.__exit__ = Mock(return_value=False)
+        mock_session.query.return_value.options.return_value.filter.return_value.one_or_none.return_value = mock_sens
+        mock_database.get_session.return_value = mock_session
         
         # Create mock readings
         mock_readings = []
@@ -384,11 +407,22 @@ class TestGerarGraficoLeiturasTool:
         # Mock matplotlib
         mock_plt.figure.return_value = Mock()
         
+        # Mock tempfile
+        mock_temp = Mock()
+        mock_temp.name = '/tmp/test_graph.png'
+        mock_temp.write = Mock()
+        mock_temp.close = Mock()
+        mock_tempfile.return_value = mock_temp
+        
         result = gerar_grafico_leituras(sensor_id=1, dias=7)
         
-        assert "Gráfico Gerado" in result
-        assert "RESUMO DOS DADOS" in result
-        assert "Valor Médio" in result
+        assert isinstance(result, dict)
+        assert "sensor_id" in result
+        assert result["sensor_id"] == 1
+        assert "estatisticas" in result
+        assert "imagem_path" in result
+        assert "obs" in result
+        assert result["obs"] == "O gráfico está sendo exibido ao usuário na interface"
 
 
 class TestPreverNecessidadeManutencaoTool:
