@@ -2,6 +2,7 @@ import streamlit as st
 import joblib
 import os
 import numpy as np
+import pandas as pd
 from datetime import datetime
 
 from src.notificacoes.email import enviar_email
@@ -25,6 +26,31 @@ def enviar_alerta_manutencao(lux, temperatura, vibracao):
         )
         st.success("Alerta de manutenção enviado com sucesso!")
 
+def preparar_dados_para_previsao(lux: float, temp: float, vibracao: float) -> pd.DataFrame:
+    """
+    Prepara os dados de entrada no formato correto esperado pelos modelos PyCaret.
+    
+    Os modelos treinados pelo PyCaret esperam um DataFrame com os nomes de colunas
+    exatamente como foram usados no treinamento: 'Lux (x10³)', 'Temperatura (°C)', 'Vibração'.
+    
+    Args:
+        lux: Valor da intensidade luminosa
+        temp: Valor da temperatura
+        vibracao: Valor da vibração
+        
+    Returns:
+        DataFrame com uma linha e colunas nomeadas corretamente
+    """
+    # Cria DataFrame com os nomes de colunas corretos usados no treinamento
+    dados_df = pd.DataFrame({
+        'Lux (x10³)': [lux],
+        'Temperatura (°C)': [temp],
+        'Vibração': [vibracao]
+    })
+    
+    return dados_df
+
+
 @st.fragment
 def carregar_modelo_e_realizar_previsao(lux:float, temp:float, vibracao:float):
     def carregar_modelo():
@@ -41,7 +67,6 @@ def carregar_modelo_e_realizar_previsao(lux:float, temp:float, vibracao:float):
             
             if models_summary:
                 # Exibe tabela com informações dos modelos
-                import pandas as pd
                 summary_df = pd.DataFrame(models_summary)
                 
                 # Seleciona colunas relevantes para display
@@ -132,11 +157,15 @@ def carregar_modelo_e_realizar_previsao(lux:float, temp:float, vibracao:float):
         # Botão para executar a previsão, agora na página principal
         if st.button("🔮 Fazer Previsão", type="primary"):
             try:
-                # Junta todos os inputs de texto em uma lista
-                features = [lux, temp, vibracao]
-
-                # Converte a lista para o formato que o modelo espera (array 2D)
-                dados_para_prever = np.array(features).reshape(1, -1)
+                # Prepara os dados no formato correto (DataFrame com nomes de colunas)
+                dados_para_prever = preparar_dados_para_previsao(lux, temp, vibracao)
+                
+                # Exibe os dados que serão enviados para o modelo
+                with st.expander("🔍 Dados de Entrada (Debug)"):
+                    st.write("Formato dos dados enviados ao modelo:")
+                    st.dataframe(dados_para_prever)
+                    st.write(f"Colunas: {list(dados_para_prever.columns)}")
+                    st.write(f"Shape: {dados_para_prever.shape}")
 
                 # Faz a previsão usando o modelo carregado
                 resultado_numerico = modelo.predict(dados_para_prever)[0]
@@ -166,6 +195,12 @@ def carregar_modelo_e_realizar_previsao(lux:float, temp:float, vibracao:float):
             except Exception as e:
                 st.error(f"❌ Erro ao fazer previsão: {str(e)}")
                 st.info("Verifique se os valores de entrada estão corretos.")
+                # Exibe informações adicionais para debug
+                with st.expander("ℹ️ Informações de Debug"):
+                    st.write(f"Tipo do erro: {type(e).__name__}")
+                    st.write(f"Detalhes: {str(e)}")
+                    if hasattr(modelo, 'feature_names_in_'):
+                        st.write(f"Features esperadas pelo modelo: {modelo.feature_names_in_}")
     else:
         st.warning("⚠️ Nenhum modelo carregado. Por favor, selecione um modelo válido acima.")
 
