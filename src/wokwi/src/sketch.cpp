@@ -140,6 +140,10 @@ void primaryTask() {
     painel.clear();
         
     // Linha 1: Luminosidade
+    Serial.println(String("Lux Min: ") + String(sensorLimits.luxThresholdMin.value));
+    Serial.println(String("Lux Max: ") + String(sensorLimits.luxThresholdMax.value));
+
+
     if (!sensorLimits.luxThresholdMin.isNull && sensorData.lux < sensorLimits.luxThresholdMin.value) {
         snprintf(buffer, sizeof(buffer), "Lux: %.0f (Escuro)", sensorData.lux);
         painel.printLCDSerial(0, 0, buffer);
@@ -156,6 +160,9 @@ void primaryTask() {
     snprintf(buffer, sizeof(buffer), "Vib: %.2f", sensorData.vibration);
     painel.printLCDSerial(0, 1, buffer);
 
+    Serial.println(String("Vib Min: ") + String(sensorLimits.vibrationThresholdMin.value));
+    Serial.println(String("Vib Max: ") + String(sensorLimits.vibrationThresholdMax.value));
+
     if (!sensorLimits.vibrationThresholdMax.isNull && sensorData.vibration > sensorLimits.vibrationThresholdMax.value) {
         painel.printLCDSerial(0, 1, "#ALERTA VIBRACAO#");
         buzzer.alertaBuzzerLed(3, 1200, 300);
@@ -168,6 +175,9 @@ void primaryTask() {
     }
     
     delay(1000);
+
+    Serial.println(String("Temp Min: ") + String(sensorLimits.temperatureThresholdMin.value));
+    Serial.println(String("Temp Max: ") + String(sensorLimits.temperatureThresholdMax.value));
 
     if (!sensorLimits.temperatureThresholdMax.isNull && sensorData.temperature > sensorLimits.temperatureThresholdMax.value) {
         painel.printLCDSerial(0, 2, "#ALERTA TEMP#");

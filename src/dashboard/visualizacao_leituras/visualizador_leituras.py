@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from src.database.tipos_base.database import Database
 
-RELOAD_TIMER = 60  # segundos
+RELOAD_TIMER = 10  # segundos
 
 @st.fragment
 def prever_necessidade_de_manutencao(
