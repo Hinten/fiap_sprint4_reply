@@ -10,6 +10,8 @@ class AvailableGenerativeModels(StrEnum):
     """
     Enum para os modelos de linguagem generativa disponíveis.
     """
+    GEMINI_2_5_FLASH = 'gemini-2.5-flash'
+    GEMINI_2_5_FLASH_LITE = 'gemini-2.5-flash-lite'
     GEMINI_2_0_FLASH = 'gemini-2.0-flash'
     GEMINI_2_0_FLASH_LITE = 'gemini-2.0-flash-lite'
 
@@ -20,6 +22,10 @@ class AvailableGenerativeModels(StrEnum):
                 return "Gemini 2.0 Flash"
             case AvailableGenerativeModels.GEMINI_2_0_FLASH_LITE:
                 return "Gemini 2.0 Flash Lite"
+            case AvailableGenerativeModels.GEMINI_2_5_FLASH:
+                return "Gemini 2.5 Flash"
+            case AvailableGenerativeModels.GEMINI_2_5_FLASH_LITE:
+                return "Gemini 2.5 Flash Lite"
             case _:
                 return self.value
 
@@ -49,7 +55,7 @@ class GenerativeModelClient:
             raise ValueError("API key must be provided either as an argument or through the GEMINI_API environment variable.")
 
         self.client:genai.Client = genai.Client(api_key=api_key)
-        self.generative_model:AvailableGenerativeModels = generative_model or AvailableGenerativeModels.GEMINI_2_0_FLASH
+        self.generative_model:AvailableGenerativeModels = generative_model or AvailableGenerativeModels.GEMINI_2_5_FLASH
 
         tools = import_tools(sort=True)
 

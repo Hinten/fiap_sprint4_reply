@@ -10,6 +10,8 @@ matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import io
 import base64
+from sqlalchemy.orm import joinedload
+from src.database.tipos_base.database import Database
 
 
 def gerar_grafico_leituras(
@@ -32,7 +34,13 @@ def gerar_grafico_leituras(
     """
     try:
         # Verificar se o sensor existe
-        sensor = Sensor.get_from_id(sensor_id)
+        # Busca o sensor dentro de uma sessão e pré-carrega relacionamentos
+        with Database.get_session() as session:
+            sensor = session.query(Sensor).options(
+                joinedload(Sensor.tipo_sensor),
+                joinedload(Sensor.equipamento)
+            ).filter(Sensor.id == sensor_id).one_or_none()
+
         if not sensor:
             return f"Erro: Sensor com ID {sensor_id} não encontrado."
         
@@ -71,8 +79,8 @@ def gerar_grafico_leituras(
         # Configurar título e labels
         tipo_sensor = sensor.tipo_sensor.nome if sensor.tipo_sensor else "Sensor"
         unidade = str(sensor.tipo_sensor.tipo) if sensor.tipo_sensor else ""
-        
-        plt.title(f'{tipo_sensor} - {sensor.nome or f"ID {sensor_id}"}\nLeituras {titulo_periodo}', 
+
+        plt.title(f'{tipo_sensor} - {sensor.nome or f"ID {sensor_id}"}\nLeituras {titulo_periodo}',
                  fontsize=14, fontweight='bold')
         plt.xlabel('Data/Hora', fontsize=12)
         plt.ylabel(f'Valor {unidade}', fontsize=12)
