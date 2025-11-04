@@ -29,6 +29,9 @@ from src.large_language_model.tools.gerar_grafico_leituras_tool import (
 from src.large_language_model.tools.prever_necessidade_manutencao_tool import (
     PreverNecessidadeManutencaoTool, prever_necessidade_manutencao
 )
+from src.large_language_model.tools.prever_por_valores_tool import (
+    PreverManutencaoPorValoresTool, prever_manutencao_por_valores
+)
 
 
 class TestListarEquipamentosTool:
@@ -452,19 +455,107 @@ class TestPreverNecessidadeManutencaoTool:
         result = prever_necessidade_manutencao(equipamento_id=1)
         assert "não possui sensores" in result
     
-    @patch('src.large_language_model.tools.prever_necessidade_manutencao_tool.os.path.exists')
+    @patch('src.large_language_model.tools.prever_necessidade_manutencao_tool.carregar_modelo_legado')
     @patch('src.large_language_model.tools.prever_necessidade_manutencao_tool.Equipamento')
-    def test_prever_manutencao_no_model(self, mock_equipamento, mock_exists):
+    def test_prever_manutencao_no_model(self, mock_equipamento, mock_carregar_modelo):
         """Test prediction when ML model doesn't exist."""
         mock_equip = Mock()
         mock_equip.nome = "Equipamento Teste"
         mock_equip.sensores = [Mock()]
         mock_equipamento.get_from_id.return_value = mock_equip
         
-        mock_exists.return_value = False
+        mock_carregar_modelo.side_effect = FileNotFoundError("Model not found")
         
         result = prever_necessidade_manutencao(equipamento_id=1)
         assert "Modelo de predição não encontrado" in result
+
+
+class TestPreverManutencaoPorValoresTool:
+    """Tests for maintenance prediction by values tool."""
+    
+    def test_tool_instantiation(self):
+        """Test that the tool can be instantiated."""
+        tool = PreverManutencaoPorValoresTool()
+        assert tool is not None
+        assert tool.function_name == "prever_manutencao_por_valores"
+    
+    def test_tool_has_docstring(self):
+        """Test that the function has a docstring."""
+        tool = PreverManutencaoPorValoresTool()
+        assert tool.function_declaration.__doc__ is not None
+        assert len(tool.function_declaration.__doc__.strip()) > 0
+    
+    @patch('src.large_language_model.tools.prever_por_valores_tool.carregar_modelo_legado')
+    def test_prever_por_valores_no_model(self, mock_carregar_modelo):
+        """Test prediction when ML model doesn't exist."""
+        mock_carregar_modelo.side_effect = FileNotFoundError("Model not found")
+        
+        result = prever_manutencao_por_valores(lux=15.0, temperatura=25.0, vibracao=0.5)
+        assert "Modelo de predição não encontrado" in result
+    
+    @patch('src.large_language_model.tools.prever_por_valores_tool.realizar_previsao')
+    @patch('src.large_language_model.tools.prever_por_valores_tool.carregar_modelo_legado')
+    def test_prever_por_valores_success(self, mock_carregar_modelo, mock_realizar_previsao):
+        """Test successful prediction with values."""
+        mock_model = Mock()
+        mock_carregar_modelo.return_value = mock_model
+        
+        mock_realizar_previsao.return_value = {
+            'predicao': 1,
+            'probabilidade_manutencao': 0.75,
+            'probabilidade_sem_manutencao': 0.25,
+            'tem_proba': True,
+            'dados_entrada': {
+                'lux': 15.0,
+                'temperatura': 25.0,
+                'vibracao': 0.5
+            }
+        }
+        
+        result = prever_manutencao_por_valores(lux=15.0, temperatura=25.0, vibracao=0.5)
+        
+        assert "MANUTENÇÃO RECOMENDADA" in result
+        assert "75.0%" in result or "75%" in result
+        assert "Luminosidade: 15.00" in result
+        assert "Temperatura: 25.00" in result
+        assert "Vibração: 0.50" in result
+    
+    @patch('src.large_language_model.tools.prever_por_valores_tool.realizar_previsao')
+    @patch('src.large_language_model.tools.prever_por_valores_tool.carregar_modelo_legado')
+    def test_prever_por_valores_no_maintenance(self, mock_carregar_modelo, mock_realizar_previsao):
+        """Test prediction indicating no maintenance needed."""
+        mock_model = Mock()
+        mock_carregar_modelo.return_value = mock_model
+        
+        mock_realizar_previsao.return_value = {
+            'predicao': 0,
+            'probabilidade_manutencao': 0.15,
+            'probabilidade_sem_manutencao': 0.85,
+            'tem_proba': True,
+            'dados_entrada': {
+                'lux': 10.0,
+                'temperatura': 20.0,
+                'vibracao': 0.3
+            }
+        }
+        
+        result = prever_manutencao_por_valores(lux=10.0, temperatura=20.0, vibracao=0.3)
+        
+        assert "CONDIÇÕES NORMAIS" in result
+        assert "15.0%" in result or "15%" in result
+    
+    def test_call_chat_display(self):
+        """Test chat display message."""
+        tool = PreverManutencaoPorValoresTool()
+        message = tool.call_chat_display()
+        assert "🤖" in message or "Analisando" in message
+    
+    def test_call_result_display(self):
+        """Test result display message."""
+        tool = PreverManutencaoPorValoresTool()
+        result = "Test result"
+        display = tool.call_result_display(result)
+        assert result in display
 
 
 class TestToolsDiscovery:
@@ -485,7 +576,8 @@ class TestToolsDiscovery:
             'EnviarNotificacaoTool',
             'AnalisarDadosSensorTool',
             'GerarGraficoLeiturasTool',
-            'PreverNecessidadeManutencaoTool'
+            'PreverNecessidadeManutencaoTool',
+            'PreverManutencaoPorValoresTool'
         ]
         
         for expected_tool in expected_tools:
@@ -505,7 +597,8 @@ class TestToolsDiscovery:
             'EnviarNotificacaoTool',
             'AnalisarDadosSensorTool',
             'GerarGraficoLeiturasTool',
-            'PreverNecessidadeManutencaoTool'
+            'PreverNecessidadeManutencaoTool',
+            'PreverManutencaoPorValoresTool'
         ]
         
         for tool_name in new_tool_names:
