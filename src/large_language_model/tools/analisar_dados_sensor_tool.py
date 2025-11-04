@@ -4,8 +4,10 @@ Calculates metrics like mean, median, std deviation, min, max, and identifies tr
 """
 from src.large_language_model.tipos_base.base_tools import BaseTool
 from src.database.models.sensor import LeituraSensor, Sensor
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 import statistics
+from src.database.tipos_base.database import Database
+from sqlalchemy.orm import joinedload
 
 
 def analisar_dados_sensor(
@@ -24,8 +26,13 @@ def analisar_dados_sensor(
     :return: String com análise estatística e resumo dos dados
     """
     try:
-        # Verificar se o sensor existe
-        sensor = Sensor.get_from_id(sensor_id)
+        # Verificar se o sensor existe. Carrega relações necessárias dentro da sessão
+        with Database.get_session() as session:
+            sensor = session.query(Sensor).options(
+                joinedload(Sensor.tipo_sensor),
+                joinedload(Sensor.equipamento)
+            ).filter(Sensor.id == sensor_id).one_or_none()
+
         if not sensor:
             return f"Erro: Sensor com ID {sensor_id} não encontrado."
         
@@ -64,6 +71,8 @@ def analisar_dados_sensor(
         
         # Analisar tendência (comparar primeira e segunda metade)
         meio = len(valores) // 2
+        # Garantir variável definida mesmo se não houver dados suficientes
+        diferenca_percentual = 0
         if meio > 0:
             media_primeira_metade = statistics.mean(valores[:meio])
             media_segunda_metade = statistics.mean(valores[meio:])
