@@ -124,6 +124,19 @@ class Database:
             Database._session = session_maker
 
     @staticmethod
+    def init_with_old_instance(session: sessionmaker, engine: Engine):
+        """
+        Inicializa a classe Database com uma instância existente de sessionmaker e engine.
+        :param session: Instância existente de sessionmaker.
+        :param engine: Instância existente de Engine.
+        :return:
+        """
+        with Database._lock:
+            Database._session = session
+            Database._engine = engine
+
+
+    @staticmethod
     @contextmanager
     def get_session() -> Generator[Session, None, None]:
         if Database._session is None:
