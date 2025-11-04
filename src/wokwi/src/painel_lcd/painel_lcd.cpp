@@ -62,7 +62,7 @@ void PainelLCD::printLCDSerial(uint8_t col, uint8_t row, const String& msg) {
     
     // Check if row is out of bounds
     if (row >= lcdRows) {
-        row = lcdRows - 1;
+        row = row % lcdRows;
     }
     
     // Set cursor and clear the line

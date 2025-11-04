@@ -63,7 +63,6 @@ const float LDR_VCC = 3.3;
 const float LDR_RESISTOR = 10000.0;
 
 // MPU6050
-const float VIBRATION_THRESHOLD = 1.0;  // Limiar de vibração
 const int VIBRATION_SAMPLES = 100;      // Número de amostras para cálculo
 
 // ===== CONFIGURAÇÃO DE TIMING =====

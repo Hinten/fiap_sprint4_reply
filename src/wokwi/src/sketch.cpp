@@ -30,6 +30,35 @@ struct SensorData {
     float vibration;
 } sensorData;
 
+struct NullableFloat {
+    float value;
+    bool isNull;
+
+    // Construtor para valor definido
+    NullableFloat(float val) : value(val), isNull(false) {}
+
+    // Construtor para nulo
+    NullableFloat() : value(0.0f), isNull(true) {}
+};
+
+struct SensorLimits {
+    NullableFloat vibrationThresholdMin; // Limite de vibração para alerta
+    NullableFloat vibrationThresholdMax;
+    NullableFloat temperatureThresholdMin;
+    NullableFloat temperatureThresholdMax;
+    NullableFloat luxThresholdMin;
+    NullableFloat luxThresholdMax;
+
+    SensorLimits(NullableFloat vibrationMin, NullableFloat vibrationMax, NullableFloat temperatureMin, NullableFloat temperatureMax, NullableFloat luxMin, NullableFloat luxMax) :
+    vibrationThresholdMin(vibrationMin),
+    vibrationThresholdMax(vibrationMax),
+    temperatureThresholdMin(temperatureMin),
+    temperatureThresholdMax(temperatureMax),
+    luxThresholdMin(luxMin),
+    luxThresholdMax(luxMax) 
+    {}
+} sensorLimits(NullableFloat(), NullableFloat(1.0f), NullableFloat(), NullableFloat(70.0f), NullableFloat(500.0f), NullableFloat());
+
 bool sensorIniciado = false;
 unsigned long ultimoMillis = 0;
 
@@ -48,13 +77,29 @@ void iniciarSensor() {
     }
     
     Response response = api.post_init();
-    
+
     if (response.status_code >= 200 && response.status_code < 300) {
         painel.printLCDSerial(0, 0, "Sensor iniciado!");
         Serial.println(F("Sensor iniciado com sucesso na API"));
         Serial.print(F("Chip ID: "));
         Serial.println(api.getChipId());
         sensorIniciado = true;
+
+        JsonDocument doc = response.toJson();
+        if (!doc.isNull()) {
+            painel.printLCDSerial(0, 1, "Limiares Recebidos");
+            SensorLimits newLimits(
+                doc["vibration_threshold_min"].isNull() ? NullableFloat() : NullableFloat(float(doc["vibration_threshold_min"])),
+                doc["vibration_threshold_max"].isNull() ? NullableFloat() : NullableFloat(float(doc["vibration_threshold_max"])),
+                doc["temperature_threshold_min"].isNull() ? NullableFloat() : NullableFloat(float(doc["temperature_threshold_min"])),
+                doc["temperature_threshold_max"].isNull() ? NullableFloat() : NullableFloat(float(doc["temperature_threshold_max"])),
+                doc["lux_threshold_min"].isNull() ? NullableFloat() : NullableFloat(float(doc["lux_threshold_min"])),
+                doc["lux_threshold_max"].isNull() ? NullableFloat() : NullableFloat(float(doc["lux_threshold_max"]))
+            );
+
+            sensorLimits = newLimits;
+        }
+
         delay(1000);
     } else {
         char buffer[32];
@@ -93,65 +138,72 @@ void primaryTask() {
     // Exibe informações no display
     char buffer[32];
     painel.clear();
-    
-    // Linha 0: Temperatura
-    snprintf(buffer, sizeof(buffer), "Temp: %.1f C", sensorData.temperature);
-    painel.printLCDSerial(0, 0, buffer);
-    
+        
     // Linha 1: Luminosidade
-    if (sensorData.lux < 500) {
+    if (!sensorLimits.luxThresholdMin.isNull && sensorData.lux < sensorLimits.luxThresholdMin.value) {
         snprintf(buffer, sizeof(buffer), "Lux: %.0f (Escuro)", sensorData.lux);
-        painel.printLCDSerial(0, 1, buffer);
-        // buzzer.turnOff();
+        painel.printLCDSerial(0, 0, buffer);
+        buzzer.alertaBuzzerLed(3, 1000, 300);
+    } else if (!sensorLimits.luxThresholdMax.isNull && sensorData.lux > sensorLimits.luxThresholdMax.value) {
+        snprintf(buffer, sizeof(buffer), "Lux: %.0f (Claro)", sensorData.lux);
+        painel.printLCDSerial(0, 0, buffer);
         buzzer.alertaBuzzerLed(3, 1000, 300);
     } else {
-        snprintf(buffer, sizeof(buffer), "Lux: %.0f (Claro)", sensorData.lux);
+        snprintf(buffer, sizeof(buffer), "Lux: %.0f", sensorData.lux);
+        painel.printLCDSerial(0, 0, buffer);
+    }
+        
+    snprintf(buffer, sizeof(buffer), "Vib: %.2f", sensorData.vibration);
+    painel.printLCDSerial(0, 1, buffer);
+
+    if (!sensorLimits.vibrationThresholdMax.isNull && sensorData.vibration > sensorLimits.vibrationThresholdMax.value) {
+        painel.printLCDSerial(0, 1, "#ALERTA VIBRACAO#");
+        buzzer.alertaBuzzerLed(3, 1200, 300);
+    } else if (!sensorLimits.vibrationThresholdMin.isNull && sensorData.vibration < sensorLimits.vibrationThresholdMin.value) {
+        painel.printLCDSerial(0, 1, "#ALERTA VIBRACAO#");
+        buzzer.alertaBuzzerLed(3, 1200, 300);   
+    } else {
+        snprintf(buffer, sizeof(buffer), "Vib: %.2f", sensorData.vibration);
         painel.printLCDSerial(0, 1, buffer);
-        buzzer.turnOff();
-        // buzzer.alertaBuzzerLed(3, 1000, 300);
     }
     
     delay(1000);
-    
-    // Linha 0: Vibração
-    painel.clear();
-    snprintf(buffer, sizeof(buffer), "Vib: %.2f", sensorData.vibration);
-    painel.printLCDSerial(0, 0, buffer);
-    
-    if (sensorData.vibration > VIBRATION_THRESHOLD) {
-        painel.printLCDSerial(0, 1, "#ALERTA VIBRACAO#");
-        buzzer.alertaBuzzerLed(3, 1000, 300);
-    } else {
-        painel.printLCDSerial(0, 1, "Vibracao normal");
-    }
-    
-    // Alerta de temperatura
-    if (sensorData.temperature > 70.0) {
-        painel.printLCDSerial(0, 1, "#ALERTA: >70 C#");
+
+    if (!sensorLimits.temperatureThresholdMax.isNull && sensorData.temperature > sensorLimits.temperatureThresholdMax.value) {
+        painel.printLCDSerial(0, 2, "#ALERTA TEMP#");
         buzzer.alertaBuzzerLed(3, 1500, 300);
+    } else if (!sensorLimits.temperatureThresholdMin.isNull && sensorData.temperature < sensorLimits.temperatureThresholdMin.value) {
+        painel.printLCDSerial(0, 2, "#ALERTA TEMP#");
+        buzzer.alertaBuzzerLed(3, 1500, 300);   
+    } else {
+        snprintf(buffer, sizeof(buffer), "Temp: %.2fC", sensorData.temperature);
+        painel.printLCDSerial(0, 2, buffer);
     }
+
+    delay(1000);
+
+    painel.clear();
     
-    // Linha 2 e 3: Acelerômetro (se LCD 20x4)
-    if (SELECTED_LCD == LCD_20x4) {
-        painel.printLCDSerial(0, 2, "Accelerometer:");
-        snprintf(buffer, sizeof(buffer), "x:%.1f y:%.1f z:%.1f", 
-                 sensorData.accelX, sensorData.accelY, sensorData.accelZ);
-        painel.printLCDSerial(0, 3, buffer);
-    }
+    painel.printLCDSerial(0, 2, "Accelerometer:");
+    snprintf(buffer, sizeof(buffer), "x:%.1f y:%.1f z:%.1f", 
+                sensorData.accelX, sensorData.accelY, sensorData.accelZ);
+    painel.printLCDSerial(0, 3, buffer);
     
+    delay(1000);
+
     // Log detalhado no Serial
     Serial.print(F("Temp: "));
-    Serial.print(sensorData.temperature, 2);
+    Serial.print(sensorData.temperature, 3);
     Serial.print(F(" | Lux: "));
     Serial.print(sensorData.lux, 0);
     Serial.print(F(" | Vib: "));
-    Serial.print(sensorData.vibration, 2);
+    Serial.print(sensorData.vibration, 3);
     Serial.print(F(" | Accel X:"));
-    Serial.print(sensorData.accelX, 2);
+    Serial.print(sensorData.accelX, 3);
     Serial.print(F(" Y:"));
-    Serial.print(sensorData.accelY, 2);
+    Serial.print(sensorData.accelY, 3);
     Serial.print(F(" Z:"));
-    Serial.println(sensorData.accelZ, 2);
+    Serial.println(sensorData.accelZ, 3);
 
     hasSentData = false;
 }
