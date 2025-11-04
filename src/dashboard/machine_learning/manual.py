@@ -6,6 +6,7 @@ import pandas as pd
 from datetime import datetime
 
 from src.notificacoes.email import enviar_email
+from src.utils.env_utils import parse_bool_env
 from src.utils.model_store import list_models, load_model, get_models_summary
 
 
@@ -16,15 +17,23 @@ from src.utils.model_store import list_models, load_model, get_models_summary
 def enviar_alerta_manutencao(lux, temperatura, vibracao):
     if st.button("Enviar Alerta de Manutenção"):
         hoje = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        enviar_email(
-            f"Manutenção Necessária - {hoje}",
-            "Prezado(a),\n\nO classificador de equipamentos identificou que uma manutenção é necessária com base nas características fornecidas:\n\n"
-            f"- Lux: {lux:.2f}\n"
-            f"- Temperatura: {temperatura:.2f}\n"
-            f"- Vibração: {vibracao:.2f}\n\n"
-            "Por favor, agende a manutenção o mais breve possível.\n\nAtenciosamente,\nSistema de Monitoramento"
-        )
-        st.success("Alerta de manutenção enviado com sucesso!")
+
+        try:
+
+            enviar_email(
+                f"Manutenção Necessária - {hoje}",
+                "Prezado(a),\n\nO classificador de equipamentos identificou que uma manutenção é necessária com base nas características fornecidas:\n\n"
+                f"- Lux: {lux:.2f}\n"
+                f"- Temperatura: {temperatura:.2f}\n"
+                f"- Vibração: {vibracao:.2f}\n\n"
+                "Por favor, agende a manutenção o mais breve possível.\n\nAtenciosamente,\nSistema de Monitoramento"
+            )
+            st.success("Alerta de manutenção enviado com sucesso!")
+
+        except Exception as e:
+            if parse_bool_env("DEBUG", True):
+                raise e
+            st.error(f"Erro ao enviar alerta de manutenção: {str(e)}")
 
 def preparar_dados_para_previsao(lux: float, temp: float, vibracao: float) -> pd.DataFrame:
     """
