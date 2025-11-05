@@ -1,57 +1,63 @@
 /* ============================================================================
-   FIAP Sprint 4 Reply - Premium Dark Dashboard CSS
-   Design Concept: Sophisticated Dark-Mode IoT Dashboard
+   FIAP Sprint 4 Reply - Ultra-Modern Glass-Morphism Dashboard
+   Design Concept: Next-Gen Gradient & Glass-Morphism IoT Dashboard
    
-   Color Theory: Split-complementary scheme with deep navy, electric cyan, and coral
-   Professional IoT monitoring dashboard with harmonious dark colors,
-   modern typography, balanced spacing, elegant shadows, and smooth interactions.
+   Features: Multi-layer gradients, frosted glass panels, backdrop-filter effects,
+   RGB color tokens for alpha compositing, light/dark variants, modern shadows
    ============================================================================ */
 
-/* CSS Variables - Premium Dark Design System */
+/* CSS Design Tokens - Ultra-Modern Glass-Morphism System */
 :root {
-  /* Background Colors - Dark Navy Theme */
-  --bg-primary: #0a1628;
-  --bg-gradient-start: #0a1628;
-  --bg-gradient-end: #0f1f3a;
-  --card-bg: #1a2942;
-  --card-elevated: #243654;
+  /* Base Colors as RGB (for alpha compositing) */
+  --bg-dark-base: 12 12 20;           /* Deep space background */
+  --bg-light-base: 245 246 250;       /* Light background */
   
-  /* Text Colors - High Contrast for Dark Mode */
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
+  /* Glass Panel Colors (translucent) */
+  --glass-light: 255 255 255;         /* White glass for dark backgrounds */
+  --glass-dark: 20 20 30;             /* Dark glass for light backgrounds */
   
-  /* Accent Colors - Electric Cyan Primary */
-  --accent-primary: #00d9ff;
-  --accent-primary-dark: #00b8d9;
-  --accent-secondary: #ff6b9d;
-  --accent-secondary-dark: #ff4d85;
+  /* Gradient Accent Colors (RGB) */
+  --accent-indigo: 99 102 241;        /* Indigo primary */
+  --accent-purple: 168 85 247;        /* Purple secondary */
+  --accent-pink: 236 72 153;          /* Pink tertiary */
+  --accent-cyan: 34 211 238;          /* Cyan accent */
+  --accent-emerald: 16 185 129;       /* Emerald success */
   
-  /* Status Colors */
-  --success: #10b981;
-  --warning: #fbbf24;
-  --error: #ef4444;
-  --info: #00d9ff;
+  /* Status Colors (RGB) */
+  --success: 16 185 129;
+  --warning: 251 191 36;
+  --error: 239 68 68;
+  --info: 34 211 238;
   
-  /* Spacing */
+  /* Glass Effects */
+  --glass-blur: 12px;
+  --glass-opacity-light: 0.10;
+  --glass-opacity-medium: 0.18;
+  --glass-opacity-high: 0.25;
+  --glass-border-opacity: 0.08;
+  
+  /* Spacing System */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
+  --spacing-2xl: 48px;
   
-  /* Border Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  /* Border Radius - More Modern */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
   
-  /* Shadows - Enhanced for Dark Theme */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-hover: 0 12px 32px rgba(0, 217, 255, 0.2);
-  --shadow-glow: 0 0 20px rgba(0, 217, 255, 0.3);
+  /* Glass Shadows */
+  --shadow-glass-sm: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-glass-md: 0 8px 32px rgba(0, 0, 0, 0.18);
+  --shadow-glass-lg: 0 16px 48px rgba(0, 0, 0, 0.24);
+  --shadow-glow-indigo: 0 8px 32px rgba(99, 102, 241, 0.25);
+  --shadow-glow-pink: 0 8px 32px rgba(236, 72, 153, 0.25);
+  --shadow-glow-cyan: 0 8px 32px rgba(34, 211, 238, 0.25);
   
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -62,31 +68,54 @@
   --font-size-xl: 1.25rem;
   --font-size-2xl: 1.5rem;
   --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
   
   /* Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.25s ease;
-  --transition-slow: 0.35s ease;
-  
-  /* Border Colors */
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-color-light: rgba(255, 255, 255, 0.15);
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============================================================================
-   Base Styles
+   Base Styles - Ultra-Modern Gradient Background
    ============================================================================ */
 
 /* Import Google Font - Inter with optimized loading */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* Main App Container */
+/* Main App Container - Multi-Layer Gradient System */
 .stApp {
-  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 60%);
+  /* Layer 1: Base gradient (dark mode) */
+  background: 
+    /* Top gradient accent */
+    linear-gradient(135deg, 
+      rgba(var(--accent-indigo), 0.12) 0%, 
+      rgba(var(--accent-purple), 0.08) 25%,
+      rgba(var(--accent-pink), 0.10) 50%,
+      rgba(var(--accent-cyan), 0.06) 100%
+    ),
+    /* Radial gradient for depth */
+    radial-gradient(ellipse 1200px 800px at 15% 20%, 
+      rgba(var(--accent-indigo), 0.08), 
+      transparent 40%
+    ),
+    radial-gradient(ellipse 1000px 600px at 85% 80%, 
+      rgba(var(--accent-pink), 0.06), 
+      transparent 35%
+    ),
+    /* Base color */
+    linear-gradient(180deg, 
+      rgb(var(--bg-dark-base)) 0%, 
+      rgb(calc(var(--bg-dark-base) + 8) calc(var(--bg-dark-base) + 8) calc(var(--bg-dark-base) + 12)) 100%
+    );
+  
+  background-color: rgb(var(--bg-dark-base));
+  background-attachment: fixed;
   font-family: var(--font-family);
-  color: var(--text-primary);
+  color: rgb(241 245 249);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
 /* Page Container with Better Padding */
@@ -94,51 +123,64 @@ section.main > div.block-container {
   padding-top: var(--spacing-xl);
   padding-left: var(--spacing-xl);
   padding-right: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-2xl);
   max-width: 1400px;
 }
 
 /* ============================================================================
-   Typography
+   Typography - Modern Gradient Text
    ============================================================================ */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-family);
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   line-height: 1.2;
+  background: linear-gradient(135deg, 
+    rgb(var(--accent-indigo)) 0%, 
+    rgb(var(--accent-purple)) 50%,
+    rgb(var(--accent-pink)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(var(--accent-indigo), 0.15);
 }
 
 h1 {
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-4xl);
   margin-bottom: var(--spacing-lg);
 }
 
 h2 {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-3xl);
   margin-bottom: var(--spacing-md);
 }
 
 h3 {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   margin-bottom: var(--spacing-md);
 }
 
 p, .stMarkdown p {
   font-size: var(--font-size-base);
-  line-height: 1.6;
-  color: var(--text-secondary);
+  line-height: 1.7;
+  color: rgba(203, 213, 225, 0.95);
 }
 
 /* ============================================================================
-   Sidebar Styling
+   Sidebar - Frosted Glass Effect
    ============================================================================ */
 
 [data-testid="stSidebar"] {
-  background: var(--card-bg);
-  border-right: 1px solid var(--border-color);
-  box-shadow: var(--shadow-lg);
+  background: linear-gradient(180deg, 
+    rgba(var(--glass-light), var(--glass-opacity-light)) 0%, 
+    rgba(var(--glass-light), var(--glass-opacity-medium)) 100%
+  );
+  border-right: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
+  box-shadow: var(--shadow-glass-lg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
 }
 
 [data-testid="stSidebar"] > div:first-child {
@@ -149,79 +191,131 @@ p, .stMarkdown p {
 [data-testid="stSidebar"] h1,
 [data-testid="stSidebar"] h2,
 [data-testid="stSidebar"] h3 {
-  color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 700;
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-sm);
 }
 
 /* Sidebar Links */
 [data-testid="stSidebar"] a {
-  color: var(--text-secondary);
+  color: rgba(203, 213, 225, 0.9);
   text-decoration: none;
-  transition: color var(--transition-fast);
+  transition: all var(--transition-fast);
   font-weight: 500;
+  position: relative;
+  display: inline-block;
 }
 
 [data-testid="stSidebar"] a:hover {
-  color: var(--accent-primary);
+  color: rgb(var(--accent-cyan));
+  transform: translateX(4px);
+}
+
+[data-testid="stSidebar"] a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    rgb(var(--accent-indigo)), 
+    rgb(var(--accent-cyan))
+  );
+  transition: width var(--transition-base);
+}
+
+[data-testid="stSidebar"] a:hover::after {
+  width: 100%;
 }
 
 /* ============================================================================
-   Buttons
+   Buttons - Ultra-Modern Gradient Glass
    ============================================================================ */
 
 /* Primary Buttons */
 .stButton > button,
 button[kind="primary"],
 button[kind="primaryFormSubmit"] {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+  background: linear-gradient(135deg, 
+    rgb(var(--accent-indigo)) 0%, 
+    rgb(var(--accent-purple)) 50%,
+    rgb(var(--accent-pink)) 100%
+  );
   color: #ffffff;
-  border: none;
-  padding: 12px 24px;
+  border: 1px solid rgba(var(--glass-light), 0.2);
+  padding: 12px 28px;
   border-radius: var(--radius-md);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--font-size-base);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-glow-indigo);
   transition: all var(--transition-base);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.stButton > button::before,
+button[kind="primary"]::before,
+button[kind="primaryFormSubmit"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent
+  );
+  transition: left var(--transition-slow);
+}
+
+.stButton > button:hover::before,
+button[kind="primary"]:hover::before,
+button[kind="primaryFormSubmit"]:hover::before {
+  left: 100%;
 }
 
 .stButton > button:hover,
 button[kind="primary"]:hover,
 button[kind="primaryFormSubmit"]:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
-  background: linear-gradient(135deg, var(--accent-primary-dark) 0%, var(--accent-primary) 100%);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--shadow-glow-indigo), 
+              0 16px 32px rgba(var(--accent-indigo), 0.3);
 }
 
 .stButton > button:active,
 button[kind="primary"]:active,
 button[kind="primaryFormSubmit"]:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px) scale(1);
+  box-shadow: var(--shadow-glass-sm);
 }
 
 /* Secondary Buttons */
 button[kind="secondary"] {
-  background: var(--card-bg);
-  color: var(--accent-primary);
-  border: 2px solid var(--accent-primary);
-  padding: 10px 22px;
+  background: rgba(var(--glass-light), var(--glass-opacity-light));
+  color: rgb(var(--accent-indigo));
+  border: 2px solid rgba(var(--accent-indigo), 0.5);
+  padding: 10px 26px;
   border-radius: var(--radius-md);
-  font-weight: 600;
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all var(--transition-base);
 }
 
 button[kind="secondary"]:hover {
-  background: var(--accent-primary);
-  color: #ffffff;
+  background: rgba(var(--accent-indigo), 0.15);
+  border-color: rgb(var(--accent-indigo));
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-glass-md);
+  color: #ffffff;
 }
 
 /* ============================================================================
-   Input Fields
+   Input Fields - Glass Morphism
    ============================================================================ */
 
 /* Text Inputs */
@@ -233,15 +327,17 @@ input[type="number"],
 input[type="email"],
 input[type="password"],
 textarea {
-  background: var(--card-elevated);
-  border: 1px solid var(--border-color);
-  padding: 12px 16px;
+  background: rgba(var(--glass-light), var(--glass-opacity-light));
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
+  padding: 14px 18px;
   border-radius: var(--radius-md);
   font-family: var(--font-family);
   font-size: var(--font-size-base);
-  color: var(--text-primary);
+  color: rgb(241 245 249);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all var(--transition-base);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-glass-sm);
 }
 
 .stTextInput > div > div > input:focus,
@@ -250,21 +346,33 @@ textarea {
 input:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2), var(--shadow-glow);
+  border-color: rgb(var(--accent-indigo));
+  background: rgba(var(--glass-light), var(--glass-opacity-medium));
+  box-shadow: 0 0 0 3px rgba(var(--accent-indigo), 0.2), 
+              var(--shadow-glow-indigo);
+  transform: translateY(-1px);
 }
 
 /* Select Boxes */
 .stSelectbox > div > div,
 .stMultiSelect > div > div {
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: var(--card-elevated);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
+  background: rgba(var(--glass-light), var(--glass-opacity-light));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-glass-sm);
+  transition: all var(--transition-base);
+}
+
+.stSelectbox > div > div:hover,
+.stMultiSelect > div > div:hover {
+  border-color: rgba(var(--accent-indigo), 0.5);
+  box-shadow: var(--shadow-glass-md);
 }
 
 /* ============================================================================
-   Cards and Containers
+   Cards and Containers - Glass Panels
    ============================================================================ */
 
 /* Generic Container/Card Styling */
@@ -272,42 +380,91 @@ textarea:focus {
   margin-bottom: var(--spacing-md);
 }
 
-/* Dividers */
-.stDivider {
-  margin: var(--spacing-lg) 0;
-  border-color: var(--border-color);
-}
-
-/* ============================================================================
-   Metrics
-   ============================================================================ */
-
-[data-testid="stMetric"] {
-  background: var(--card-bg);
+/* Glass Card Class (for custom use) */
+.glass-card {
+  background: linear-gradient(135deg, 
+    rgba(var(--glass-light), var(--glass-opacity-light)) 0%, 
+    rgba(var(--glass-light), var(--glass-opacity-medium)) 100%
+  );
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-glass-md);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
   transition: all var(--transition-base);
 }
 
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glass-lg);
+  border-color: rgba(var(--accent-indigo), 0.3);
+}
+
+/* Dividers */
+.stDivider {
+  margin: var(--spacing-lg) 0;
+  border-color: rgba(var(--glass-light), 0.1);
+}
+
+/* ============================================================================
+   Metrics - Glass Panels with Gradient Accents
+   ============================================================================ */
+
+[data-testid="stMetric"] {
+  background: linear-gradient(135deg, 
+    rgba(var(--glass-light), var(--glass-opacity-light)) 0%, 
+    rgba(var(--glass-light), var(--glass-opacity-medium)) 100%
+  );
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass-md);
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-testid="stMetric"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    rgb(var(--accent-indigo)) 0%, 
+    rgb(var(--accent-purple)) 50%,
+    rgb(var(--accent-pink)) 100%
+  );
+}
+
 [data-testid="stMetric"]:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-glass-lg);
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(var(--accent-indigo), 0.3);
 }
 
 [data-testid="stMetric"] label {
   font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-weight: 700;
+  color: rgba(148, 163, 184, 0.95);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 [data-testid="stMetric"] [data-testid="stMetricValue"] {
   font-size: var(--font-size-3xl);
-  font-weight: 700;
-  color: var(--text-primary);
+  font-weight: 800;
+  background: linear-gradient(135deg, 
+    rgb(var(--accent-indigo)) 0%, 
+    rgb(var(--accent-cyan)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 [data-testid="stMetric"] [data-testid="stMetricDelta"] {
@@ -316,47 +473,60 @@ textarea:focus {
 }
 
 /* ============================================================================
-   Tabs
+   Tabs - Ultra-Modern Glass Tabs
    ============================================================================ */
 
 .stTabs [data-baseweb="tab-list"] {
   gap: var(--spacing-sm);
   background: transparent;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 2px solid rgba(var(--glass-light), 0.08);
 }
 
 .stTabs [data-baseweb="tab"] {
   padding: var(--spacing-md) var(--spacing-lg);
-  background: transparent;
+  background: rgba(var(--glass-light), 0.05);
   border-radius: var(--radius-md) var(--radius-md) 0 0;
-  border: none;
-  color: var(--text-secondary);
+  border: 1px solid rgba(var(--glass-light), 0.05);
+  border-bottom: none;
+  color: rgba(203, 213, 225, 0.7);
   font-weight: 600;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   transition: all var(--transition-base);
 }
 
 .stTabs [data-baseweb="tab"]:hover {
-  background: rgba(0, 217, 255, 0.1);
-  color: var(--accent-primary);
+  background: rgba(var(--glass-light), var(--glass-opacity-light));
+  color: rgb(var(--accent-indigo));
+  border-color: rgba(var(--accent-indigo), 0.2);
 }
 
 .stTabs [data-baseweb="tab"][aria-selected="true"] {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
-  color: var(--bg-primary);
-  box-shadow: var(--shadow-glow);
+  background: linear-gradient(135deg, 
+    rgba(var(--accent-indigo), 0.2) 0%, 
+    rgba(var(--accent-purple), 0.15) 100%
+  );
+  color: #ffffff;
+  border: 1px solid rgba(var(--accent-indigo), 0.4);
+  border-bottom: none;
+  box-shadow: var(--shadow-glow-indigo);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 /* ============================================================================
-   Dataframes and Tables
+   Dataframes and Tables - Glass Effect
    ============================================================================ */
 
 .stDataFrame,
 [data-testid="stDataFrame"] {
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
+  box-shadow: var(--shadow-glass-md);
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
+  background: rgba(var(--glass-light), 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .stDataFrame table {
@@ -365,149 +535,191 @@ textarea:focus {
 }
 
 .stDataFrame thead th {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
-  color: var(--bg-primary);
+  background: linear-gradient(135deg, 
+    rgba(var(--accent-indigo), 0.4) 0%, 
+    rgba(var(--accent-purple), 0.35) 100%
+  );
+  color: #ffffff;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   padding: var(--spacing-md);
   border: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .stDataFrame tbody td {
   padding: var(--spacing-md);
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-primary);
-  background: var(--card-bg);
+  border-bottom: 1px solid rgba(var(--glass-light), 0.05);
+  color: rgba(241, 245, 249, 0.95);
+  background: transparent;
 }
 
 .stDataFrame tbody tr:hover {
-  background: var(--card-elevated);
+  background: rgba(var(--glass-light), var(--glass-opacity-light));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 /* ============================================================================
-   Charts and Plots
+   Charts and Plots - Glass Containers
    ============================================================================ */
 
 .stPlotlyChart,
 .js-plotly-plot {
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass-md);
+  background: rgba(var(--glass-light), 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: var(--spacing-md);
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
 }
 
 /* ============================================================================
-   Expander
+   Expander - Glass Accordion
    ============================================================================ */
 
 .streamlit-expanderHeader {
-  background: var(--card-bg);
+  background: rgba(var(--glass-light), var(--glass-opacity-light));
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
   font-weight: 600;
-  color: var(--text-primary);
+  color: rgb(241 245 249);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all var(--transition-base);
 }
 
 .streamlit-expanderHeader:hover {
-  background: var(--card-elevated);
-  border-color: var(--accent-primary);
+  background: rgba(var(--glass-light), var(--glass-opacity-medium));
+  border-color: rgba(var(--accent-indigo), 0.4);
+  box-shadow: var(--shadow-glass-md);
 }
 
 .streamlit-expanderContent {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
+  background: rgba(var(--glass-light), 0.05);
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
   border-top: none;
   border-radius: 0 0 var(--radius-md) var(--radius-md);
   padding: var(--spacing-md);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 /* ============================================================================
-   Alerts and Messages
+   Alerts and Messages - Glass Notifications
    ============================================================================ */
 
 .stAlert {
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   border: none;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-glass-sm);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* Success Alert */
 [data-testid="stSuccess"],
 .stSuccess {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%);
-  border-left: 4px solid var(--success);
+  background: linear-gradient(135deg, 
+    rgba(var(--success), 0.2) 0%, 
+    rgba(var(--success), 0.12) 100%
+  );
+  border-left: 4px solid rgb(var(--success));
   color: #a7f3d0;
 }
 
 /* Warning Alert */
 [data-testid="stWarning"],
 .stWarning {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%);
-  border-left: 4px solid var(--warning);
+  background: linear-gradient(135deg, 
+    rgba(var(--warning), 0.2) 0%, 
+    rgba(var(--warning), 0.12) 100%
+  );
+  border-left: 4px solid rgb(var(--warning));
   color: #fde68a;
 }
 
 /* Error Alert */
 [data-testid="stError"],
 .stError {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%);
-  border-left: 4px solid var(--error);
+  background: linear-gradient(135deg, 
+    rgba(var(--error), 0.2) 0%, 
+    rgba(var(--error), 0.12) 100%
+  );
+  border-left: 4px solid rgb(var(--error));
   color: #fca5a5;
 }
 
 /* Info Alert */
 [data-testid="stInfo"],
 .stInfo {
-  background: linear-gradient(135deg, rgba(0, 217, 255, 0.15) 0%, rgba(0, 217, 255, 0.08) 100%);
-  border-left: 4px solid var(--info);
+  background: linear-gradient(135deg, 
+    rgba(var(--info), 0.2) 0%, 
+    rgba(var(--info), 0.12) 100%
+  );
+  border-left: 4px solid rgb(var(--info));
   color: #7dd3fc;
 }
 
 /* ============================================================================
-   Forms
+   Forms - Glass Form Containers
    ============================================================================ */
 
 .stForm {
-  background: var(--card-bg);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-color);
+  background: linear-gradient(135deg, 
+    rgba(var(--glass-light), var(--glass-opacity-light)) 0%, 
+    rgba(var(--glass-light), var(--glass-opacity-medium)) 100%
+  );
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass-md);
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 /* ============================================================================
-   Progress and Spinners
+   Progress and Spinners - Gradient Effects
    ============================================================================ */
 
 .stProgress > div > div {
-  background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  background: linear-gradient(90deg, 
+    rgb(var(--accent-indigo)) 0%, 
+    rgb(var(--accent-purple)) 50%,
+    rgb(var(--accent-pink)) 100%
+  );
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glow-indigo);
 }
 
 .stSpinner > div {
-  border-color: var(--accent-primary);
+  border-color: rgb(var(--accent-indigo));
+  border-top-color: transparent;
 }
 
 /* ============================================================================
-   File Uploader
+   File Uploader - Glass Effect
    ============================================================================ */
 
 [data-testid="stFileUploader"] {
-  border-radius: var(--radius-md);
-  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  border: 2px dashed rgba(var(--glass-light), 0.15);
   padding: var(--spacing-xl);
-  background: var(--card-bg);
+  background: rgba(var(--glass-light), 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all var(--transition-base);
 }
 
 [data-testid="stFileUploader"]:hover {
-  border-color: var(--accent-primary);
-  background: var(--card-elevated);
-  box-shadow: var(--shadow-glow);
+  border-color: rgba(var(--accent-indigo), 0.5);
+  background: rgba(var(--glass-light), var(--glass-opacity-light));
+  box-shadow: var(--shadow-glow-indigo);
 }
 
 /* ============================================================================
@@ -519,48 +731,60 @@ textarea:focus {
 }
 
 /* ============================================================================
-   Toast Notifications
+   Toast Notifications - Glass Style
    ============================================================================ */
 
 .stToast {
-  background: var(--card-bg);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border-color);
+  background: rgba(var(--glass-light), var(--glass-opacity-medium));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass-lg);
+  border: 1px solid rgba(var(--glass-light), 0.15);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 /* ============================================================================
-   Slider
+   Slider - Modern Gradient
    ============================================================================ */
 
 .stSlider [role="slider"] {
-  background: var(--accent-primary);
-  border: 3px solid var(--card-bg);
-  box-shadow: var(--shadow-glow);
+  background: linear-gradient(135deg, 
+    rgb(var(--accent-indigo)) 0%, 
+    rgb(var(--accent-purple)) 100%
+  );
+  border: 3px solid rgba(var(--glass-light), 0.2);
+  box-shadow: var(--shadow-glow-indigo);
 }
 
 .stSlider [data-testid="stThumbValue"] {
-  background: var(--accent-primary);
-  color: var(--bg-primary);
-  font-weight: 600;
+  background: linear-gradient(135deg, 
+    rgb(var(--accent-indigo)) 0%, 
+    rgb(var(--accent-purple)) 100%
+  );
+  color: #ffffff;
+  font-weight: 700;
   border-radius: var(--radius-sm);
   padding: var(--spacing-xs) var(--spacing-sm);
+  box-shadow: var(--shadow-glass-sm);
 }
 
 /* ============================================================================
-   Checkbox and Radio
+   Checkbox and Radio - Modern Style
    ============================================================================ */
 
 .stCheckbox label,
 .stRadio label {
   font-weight: 500;
-  color: var(--text-primary);
+  color: rgba(241, 245, 249, 0.95);
 }
 
 .stCheckbox input:checked,
 .stRadio input:checked {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
+  background: linear-gradient(135deg, 
+    rgb(var(--accent-indigo)) 0%, 
+    rgb(var(--accent-purple)) 100%
+  );
+  border-color: rgb(var(--accent-indigo));
 }
 
 /* ============================================================================
@@ -571,6 +795,10 @@ textarea:focus {
   section.main > div.block-container {
     padding-left: var(--spacing-lg);
     padding-right: var(--spacing-lg);
+  }
+  
+  h1 {
+    font-size: var(--font-size-3xl);
   }
 }
 
@@ -591,23 +819,28 @@ textarea:focus {
   
   .stButton > button {
     width: 100%;
-    padding: 14px 20px;
+    padding: 14px 24px;
   }
   
   [data-testid="stMetric"] {
     padding: var(--spacing-md);
   }
+  
+  [data-testid="stSidebar"] {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
 }
 
 /* ============================================================================
-   Animations
+   Animations - Ultra-Smooth
    ============================================================================ */
 
 /* Fade In Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -616,21 +849,44 @@ textarea:focus {
 }
 
 .fade-in {
-  animation: fadeIn 0.4s ease both;
+  animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
-/* Pulse Animation for emphasis */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
+/* Gradient Animation */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
   }
   50% {
-    opacity: 0.8;
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Pulse Glow Animation */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: var(--shadow-glow-indigo);
+  }
+  50% {
+    box-shadow: 0 8px 40px rgba(var(--accent-indigo), 0.4);
+  }
+}
+
+/* Glass Shine Animation */
+@keyframes glassShine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
   }
 }
 
 /* ============================================================================
-   Utility Classes
+   Utility Classes - Modern Design Tokens
    ============================================================================ */
 
 /* Text Utilities */
@@ -638,16 +894,25 @@ textarea:focus {
   text-align: center;
 }
 
-.text-primary {
-  color: var(--text-primary);
+.text-gradient-primary {
+  background: linear-gradient(135deg, 
+    rgb(var(--accent-indigo)) 0%, 
+    rgb(var(--accent-purple)) 50%,
+    rgb(var(--accent-pink)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.text-secondary {
-  color: var(--text-secondary);
-}
-
-.text-accent {
-  color: var(--accent-primary);
+.text-gradient-secondary {
+  background: linear-gradient(90deg, 
+    rgb(var(--accent-cyan)) 0%, 
+    rgb(var(--accent-emerald)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Spacing Utilities */
@@ -661,28 +926,133 @@ textarea:focus {
 .mt-lg { margin-top: var(--spacing-lg); }
 .mt-xl { margin-top: var(--spacing-xl); }
 
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+
+/* Glass Utilities */
+.glass-light {
+  background: rgba(var(--glass-light), var(--glass-opacity-light));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
+}
+
+.glass-medium {
+  background: rgba(var(--glass-light), var(--glass-opacity-medium));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(var(--glass-light), 0.12);
+}
+
+.glass-heavy {
+  background: rgba(var(--glass-light), var(--glass-opacity-high));
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(var(--glass-light), 0.15);
+}
+
 /* ============================================================================
-   Custom Scrollbar
+   Custom Scrollbar - Modern Glass
    ============================================================================ */
 
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: rgba(var(--glass-light), 0.03);
   border-radius: var(--radius-sm);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color-light);
+  background: linear-gradient(135deg, 
+    rgba(var(--accent-indigo), 0.4) 0%, 
+    rgba(var(--accent-purple), 0.35) 100%
+  );
   border-radius: var(--radius-sm);
+  border: 2px solid rgba(var(--glass-light), 0.05);
   transition: background var(--transition-base);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
+  background: linear-gradient(135deg, 
+    rgba(var(--accent-indigo), 0.6) 0%, 
+    rgba(var(--accent-purple), 0.55) 100%
+  );
+}
+
+/* ============================================================================
+   Accessibility - Focus States
+   ============================================================================ */
+
+/* Enhanced Focus Indicators */
+*:focus-visible {
+  outline: 3px solid rgba(var(--accent-indigo), 0.5);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+button:focus-visible,
+.stButton > button:focus-visible {
+  outline: 3px solid rgba(var(--accent-pink), 0.6);
+  outline-offset: 3px;
+}
+
+/* Skip to main content link (for screen readers) */
+.skip-to-main {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: rgb(var(--accent-indigo));
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 0 0 var(--radius-sm) 0;
+  z-index: 100;
+}
+
+.skip-to-main:focus {
+  top: 0;
+}
+
+/* ============================================================================
+   Browser Fallbacks - Graceful Degradation
+   ============================================================================ */
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .stApp {
+    background: rgb(var(--bg-dark-base));
+  }
+  
+  [data-testid="stSidebar"] {
+    background: linear-gradient(180deg, 
+      rgba(var(--glass-light), 0.15) 0%, 
+      rgba(var(--glass-light), 0.08) 100%
+    );
+    box-shadow: var(--shadow-glass-lg), 
+                inset 0 0 60px rgba(var(--accent-indigo), 0.05);
+  }
+  
+  .glass-card,
+  [data-testid="stMetric"],
+  .stForm {
+    background: linear-gradient(135deg, 
+      rgba(var(--glass-light), 0.12) 0%, 
+      rgba(var(--glass-light), 0.06) 100%
+    );
+    box-shadow: var(--shadow-glass-md), 
+                inset 0 0 40px rgba(255, 255, 255, 0.02);
+  }
+  
+  .stTextInput > div > div > input,
+  .stNumberInput > div > div > input,
+  .stTextArea textarea {
+    background: rgba(var(--glass-light), 0.08);
+  }
 }
 
 /* ============================================================================
@@ -701,4 +1071,63 @@ textarea:focus {
   .stButton {
     display: none;
   }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #000;
+    -webkit-text-fill-color: #000;
+    background: none;
+  }
 }
+
+/* ============================================================================
+   Additional Glass Effects - Special Components
+   ============================================================================ */
+
+/* Streamlit Native Containers with Glass */
+.block-container > div {
+  animation: fadeIn 0.4s ease both;
+}
+
+/* Enhanced Glass for Code Blocks */
+.stCodeBlock,
+pre {
+  background: rgba(var(--glass-light), 0.08) !important;
+  border: 1px solid rgba(var(--glass-light), var(--glass-border-opacity));
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-glass-sm);
+}
+
+/* Glass Effect for Images */
+.stImage,
+img {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glass-md);
+  transition: all var(--transition-base);
+}
+
+.stImage:hover,
+img:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-glass-lg);
+}
+
+/* Download Button Styling */
+.stDownloadButton > button {
+  background: linear-gradient(135deg, 
+    rgba(var(--accent-cyan), 0.9) 0%, 
+    rgba(var(--accent-emerald), 0.9) 100%
+  );
+  border: 1px solid rgba(var(--glass-light), 0.2);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.stDownloadButton > button:hover {
+  box-shadow: var(--shadow-glow-cyan), 
+              0 16px 32px rgba(var(--accent-cyan), 0.3);
+}
+
+/* ============================================================================
+   End of Ultra-Modern Glass-Morphism Design System
+   ============================================================================ */
