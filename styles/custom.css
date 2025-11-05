@@ -133,6 +133,7 @@
   -moz-osx-font-smoothing: grayscale;
   position: relative;
   overflow-x: hidden;
+  will-change: background-position;
 }
 
 /* Animated gradient overlay for extra visual depth */
@@ -191,6 +192,14 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
 }
 
+/* Fallback for browsers that don't support background-clip: text */
+@supports not (-webkit-background-clip: text) {
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--accent-primary-light);
+    -webkit-text-fill-color: inherit;
+  }
+}
+
 h1 {
   font-size: var(--font-size-4xl);
   margin-bottom: var(--spacing-xl);
@@ -228,6 +237,13 @@ p, .stMarkdown p {
   border-image: var(--border-gradient) 1;
   box-shadow: var(--shadow-xl), var(--shadow-glow-primary);
   position: relative;
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(20px)) {
+  [data-testid="stSidebar"] {
+    background: var(--bg-secondary);
+  }
 }
 
 [data-testid="stSidebar"]::before {
@@ -380,6 +396,7 @@ button[kind="secondary"]::before {
   background: var(--gradient-primary);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   z-index: -1;
 }
@@ -841,6 +858,7 @@ textarea:focus {
   background: var(--gradient-primary);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   opacity: 0;
   transition: opacity var(--transition-base);
@@ -1217,6 +1235,7 @@ textarea:focus {
   background: var(--gradient-primary);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
 }
 
