@@ -32,6 +32,9 @@ from src.large_language_model.tools.prever_necessidade_manutencao_tool import (
 from src.large_language_model.tools.prever_por_valores_tool import (
     PreverManutencaoPorValoresTool, prever_manutencao_por_valores
 )
+from src.large_language_model.tools.obter_leitura_mais_recente_sensor_tool import (
+    ObterLeituraMaisRecenteSensorTool, obter_leitura_mais_recente_sensor
+)
 
 
 class TestListarEquipamentosTool:
@@ -558,6 +561,110 @@ class TestPreverManutencaoPorValoresTool:
         assert result in display
 
 
+class TestObterLeituraMaisRecenteSensorTool:
+    """Tests for getting most recent sensor reading tool."""
+    
+    def test_tool_instantiation(self):
+        """Test that the tool can be instantiated."""
+        tool = ObterLeituraMaisRecenteSensorTool()
+        assert tool is not None
+        assert tool.function_name == "obter_leitura_mais_recente_sensor"
+    
+    def test_tool_has_docstring(self):
+        """Test that the function has a docstring."""
+        tool = ObterLeituraMaisRecenteSensorTool()
+        assert tool.function_declaration.__doc__ is not None
+        assert len(tool.function_declaration.__doc__.strip()) > 0
+    
+    def test_obter_leitura_sensor_not_found(self):
+        """Test getting reading when sensor doesn't exist."""
+        result = obter_leitura_mais_recente_sensor(sensor_id=99999)
+        assert "não encontrado" in result.lower() or "erro" in result.lower()
+    
+    @patch('src.large_language_model.tools.obter_leitura_mais_recente_sensor_tool.Database.get_session')
+    def test_obter_leitura_no_readings(self, mock_get_session):
+        """Test getting reading when no readings exist."""
+        # Mock sensor exists
+        mock_sensor = Mock()
+        mock_sensor.id = 1
+        mock_sensor.nome = "Test Sensor"
+        mock_sensor.tipo_sensor = Mock()
+        mock_sensor.tipo_sensor.tipo = "Temperatura (°C)"
+        mock_sensor.equipamento = None
+        
+        # Mock session to return sensor but no readings
+        mock_session = MagicMock()
+        mock_session.__enter__ = Mock(return_value=mock_session)
+        mock_session.__exit__ = Mock(return_value=False)
+        
+        def session_query_side_effect(model):
+            query_mock = Mock()
+            if model.__name__ == 'Sensor':
+                query_mock.options.return_value.filter.return_value.one_or_none.return_value = mock_sensor
+            else:  # LeituraSensor
+                query_mock.filter.return_value.order_by.return_value.first.return_value = None
+            return query_mock
+        
+        mock_session.query.side_effect = session_query_side_effect
+        mock_get_session.return_value = mock_session
+        
+        result = obter_leitura_mais_recente_sensor(sensor_id=1)
+        assert "nenhuma leitura" in result.lower() or "não encontrada" in result.lower()
+    
+    @patch('src.large_language_model.tools.obter_leitura_mais_recente_sensor_tool.Database.get_session')
+    def test_obter_leitura_with_reading(self, mock_get_session):
+        """Test getting reading when reading exists."""
+        # Mock sensor
+        mock_sensor = Mock()
+        mock_sensor.id = 1
+        mock_sensor.nome = "Sensor Temperatura"
+        mock_sensor.tipo_sensor = Mock()
+        mock_sensor.tipo_sensor.tipo = "Temperatura (°C)"
+        mock_sensor.equipamento = Mock()
+        mock_sensor.equipamento.nome = "Equipamento 1"
+        mock_sensor.equipamento.id = 1
+        
+        # Mock reading
+        mock_leitura = Mock()
+        mock_leitura.valor = 25.5
+        mock_leitura.data_leitura = datetime.now() - timedelta(minutes=5)
+        
+        # Mock session
+        mock_session = MagicMock()
+        mock_session.__enter__ = Mock(return_value=mock_session)
+        mock_session.__exit__ = Mock(return_value=False)
+        
+        def session_query_side_effect(model):
+            query_mock = Mock()
+            if model.__name__ == 'Sensor':
+                query_mock.options.return_value.filter.return_value.one_or_none.return_value = mock_sensor
+            else:  # LeituraSensor
+                query_mock.filter.return_value.order_by.return_value.first.return_value = mock_leitura
+            return query_mock
+        
+        mock_session.query.side_effect = session_query_side_effect
+        mock_get_session.return_value = mock_session
+        
+        result = obter_leitura_mais_recente_sensor(sensor_id=1)
+        
+        assert "Leitura Mais Recente" in result
+        assert "25.5" in result or "25.50" in result
+        assert "Sensor Temperatura" in result
+    
+    def test_call_chat_display(self):
+        """Test chat display message."""
+        tool = ObterLeituraMaisRecenteSensorTool()
+        message = tool.call_chat_display()
+        assert "📡" in message or "Consultando" in message
+    
+    def test_call_result_display(self):
+        """Test result display message."""
+        tool = ObterLeituraMaisRecenteSensorTool()
+        result = "Test result"
+        display = tool.call_result_display(result)
+        assert result in display
+
+
 class TestToolsDiscovery:
     """Tests for automatic tool discovery."""
     
@@ -577,7 +684,8 @@ class TestToolsDiscovery:
             'AnalisarDadosSensorTool',
             'GerarGraficoLeiturasTool',
             'PreverNecessidadeManutencaoTool',
-            'PreverManutencaoPorValoresTool'
+            'PreverManutencaoPorValoresTool',
+            'ObterLeituraMaisRecenteSensorTool'
         ]
         
         for expected_tool in expected_tools:
@@ -598,7 +706,8 @@ class TestToolsDiscovery:
             'AnalisarDadosSensorTool',
             'GerarGraficoLeiturasTool',
             'PreverNecessidadeManutencaoTool',
-            'PreverManutencaoPorValoresTool'
+            'PreverManutencaoPorValoresTool',
+            'ObterLeituraMaisRecenteSensorTool'
         ]
         
         for tool_name in new_tool_names:

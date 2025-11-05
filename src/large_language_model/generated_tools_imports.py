@@ -18,7 +18,7 @@ def import_generated_tools() -> None:
     all tool modules, providing better performance and determinism
     than dynamic imports at runtime.
     """
-    # Importing 10 tool module(s)
+    # Importing 11 tool module(s)
     try:
         importlib.import_module("src.large_language_model.tools.agendar_manutencao_tool")
     except ImportError as e:
@@ -51,6 +51,10 @@ def import_generated_tools() -> None:
         importlib.import_module("src.large_language_model.tools.listar_sensores_tool")
     except ImportError as e:
         logger.error(f"Failed to import src.large_language_model.tools.listar_sensores_tool: {e}")
+    try:
+        importlib.import_module("src.large_language_model.tools.obter_leitura_mais_recente_sensor_tool")
+    except ImportError as e:
+        logger.error(f"Failed to import src.large_language_model.tools.obter_leitura_mais_recente_sensor_tool: {e}")
     try:
         importlib.import_module("src.large_language_model.tools.prever_necessidade_manutencao_tool")
     except ImportError as e:
