@@ -131,6 +131,7 @@ zipp==3.23.0
 psycopg2-binary==2.9.10
 boto3==1.40.41
 google-genai==1.46.0
+tensorflow==2.20.0
 
 # Pacotes de teste
 pytest-cov==6.0.0
