@@ -29,6 +29,12 @@ from src.large_language_model.tools.gerar_grafico_leituras_tool import (
 from src.large_language_model.tools.prever_necessidade_manutencao_tool import (
     PreverNecessidadeManutencaoTool, prever_necessidade_manutencao
 )
+from src.large_language_model.tools.prever_por_valores_tool import (
+    PreverManutencaoPorValoresTool, prever_manutencao_por_valores
+)
+from src.large_language_model.tools.obter_leitura_mais_recente_sensor_tool import (
+    ObterLeituraMaisRecenteSensorTool, obter_leitura_mais_recente_sensor
+)
 
 
 class TestListarEquipamentosTool:
@@ -452,19 +458,211 @@ class TestPreverNecessidadeManutencaoTool:
         result = prever_necessidade_manutencao(equipamento_id=1)
         assert "não possui sensores" in result
     
-    @patch('src.large_language_model.tools.prever_necessidade_manutencao_tool.os.path.exists')
+    @patch('src.large_language_model.tools.prever_necessidade_manutencao_tool.carregar_modelo_legado')
     @patch('src.large_language_model.tools.prever_necessidade_manutencao_tool.Equipamento')
-    def test_prever_manutencao_no_model(self, mock_equipamento, mock_exists):
+    def test_prever_manutencao_no_model(self, mock_equipamento, mock_carregar_modelo):
         """Test prediction when ML model doesn't exist."""
         mock_equip = Mock()
         mock_equip.nome = "Equipamento Teste"
         mock_equip.sensores = [Mock()]
         mock_equipamento.get_from_id.return_value = mock_equip
         
-        mock_exists.return_value = False
+        mock_carregar_modelo.side_effect = FileNotFoundError("Model not found")
         
         result = prever_necessidade_manutencao(equipamento_id=1)
         assert "Modelo de predição não encontrado" in result
+
+
+class TestPreverManutencaoPorValoresTool:
+    """Tests for maintenance prediction by values tool."""
+    
+    def test_tool_instantiation(self):
+        """Test that the tool can be instantiated."""
+        tool = PreverManutencaoPorValoresTool()
+        assert tool is not None
+        assert tool.function_name == "prever_manutencao_por_valores"
+    
+    def test_tool_has_docstring(self):
+        """Test that the function has a docstring."""
+        tool = PreverManutencaoPorValoresTool()
+        assert tool.function_declaration.__doc__ is not None
+        assert len(tool.function_declaration.__doc__.strip()) > 0
+    
+    @patch('src.large_language_model.tools.prever_por_valores_tool.carregar_modelo_legado')
+    def test_prever_por_valores_no_model(self, mock_carregar_modelo):
+        """Test prediction when ML model doesn't exist."""
+        mock_carregar_modelo.side_effect = FileNotFoundError("Model not found")
+        
+        result = prever_manutencao_por_valores(lux=15.0, temperatura=25.0, vibracao=0.5)
+        assert "Modelo de predição não encontrado" in result
+    
+    @patch('src.large_language_model.tools.prever_por_valores_tool.realizar_previsao')
+    @patch('src.large_language_model.tools.prever_por_valores_tool.carregar_modelo_legado')
+    def test_prever_por_valores_success(self, mock_carregar_modelo, mock_realizar_previsao):
+        """Test successful prediction with values."""
+        mock_model = Mock()
+        mock_carregar_modelo.return_value = mock_model
+        
+        mock_realizar_previsao.return_value = {
+            'predicao': 1,
+            'probabilidade_manutencao': 0.75,
+            'probabilidade_sem_manutencao': 0.25,
+            'tem_proba': True,
+            'dados_entrada': {
+                'lux': 15.0,
+                'temperatura': 25.0,
+                'vibracao': 0.5
+            }
+        }
+        
+        result = prever_manutencao_por_valores(lux=15.0, temperatura=25.0, vibracao=0.5)
+        
+        assert "MANUTENÇÃO RECOMENDADA" in result
+        assert "75.0%" in result or "75%" in result
+        assert "Luminosidade: 15.00" in result
+        assert "Temperatura: 25.00" in result
+        assert "Vibração: 0.50" in result
+    
+    @patch('src.large_language_model.tools.prever_por_valores_tool.realizar_previsao')
+    @patch('src.large_language_model.tools.prever_por_valores_tool.carregar_modelo_legado')
+    def test_prever_por_valores_no_maintenance(self, mock_carregar_modelo, mock_realizar_previsao):
+        """Test prediction indicating no maintenance needed."""
+        mock_model = Mock()
+        mock_carregar_modelo.return_value = mock_model
+        
+        mock_realizar_previsao.return_value = {
+            'predicao': 0,
+            'probabilidade_manutencao': 0.15,
+            'probabilidade_sem_manutencao': 0.85,
+            'tem_proba': True,
+            'dados_entrada': {
+                'lux': 10.0,
+                'temperatura': 20.0,
+                'vibracao': 0.3
+            }
+        }
+        
+        result = prever_manutencao_por_valores(lux=10.0, temperatura=20.0, vibracao=0.3)
+        
+        assert "CONDIÇÕES NORMAIS" in result
+        assert "15.0%" in result or "15%" in result
+    
+    def test_call_chat_display(self):
+        """Test chat display message."""
+        tool = PreverManutencaoPorValoresTool()
+        message = tool.call_chat_display()
+        assert "🤖" in message or "Analisando" in message
+    
+    def test_call_result_display(self):
+        """Test result display message."""
+        tool = PreverManutencaoPorValoresTool()
+        result = "Test result"
+        display = tool.call_result_display(result)
+        assert result in display
+
+
+class TestObterLeituraMaisRecenteSensorTool:
+    """Tests for getting most recent sensor reading tool."""
+    
+    def test_tool_instantiation(self):
+        """Test that the tool can be instantiated."""
+        tool = ObterLeituraMaisRecenteSensorTool()
+        assert tool is not None
+        assert tool.function_name == "obter_leitura_mais_recente_sensor"
+    
+    def test_tool_has_docstring(self):
+        """Test that the function has a docstring."""
+        tool = ObterLeituraMaisRecenteSensorTool()
+        assert tool.function_declaration.__doc__ is not None
+        assert len(tool.function_declaration.__doc__.strip()) > 0
+    
+    def test_obter_leitura_sensor_not_found(self):
+        """Test getting reading when sensor doesn't exist."""
+        result = obter_leitura_mais_recente_sensor(sensor_id=99999)
+        assert "não encontrado" in result.lower() or "erro" in result.lower()
+    
+    @patch('src.large_language_model.tools.obter_leitura_mais_recente_sensor_tool.Database.get_session')
+    def test_obter_leitura_no_readings(self, mock_get_session):
+        """Test getting reading when no readings exist."""
+        # Mock sensor exists
+        mock_sensor = Mock()
+        mock_sensor.id = 1
+        mock_sensor.nome = "Test Sensor"
+        mock_sensor.tipo_sensor = Mock()
+        mock_sensor.tipo_sensor.tipo = "Temperatura (°C)"
+        mock_sensor.equipamento = None
+        
+        # Mock session to return sensor but no readings
+        mock_session = MagicMock()
+        mock_session.__enter__ = Mock(return_value=mock_session)
+        mock_session.__exit__ = Mock(return_value=False)
+        
+        def session_query_side_effect(model):
+            query_mock = Mock()
+            if model.__name__ == 'Sensor':
+                query_mock.options.return_value.filter.return_value.one_or_none.return_value = mock_sensor
+            else:  # LeituraSensor
+                query_mock.filter.return_value.order_by.return_value.first.return_value = None
+            return query_mock
+        
+        mock_session.query.side_effect = session_query_side_effect
+        mock_get_session.return_value = mock_session
+        
+        result = obter_leitura_mais_recente_sensor(sensor_id=1)
+        assert "nenhuma leitura" in result.lower() or "não encontrada" in result.lower()
+    
+    @patch('src.large_language_model.tools.obter_leitura_mais_recente_sensor_tool.Database.get_session')
+    def test_obter_leitura_with_reading(self, mock_get_session):
+        """Test getting reading when reading exists."""
+        # Mock sensor
+        mock_sensor = Mock()
+        mock_sensor.id = 1
+        mock_sensor.nome = "Sensor Temperatura"
+        mock_sensor.tipo_sensor = Mock()
+        mock_sensor.tipo_sensor.tipo = "Temperatura (°C)"
+        mock_sensor.equipamento = Mock()
+        mock_sensor.equipamento.nome = "Equipamento 1"
+        mock_sensor.equipamento.id = 1
+        
+        # Mock reading
+        mock_leitura = Mock()
+        mock_leitura.valor = 25.5
+        mock_leitura.data_leitura = datetime.now() - timedelta(minutes=5)
+        
+        # Mock session
+        mock_session = MagicMock()
+        mock_session.__enter__ = Mock(return_value=mock_session)
+        mock_session.__exit__ = Mock(return_value=False)
+        
+        def session_query_side_effect(model):
+            query_mock = Mock()
+            if model.__name__ == 'Sensor':
+                query_mock.options.return_value.filter.return_value.one_or_none.return_value = mock_sensor
+            else:  # LeituraSensor
+                query_mock.filter.return_value.order_by.return_value.first.return_value = mock_leitura
+            return query_mock
+        
+        mock_session.query.side_effect = session_query_side_effect
+        mock_get_session.return_value = mock_session
+        
+        result = obter_leitura_mais_recente_sensor(sensor_id=1)
+        
+        assert "Leitura Mais Recente" in result
+        assert "25.5" in result or "25.50" in result
+        assert "Sensor Temperatura" in result
+    
+    def test_call_chat_display(self):
+        """Test chat display message."""
+        tool = ObterLeituraMaisRecenteSensorTool()
+        message = tool.call_chat_display()
+        assert "📡" in message or "Consultando" in message
+    
+    def test_call_result_display(self):
+        """Test result display message."""
+        tool = ObterLeituraMaisRecenteSensorTool()
+        result = "Test result"
+        display = tool.call_result_display(result)
+        assert result in display
 
 
 class TestToolsDiscovery:
@@ -485,7 +683,9 @@ class TestToolsDiscovery:
             'EnviarNotificacaoTool',
             'AnalisarDadosSensorTool',
             'GerarGraficoLeiturasTool',
-            'PreverNecessidadeManutencaoTool'
+            'PreverNecessidadeManutencaoTool',
+            'PreverManutencaoPorValoresTool',
+            'ObterLeituraMaisRecenteSensorTool'
         ]
         
         for expected_tool in expected_tools:
@@ -505,7 +705,9 @@ class TestToolsDiscovery:
             'EnviarNotificacaoTool',
             'AnalisarDadosSensorTool',
             'GerarGraficoLeiturasTool',
-            'PreverNecessidadeManutencaoTool'
+            'PreverNecessidadeManutencaoTool',
+            'PreverManutencaoPorValoresTool',
+            'ObterLeituraMaisRecenteSensorTool'
         ]
         
         for tool_name in new_tool_names:

@@ -93,29 +93,29 @@ def get_conversa():
                 resposta_text = ""
 
                 for content in grupo:
+                    if content.parts:
+                        for part in content.parts:
 
-                    for part in content.parts:
+                            if part.file_data:
+                                st.write(
+                                    f"📎 Arquivo recebido: {part.file_data.name} ({part.file_data.mime_type})"
+                                )
+                            if part.function_call:
+                                tool = chat_client.get_tool(part.function_call.name)
 
-                        if part.file_data:
-                            st.write(
-                                f"📎 Arquivo recebido: {part.file_data.name} ({part.file_data.mime_type})"
-                            )
-                        if part.function_call:
-                            tool = chat_client.get_tool(part.function_call.name)
+                                st.write(
+                                    tool.call_chat_display(),
+                                )
 
-                            st.write(
-                                tool.call_chat_display(),
-                            )
+                            if part.function_response:
+                                tool = chat_client.get_tool(part.function_response.name)
+                                st.write(
+                                    tool.call_result_display(part.function_response.response),
+                                )
 
-                        if part.function_response:
-                            tool = chat_client.get_tool(part.function_response.name)
-                            st.write(
-                                tool.call_result_display(part.function_response.response),
-                            )
-
-                        if part.text:
-                            resposta_text += part.text
-                            placeholder.write(resposta_text)
+                            if part.text:
+                                resposta_text += part.text
+                                placeholder.write(resposta_text)
 
     prompt = st.chat_input(
         "Digite sua mensagem aqui...",

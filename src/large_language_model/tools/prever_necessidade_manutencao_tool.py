@@ -6,10 +6,8 @@ from src.large_language_model.tipos_base.base_tools import BaseTool
 from src.database.models.sensor import LeituraSensor, Sensor, TipoSensorEnum
 from src.database.models.equipamento import Equipamento
 from datetime import datetime, timedelta, date
-import joblib
-import os
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+from src.ml.prediction import carregar_modelo_legado, realizar_previsao
 
 
 def prever_necessidade_manutencao(
@@ -37,29 +35,12 @@ def prever_necessidade_manutencao(
         if not equipamento.sensores or len(equipamento.sensores) == 0:
             return f"Equipamento '{equipamento.nome}' não possui sensores cadastrados."
         
-        # Buscar modelo treinado (usando o melhor modelo segundo a documentação: DecTree_d5)
-        modelo_path = os.path.join(
-            os.path.dirname(__file__), 
-            "..", "..", "..", "assets", "modelos_otimizados_salvos", "DecTree_d5.pkl"
-        )
-        
-        if not os.path.exists(modelo_path):
-            # Try alternative path
-            modelo_path = os.path.join(
-                os.path.dirname(__file__), 
-                "..", "..", "..", "assets", "modelos_salvos", "DecTree_d5.pkl"
-            )
-        
-        if not os.path.exists(modelo_path):
-            return ("⚠️ Modelo de predição não encontrado.\n"
-                   "Execute o treinamento de modelos antes de usar a predição.\n"
-                   "Caminho esperado: assets/modelos_otimizados_salvos/DecTree_d5.pkl")
-        
         # Carregar modelo
         try:
-            modelo = joblib.load(modelo_path)
+            modelo = carregar_modelo_legado()
         except Exception as e:
-            return f"Erro ao carregar modelo de ML: {str(e)}"
+            return (f"⚠️ Modelo de predição não encontrado: {str(e)}\n"
+                   "Execute o treinamento de modelos antes de usar a predição.")
         
         # Coletar leituras recentes de todos os sensores do equipamento
         data_final = date.today()
@@ -101,87 +82,56 @@ def prever_necessidade_manutencao(
         
         # Calcular features (média de cada tipo de sensor)
         # O modelo espera 3 features: Temperatura, Vibração, Luminosidade
-        features = []
-        tipos_presentes = []
+        lux_media = np.mean(leituras_por_tipo[TipoSensorEnum.LUX]) if leituras_por_tipo[TipoSensorEnum.LUX] else 0.0
+        temp_media = np.mean(leituras_por_tipo[TipoSensorEnum.TEMPERATURA]) if leituras_por_tipo[TipoSensorEnum.TEMPERATURA] else 0.0
+        vibracao_media = np.mean(leituras_por_tipo[TipoSensorEnum.VIBRACAO]) if leituras_por_tipo[TipoSensorEnum.VIBRACAO] else 0.0
         
-        for tipo in [TipoSensorEnum.TEMPERATURA, TipoSensorEnum.VIBRACAO, TipoSensorEnum.LUX]:
-            if leituras_por_tipo[tipo]:
-                media = np.mean(leituras_por_tipo[tipo])
-                features.append(media)
-                tipos_presentes.append(str(tipo))
-            else:
-                # Se não há leituras deste tipo, usar valor neutro (0 após normalização)
-                features.append(0.0)
-        
-        if len(tipos_presentes) == 0:
-            return "Erro: Não foi possível extrair features dos sensores para predição."
-        
-        # Normalizar features (o modelo foi treinado com dados normalizados)
-        # Usar MinMaxScaler com ranges conhecidos dos sensores
-        scaler = MinMaxScaler()
-        # Definir ranges aproximados baseados nos tipos de sensores
-        # Temperatura: -40 a 85°C, Vibração: 0 a 3, Luminosidade: 0.1 a 100000
-        scaler.fit([[-40, 0, 0.1], [85, 3, 100000]])
-        features_scaled = scaler.transform([features])[0]
-        
-        # Fazer predição
+        # Fazer predição usando a função compartilhada
         try:
-            predicao = modelo.predict([features_scaled])[0]
-            
-            # Tentar obter probabilidade se o modelo suportar
-            if hasattr(modelo, 'predict_proba'):
-                probabilidades = modelo.predict_proba([features_scaled])[0]
-                prob_manutencao = probabilidades[1] * 100  # Probabilidade da classe 1 (necessita manutenção)
-            else:
-                # Se não tiver predict_proba, usar a predição binária
-                prob_manutencao = 100.0 if predicao == 1 else 0.0
+            resultado = realizar_previsao(modelo, lux_media, temp_media, vibracao_media)
+            predicao = resultado['predicao']
+            prob_manutencao = resultado['probabilidade_manutencao'] * 100
         except Exception as e:
             return f"Erro ao executar predição: {str(e)}"
         
         # Construir resultado
-        resultado = f"🤖 Predição de Manutenção - Machine Learning\n\n"
-        resultado += f"📦 Equipamento: {equipamento.nome} (ID: {equipamento.id})\n"
-        resultado += f"📅 Período Analisado: {dias_analise} dias\n"
-        resultado += f"📡 Sensores Analisados: {len(sensores_info)}\n\n"
+        output = f"🤖 Predição de Manutenção - Machine Learning\n\n"
+        output += f"📦 Equipamento: {equipamento.nome} (ID: {equipamento.id})\n"
+        output += f"📅 Período Analisado: {dias_analise} dias\n"
+        output += f"📡 Sensores Analisados: {len(sensores_info)}\n\n"
         
         # Detalhes dos sensores
-        resultado += "📊 DADOS COLETADOS:\n"
+        output += "📊 DADOS COLETADOS:\n"
         for info in sensores_info:
-            resultado += f"   • {info['nome']} ({info['tipo']}): {info['num_leituras']} leitura(s)\n"
-        resultado += "\n"
+            output += f"   • {info['nome']} ({info['tipo']}): {info['num_leituras']} leitura(s)\n"
+        output += "\n"
         
         # Valores médios das features
-        resultado += "📈 VALORES MÉDIOS DETECTADOS:\n"
-        labels = ["Temperatura", "Vibração", "Luminosidade (x10³)"]
-        for i, (label, valor) in enumerate(zip(labels, features)):
-            if valor != 0.0 or tipos_presentes:
-                resultado += f"   • {label}: {valor:.2f}\n"
-        resultado += "\n"
+        output += "📈 VALORES MÉDIOS DETECTADOS:\n"
+        output += f"   • Luminosidade: {lux_media:.2f} lux\n"
+        output += f"   • Temperatura: {temp_media:.2f} °C\n"
+        output += f"   • Vibração: {vibracao_media:.2f}\n\n"
         
         # Resultado da predição
-        resultado += "🎯 RESULTADO DA PREDIÇÃO:\n"
-        resultado += f"   • Probabilidade de Necessidade de Manutenção: {prob_manutencao:.1f}%\n"
+        output += "🎯 RESULTADO DA PREDIÇÃO:\n"
+        output += f"   • Probabilidade de Necessidade de Manutenção: {prob_manutencao:.1f}%\n"
         
         if predicao == 1 or prob_manutencao >= 50:
-            resultado += "   • Status: ⚠️ MANUTENÇÃO RECOMENDADA\n\n"
-            resultado += "🔧 RECOMENDAÇÕES:\n"
-            resultado += "   • Agendar manutenção preventiva o mais breve possível\n"
-            resultado += "   • Verificar os sensores com leituras anormais\n"
-            resultado += "   • Monitorar o equipamento com maior frequência\n"
-            resultado += "   • Considerar inspeção técnica detalhada\n"
+            output += "   • Status: ⚠️ MANUTENÇÃO RECOMENDADA\n\n"
+            output += "🔧 RECOMENDAÇÕES:\n"
+            output += "   • Agendar manutenção preventiva o mais breve possível\n"
+            output += "   • Verificar os sensores com leituras anormais\n"
+            output += "   • Monitorar o equipamento com maior frequência\n"
+            output += "   • Considerar inspeção técnica detalhada\n"
         else:
-            resultado += "   • Status: ✅ EQUIPAMENTO NORMAL\n\n"
-            resultado += "💡 RECOMENDAÇÕES:\n"
-            resultado += "   • Continuar monitoramento regular\n"
-            resultado += "   • Manter cronograma de manutenção preventiva padrão\n"
+            output += "   • Status: ✅ EQUIPAMENTO NORMAL\n\n"
+            output += "💡 RECOMENDAÇÕES:\n"
+            output += "   • Continuar monitoramento regular\n"
+            output += "   • Manter cronograma de manutenção preventiva padrão\n"
             if prob_manutencao > 20:
-                resultado += "   • Atenção: probabilidade moderada - monitorar de perto\n"
+                output += "   • Atenção: probabilidade moderada - monitorar de perto\n"
         
-        resultado += f"\n📝 MODELO UTILIZADO: Decision Tree (max_depth=5)\n"
-        resultado += f"   • Acurácia do modelo: 95.24%\n"
-        resultado += f"   • F1-Score: 0.9524\n"
-        
-        return resultado
+        return output
         
     except Exception as e:
         import traceback

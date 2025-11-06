@@ -8,6 +8,7 @@ from datetime import datetime
 from src.notificacoes.email import enviar_email
 from src.utils.env_utils import parse_bool_env
 from src.utils.model_store import list_models, load_model, get_models_summary
+from src.ml.prediction import realizar_previsao as realizar_previsao_ml
 
 
 # --- 1. CARREGAR O SEU MODELO ---
@@ -39,6 +40,9 @@ def preparar_dados_para_previsao(lux: float, temp: float, vibracao: float) -> pd
     """
     Prepara os dados de entrada no formato correto esperado pelos modelos PyCaret.
     
+    DEPRECATED: Esta função é mantida para compatibilidade. 
+    Use src.ml.prediction.preparar_dados_para_previsao() para novos códigos.
+    
     Os modelos treinados pelo PyCaret esperam um DataFrame com os nomes de colunas
     exatamente como foram usados no treinamento: 'Lux (x10³)', 'Temperatura (°C)', 'Vibração'.
     
@@ -50,14 +54,9 @@ def preparar_dados_para_previsao(lux: float, temp: float, vibracao: float) -> pd
     Returns:
         DataFrame com uma linha e colunas nomeadas corretamente
     """
-    # Cria DataFrame com os nomes de colunas corretos usados no treinamento
-    dados_df = pd.DataFrame({
-        'Lux (x10³)': [lux],
-        'Temperatura (°C)': [temp],
-        'Vibração': [vibracao]
-    })
-    
-    return dados_df
+    # Importa a função compartilhada
+    from src.ml.prediction import preparar_dados_para_previsao as preparar_shared
+    return preparar_shared(lux, temp, vibracao)
 
 
 @st.fragment
@@ -166,38 +165,28 @@ def carregar_modelo_e_realizar_previsao(lux:float, temp:float, vibracao:float):
         # Botão para executar a previsão, agora na página principal
         if st.button("🔮 Fazer Previsão", type="primary"):
             try:
-                # Prepara os dados no formato correto (DataFrame com nomes de colunas)
-                dados_para_prever = preparar_dados_para_previsao(lux, temp, vibracao)
+                # Usa a função compartilhada de predição
+                resultado = realizar_previsao_ml(modelo, lux, temp, vibracao)
                 
-                # Exibe os dados que serão enviados para o modelo
+                # Exibe os dados que foram enviados para o modelo
                 with st.expander("🔍 Dados de Entrada (Debug)"):
-                    st.write("Formato dos dados enviados ao modelo:")
-                    st.dataframe(dados_para_prever)
-                    st.write(f"Colunas: {list(dados_para_prever.columns)}")
-                    st.write(f"Shape: {dados_para_prever.shape}")
-
-                # Faz a previsão usando o modelo carregado
-                resultado_numerico = modelo.predict(dados_para_prever)[0]
+                    st.write("Dados enviados:")
+                    st.json(resultado['dados_entrada'])
 
                 # Mostra probabilidades se o modelo suportar
-                if hasattr(modelo, 'predict_proba'):
-                    probabilidades = modelo.predict_proba(dados_para_prever)[0]
-                    
+                if resultado['tem_proba']:
                     col1, col2 = st.columns(2)
                     with col1:
-                        st.metric("Probabilidade - Sem Manutenção", f"{probabilidades[0]:.2%}")
+                        st.metric("Probabilidade - Sem Manutenção", 
+                                f"{resultado['probabilidade_sem_manutencao']:.2%}")
                     with col2:
-                        st.metric("Probabilidade - Com Manutenção", f"{probabilidades[1]:.2%}")
+                        st.metric("Probabilidade - Com Manutenção", 
+                                f"{resultado['probabilidade_manutencao']:.2%}")
 
                 # retorna se é necessário fazer manutenção ou não
-                if int(resultado_numerico) == 1:
+                if resultado['predicao'] == 1:
                     st.error("⚠️ **Manutenção Necessária**")
-                    enviar_alerta_manutencao(
-                        lux,
-                        temp,
-                        vibracao
-                    )
-
+                    enviar_alerta_manutencao(lux, temp, vibracao)
                 else:
                     st.success("✅ **Sem Necessidade de Manutenção**")
                     
