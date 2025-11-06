@@ -82,3 +82,9 @@ variable "aws_session_token" {
   type        = string
   sensitive   = true
 }
+
+variable "gemini_api_key" {
+  description = "Chave da API do Gemini para integração com modelos de linguagem avançados"
+  type        = string
+  sensitive   = true
+}

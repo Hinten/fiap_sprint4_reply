@@ -1,8 +1,8 @@
-# Model Imports Generator - ELI5 (Explain Like I'm 5) 🧸
+# Code Generators - ELI5 (Explain Like I'm 5) 🧸
 
 ## What Does This Do? 🤔
 
-Imagine you have a toy box (your app) with lots of different toys (models). Every time you want to play, you need to find all the toys. 
+Imagine you have toy boxes (your app) with lots of different toys (models and tools). Every time you want to play, you need to find all the toys. 
 
 **The Old Way (Slow):** 
 Every time the app starts, it looks through the entire toy box to find all the toys. This takes time! ⏰
@@ -10,22 +10,41 @@ Every time the app starts, it looks through the entire toy box to find all the t
 **The New Way (Fast):**
 Before you even start playing, we make a list of where all the toys are! Now when you want to play, you just read the list instead of searching. Much faster! 🚀
 
+## What Generators Are Available? 🏭
+
+We have TWO generators:
+
+### 1. Model Imports Generator 📊
+**What it does:** Finds all database model classes (like Empresa, Sensor, etc.)
+**Where it looks:** `src/database/models/`
+**What it creates:** `src/database/generated_models_imports.py`
+
+### 2. Tool Imports Generator 🛠️
+**What it does:** Finds all LLM tool classes (like DateTimeTool, ListarEquipamentosTool, etc.)
+**Where it looks:** `src/large_language_model/tools/`
+**What it creates:** `src/large_language_model/generated_tools_imports.py`
+
 ## What is a "Generator"? 🏭
 
 A generator is like a helper robot 🤖 that:
-1. Looks at all your toy boxes (model files)
-2. Finds which ones have the toys you need (Model classes)
+1. Looks at all your toy boxes (model/tool files)
+2. Finds which ones have the toys you need (Model/BaseTool classes)
 3. Makes a list of them (generates a file)
 
 This list is saved, so next time you don't need to search again!
 
-## How to Run the Generator 🏃‍♂️
+## How to Run the Generators 🏃‍♂️
 
-### Option 1: Run it manually (for testing)
+### Option 1: Run them manually (for testing)
 
 ```bash
 # From the project root directory
+
+# Generate model imports
 python generators/generate_model_imports.py
+
+# Generate tool imports
+python generators/generate_tool_imports.py
 ```
 
 You'll see something like:
@@ -46,41 +65,46 @@ Output file: /your/project/path/src/database/generated_models_imports.py
 ✓ Generation complete!
 ```
 
-### Option 2: It runs automatically! ✨
+### Option 2: They run automatically! ✨
 
-When you build the Docker image, the generator runs **automatically**! 
+When you build the Docker image, the generators run **automatically**! 
 
 Look in the Dockerfile:
 ```dockerfile
 COPY generators/generate_model_imports.py /app/generators/generate_model_imports.py
+COPY generators/generate_tool_imports.py /app/generators/generate_tool_imports.py
 RUN python /app/generators/generate_model_imports.py
+RUN python /app/generators/generate_tool_imports.py
 ```
 
 This means:
-- Every time you build the app → generator runs
-- The list is always up-to-date
+- Every time you build the app → generators run
+- The lists are always up-to-date
 - Your app starts faster! 
 
 ## What Files Are Involved? 📁
 
-### Input Files (What the generator reads):
-- `src/database/models/*.py` - All your model files (the toy boxes)
+### For Models:
+**Input:** `src/database/models/*.py` - All your model files
+**Generator:** `generators/generate_model_imports.py` - The generator script
+**Output:** `src/database/generated_models_imports.py` - The generated list
 
-### Generator File (The robot that does the work):
-- `generators/generate_model_imports.py` - The generator script
-
-### Output File (The list that gets created):
-- `src/database/generated_models_imports.py` - The generated list of imports
+### For Tools:
+**Input:** `src/large_language_model/tools/*.py` - All your tool files
+**Generator:** `generators/generate_tool_imports.py` - The generator script
+**Output:** `src/large_language_model/generated_tools_imports.py` - The generated list
 
 ## How Does It Work? 🔍
 
-1. **Scan**: The generator looks at every `.py` file in `src/database/models/`
-2. **Detect**: It checks if the file has a class that inherits from `Model`
+1. **Scan**: The generator looks at every `.py` file in the target directory
+2. **Detect**: It checks if the file has a class that inherits from the base class (Model or BaseTool)
    - It does this using AST (Abstract Syntax Tree) - like reading the code without running it
-3. **Generate**: It creates a new file with import statements for all the models found
-4. **Save**: The file is saved as `generated_models_imports.py`
+3. **Generate**: It creates a new file with import statements for all classes found
+4. **Save**: The file is saved as `generated_*_imports.py`
 
 ## Example of What Gets Generated 📝
+
+### For Models
 
 If you have these model files:
 - `empresa.py` (has `class Empresa(Model)`)
@@ -112,24 +136,54 @@ def import_generated_models() -> None:
 
 Notice that `utils.py` is NOT included because it doesn't have a Model class!
 
+### For Tools
+
+If you have these tool files:
+- `datetime_tool.py` (has `class DateTimeTool(BaseTool)`)
+- `listar_equipamentos_tool.py` (has `class ListarEquipamentosTool(BaseTool)`)
+- `helpers.py` (just helper functions, no BaseTool)
+
+The generator creates:
+```python
+# AUTOGENERATED FILE - DO NOT EDIT
+# Generated by generators/generate_tool_imports.py
+
+import importlib
+import logging
+
+logger = logging.getLogger(__name__)
+
+def import_generated_tools() -> None:
+    """Import all modules that contain BaseTool subclasses."""
+    # Importing 2 tool module(s)
+    try:
+        importlib.import_module("src.large_language_model.tools.datetime_tool")
+    except ImportError as e:
+        logger.error(f"Failed to import src.large_language_model.tools.datetime_tool: {e}")
+    try:
+        importlib.import_module("src.large_language_model.tools.listar_equipamentos_tool")
+    except ImportError as e:
+        logger.error(f"Failed to import src.large_language_model.tools.listar_equipamentos_tool: {e}")
+```
+
 ## When Should I Run It? ⏰
 
-**You usually don't need to!** It runs automatically during Docker build.
+**You usually don't need to!** Generators run automatically during Docker build.
 
-But you might want to run it manually if:
-- ✅ You added a new model and want to test it works
+But you might want to run them manually if:
+- ✅ You added a new model/tool and want to test it works
 - ✅ You're debugging import issues
-- ✅ You want to see what models will be imported
+- ✅ You want to see what models/tools will be imported
 
 ## Troubleshooting 🔧
 
-### "No models found!"
-- Check that your model files are in `src/database/models/`
-- Make sure your classes inherit from `Model`
-- Check for syntax errors in your model files
+### "No models/tools found!"
+- Check that your files are in the correct directory
+- Make sure your classes inherit from the correct base class (Model or BaseTool)
+- Check for syntax errors in your files
 
 ### "Import failed!"
-- Check that the generated file exists: `src/database/generated_models_imports.py`
+- Check that the generated file exists
 - Try running the generator manually to see errors
 - Check the logs for specific import errors
 
@@ -140,17 +194,35 @@ But you might want to run it manually if:
 
 ## What's the Magic? ✨
 
-The "magic" is that instead of finding models every single time your app starts (slow), we find them once when building the Docker image (fast)!
+The "magic" is that instead of finding models/tools every single time your app starts (slow), we find them once when building the Docker image (fast)!
 
 Think of it like:
 - **Old way**: Look through the whole library every time you want a book 📚😰
 - **New way**: Use the library catalog that lists all books 📖😊
 
+## Fallback Mechanism 🛡️
+
+Both `import_models()` and `import_tools()` functions have a fallback mechanism:
+
+1. **First attempt**: Try to use the generated static imports (fast)
+2. **If it fails**: Fall back to dynamic imports at runtime (slower but still works)
+
+This means your app will work even if:
+- The generators didn't run
+- The generated files are missing
+- You're running in development mode
+
 ## Where to Learn More? 📚
 
-- Read the code: `generators/generate_model_imports.py` (it has comments!)
-- Check the tests: `tests/test_code_generator.py` (shows how it works)
-- Look at what it creates: `src/database/generated_models_imports.py`
+- Read the code: 
+  - `generators/generate_model_imports.py` (for models)
+  - `generators/generate_tool_imports.py` (for tools)
+- Check the usage:
+  - `src/database/dynamic_import.py` (models import logic)
+  - `src/large_language_model/dynamic_tools.py` (tools import logic)
+- Look at what gets created: 
+  - `src/database/generated_models_imports.py`
+  - `src/large_language_model/generated_tools_imports.py`
 
 ---
 

@@ -108,19 +108,33 @@ class Database:
                 print("Conexão bem-sucedida ao banco de dados PostgreSQL!")
 
     @staticmethod
-    def init_oracledb_from_file(path:str = r"E:\PythonProject\fiap_fase3_cap1\login.json"):
-
+    def init_from_dashboard(engine: Engine, session_maker: sessionmaker):
         """
-        Inicializa a conexão com o banco de dados Oracle a partir de um arquivo JSON.
-        :param path: Caminho do arquivo JSON com as credenciais do banco de dados.
+        Inicializa a conexão com o banco de dados a partir do engine e sessionmaker fornecidos.
+        :param engine: Engine do SQLAlchemy.
+        :param session_maker: Sessionmaker do SQLAlchemy.
         :return:
         """
-        with open(path, "r") as file:
-            data = json.load(file)
-            user = data["user"]
-            password = data["password"]
+        with Database._lock:
+            # Fecha engine antigo se existir
+            if Database._engine is not None:
+                Database._engine.dispose()
 
-        Database.init_oracledb(user, password)
+            Database._engine = engine
+            Database._session = session_maker
+
+    @staticmethod
+    def init_with_old_instance(session: sessionmaker, engine: Engine):
+        """
+        Inicializa a classe Database com uma instância existente de sessionmaker e engine.
+        :param session: Instância existente de sessionmaker.
+        :param engine: Instância existente de Engine.
+        :return:
+        """
+        with Database._lock:
+            Database._session = session
+            Database._engine = engine
+
 
     @staticmethod
     def init_with_old_instance(session: sessionmaker, engine: Engine):

@@ -193,6 +193,7 @@ SNS_REGION=${var.aws_region}
 AWS_ACCESS_KEY_ID=${var.aws_access_key_id}
 AWS_SECRET_ACCESS_KEY=${var.aws_secret_access_key}
 AWS_SESSION_TOKEN=${var.aws_session_token}
+GEMINI_API=${var.gemini_api_key}
 EOF
 }
 
