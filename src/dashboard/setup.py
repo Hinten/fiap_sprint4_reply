@@ -12,7 +12,6 @@ def setup():
         st.session_state['init_tables'] = True
         logging.info("Tabelas criadas com sucesso.")
         st.toast("Tabelas criadas com sucesso.")
+
     elif st.session_state.get('logged_in', False):
-        Database.init_from_dashboard(st.session_state.engine, st.session_state.session)
-    else:
-        raise RuntimeError("Banco de dados não inicializado. Faça o login primeiro.")
+        Database.init_with_old_instance(st.session_state.session, st.session_state.engine)

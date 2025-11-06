@@ -15,6 +15,11 @@ def init_sensor(request:InitSensorRequest):
     Cadastra o Sensor na base de dados
     """
 
+    response:dict[str, str] = {
+        "status": "success",
+        "message": "ESP32 iniciado com sucesso"
+    }
+
     with Database.get_session() as session:
 
         for tipo in TipoSensorEnum:
@@ -35,26 +40,33 @@ def init_sensor(request:InitSensorRequest):
                 Sensor.tipo_sensor_id == tipo_sensor.id
             ).first()
 
-            if old_sensor:
-                # Se já existir um sensor com o mesmo serial e tipo, retorna uma mensagem
-                continue
+            if not old_sensor:
 
-            # Cria o novo sensor com o tipo encontrado ou criado
-            new_sensor = Sensor(
-                nome=f"Sensor {tipo.value} - {request.serial}",
-                cod_serial=request.serial,
-                tipo_sensor_id=tipo_sensor.id,
-                descricao="Sensor cadastrado via API",
-            )
+                new_sensor = Sensor(
+                    nome=f"Sensor {tipo.value} - {request.serial}",
+                    cod_serial=request.serial,
+                    tipo_sensor_id=tipo_sensor.id,
+                    descricao="Sensor cadastrado via API",
+                )
 
-            session.add(new_sensor)
+                session.add(new_sensor)
+
+            if tipo == TipoSensorEnum.VIBRACAO:
+                response['vibration_threshold_min'] = None if not old_sensor else old_sensor.limiar_manutencao_menor
+                response['vibration_threshold_max'] = None if not old_sensor else old_sensor.limiar_manutencao_maior
+
+            elif tipo == TipoSensorEnum.TEMPERATURA:
+                response['temperature_threshold_min'] = None if not old_sensor else old_sensor.limiar_manutencao_menor
+                response['temperature_threshold_max'] = None if not old_sensor else old_sensor.limiar_manutencao_maior
+
+            elif tipo == TipoSensorEnum.LUX:
+                response['lux_threshold_min'] = None if not old_sensor else old_sensor.limiar_manutencao_menor
+                response['lux_threshold_max'] = None if not old_sensor else old_sensor.limiar_manutencao_maior
+
 
         session.commit()
 
-    return {
-        "status": "success",
-        "message": "Sensor cadastrado com sucesso."
-    }
+    return response
 
 
 @init_router.get('/test')
