@@ -66,7 +66,7 @@ const float LDR_RESISTOR = 10000.0;
 const int VIBRATION_SAMPLES = 100;      // Número de amostras para cálculo
 
 // ===== CONFIGURAÇÃO DE TIMING =====
-const unsigned long PRIMARY_TASK_INTERVAL = 5000;   // 5 segundos
+const unsigned long PRIMARY_TASK_INTERVAL = 10000;   // 5 segundos
 const unsigned long SECONDARY_TASK_DELAY = 100;     // 100ms
 
 #endif // CONFIG_H
