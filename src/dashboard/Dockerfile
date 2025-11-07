@@ -6,6 +6,7 @@ WORKDIR /app
 COPY .env /app/.env
 COPY src/ /app/src/
 COPY styles/ /app/styles/
+COPY logo/ /app/logo/
 COPY main_dash.py /app/main_dash.py
 COPY .streamlit /app/.streamlit
 

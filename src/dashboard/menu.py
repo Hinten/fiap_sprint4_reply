@@ -18,6 +18,7 @@ def crud_menu():
 
     # Importa os modelos do banco de dados
 
+
     models = import_models()
 
     #agrupa os modelos por __menu_group__ e depois ordena por __menu_order__
@@ -53,6 +54,9 @@ def menu():
     temos que dizer exatamente quais são as páginas que vão no menu lateral.
     """
 
+    st.logo('logo/maqsenseai.png', size='large')
+
+    st.sidebar.image('logo/NEURA5.png')
     
     st.sidebar.page_link(principal_page)
     st.sidebar.page_link(chat_page)
