@@ -8,6 +8,7 @@ bool MPU6050Sensor::begin(TwoWire& wire) {
     //return true;
     
     // Test connection
+    // initialized = mpu.testConnection();
     initialized = true;
     
     if (initialized) {
