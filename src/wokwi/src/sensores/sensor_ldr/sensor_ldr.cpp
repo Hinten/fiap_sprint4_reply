@@ -14,14 +14,16 @@ float SensorLDR::readLux() {
     const int adc = analogRead(ldrPin);
     
     if (adc == 0) {
-        return NAN;
+        Serial.println(F("Warning"));
+        return 0;
     }
     
     // Convert ADC to voltage
     const float vout = adc / 4095.0 * vcc;
     
     if (vout >= vcc || vout <= 0.0) {
-        return NAN;
+        Serial.println(F("Warning"));
+        return 0;
     }
     
     // Calculate LDR resistance

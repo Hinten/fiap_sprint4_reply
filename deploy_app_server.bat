@@ -1,3 +1,4 @@
+
 @echo off
 REM Script para deploy do app server via SSH
 REM Pré-requisitos: terraform, aws cli, scp, ssh instalados

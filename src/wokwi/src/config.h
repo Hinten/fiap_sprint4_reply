@@ -57,6 +57,10 @@ const int RELAY_PIN = 32;
 const int LED_PIN = 15;
 const int BUZZER_PIN = 25;
 
+// Botões e controles
+const int BUTTON_CANCEL_ALERT_PIN = 16;  // Botão para cancelar alerta sonoro
+const int BUTTON_PIN = 16;   // novo botão
+
 // ===== CONFIGURAÇÃO DE SENSORES =====
 // LDR
 const float LDR_VCC = 3.3;

@@ -17,6 +17,14 @@ SensorLDR sensorLdr(LDR_PIN, LDR_VCC, LDR_RESISTOR);
 MPU6050Sensor sensorMpu;
 BuzzerLed buzzer(BUZZER_PIN, LED_PIN, RELAY_PIN);
 
+// ===== AJUSTE DA API =====
+//Acesse dashboard: http://18.206.149.108:8501
+//Acesse api: http://18.206.149.108:8180
+
+//Execute no PowerShell (como administrador):
+//icacls "C:\PYTHON\fiap_sprint4_reply\app_server_key.pem" /inheritance:r
+//icacls "C:\PYTHON\fiap_sprint4_reply\app_server_key.pem" /grant:r "$($env:USERNAME):R"
+
 // ===== VARIÁVEIS DE CONTROLE =====
 struct SensorData {
     float temperature;
@@ -170,7 +178,7 @@ void primaryTask() {
         painel.printLCDSerial(0, 1, "#ALERTA VIBRACAO#");
         buzzer.alertaBuzzerLed(3, 1200, 300);   
     } else {
-        snprintf(buffer, sizeof(buffer), "Vib: %.2f", sensorData.vibration);
+        snprintf(buffer, sizeof(buffer), "Vicdb: %.2f", sensorData.vibration);
         painel.printLCDSerial(0, 1, buffer);
     }
     
